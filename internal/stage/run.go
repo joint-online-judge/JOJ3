@@ -2,34 +2,23 @@ package stage
 
 import (
 	"github.com/criyle/go-judge/cmd/go-judge/model"
+	"github.com/pelletier/go-toml/v2"
 )
 
-type Stage struct {
-	name         string
-	executor     Executor
-	executorCmd  model.Cmd
-	parser       Parser
-	parserConfig string
-}
-
-type StageResult struct {
-	Name string
-	ParserResult
-}
-
-func ParseStages() []Stage {
-	stages := []Stage{}
-	config := [][]string{
-		{"dummy stage 0", "dummy", "dummy"},
-		{"dummy stage 1", "dummy", "dummy"},
+func ParseStages(tomlConfig string) []Stage {
+	var stagesConfig StagesConfig
+	err := toml.Unmarshal([]byte(tomlConfig), &stagesConfig)
+	if err != nil {
+		panic(err)
 	}
-	for _, v := range config {
+	stages := []Stage{}
+	for _, stage := range stagesConfig.Stages {
 		stages = append(stages, Stage{
-			name:         v[0],
-			executor:     executorMap[v[1]],
-			executorCmd:  model.Cmd{},
-			parser:       parserMap[v[2]],
-			parserConfig: "",
+			Name:         stage.Name,
+			Executor:     executorMap[stage.Executor.Name],
+			ExecutorCmd:  model.Cmd{},
+			Parser:       parserMap[stage.Parser.Name],
+			ParserConfig: stage.Parser.With,
 		})
 	}
 	return stages
@@ -38,10 +27,10 @@ func ParseStages() []Stage {
 func Run(stages []Stage) []StageResult {
 	var parserResults []StageResult
 	for _, stage := range stages {
-		executorResult := stage.executor.Run(stage.executorCmd)
-		parserResult := stage.parser.Run(executorResult, stage.parserConfig)
+		executorResult := stage.Executor.Run(stage.ExecutorCmd)
+		parserResult := stage.Parser.Run(executorResult, stage.ParserConfig)
 		parserResults = append(parserResults, StageResult{
-			Name:         stage.name,
+			Name:         stage.Name,
 			ParserResult: parserResult,
 		})
 	}

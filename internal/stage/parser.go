@@ -5,12 +5,7 @@ import "github.com/criyle/go-judge/cmd/go-judge/model"
 var parserMap = map[string]Parser{}
 
 type Parser interface {
-	Run(model.Result, string) ParserResult
-}
-
-type ParserResult struct {
-	Score   int
-	Comment string
+	Run(model.Result, any) ParserResult
 }
 
 func RegisterParser(name string, parser Parser) {
