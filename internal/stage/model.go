@@ -6,8 +6,10 @@ import (
 
 type Stage struct {
 	Name         string
+	ExecutorName string
 	Executor     Executor
 	ExecutorCmd  model.Cmd
+	ParserName   string
 	Parser       Parser
 	ParserConfig any
 }
@@ -19,7 +21,7 @@ type ParserResult struct {
 
 type StageResult struct {
 	Name string
-	ParserResult
+	*ParserResult
 }
 
 type StagesConfig struct {
@@ -27,7 +29,7 @@ type StagesConfig struct {
 		Name     string
 		Executor struct {
 			Name string
-			With interface{}
+			With model.Cmd
 		}
 		Parser struct {
 			Name string

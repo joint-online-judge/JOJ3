@@ -1,6 +1,9 @@
 package dummy
 
 import (
+	"fmt"
+	"log/slog"
+
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/cmd/go-judge/model"
 	"github.com/mitchellh/mapstructure"
@@ -13,14 +16,20 @@ type Config struct {
 
 type Dummy struct{}
 
-func (e *Dummy) Run(result model.Result, configAny any) stage.ParserResult {
+func (e *Dummy) Run(result *model.Result, configAny any) (
+	*stage.ParserResult, error,
+) {
 	var config Config
 	err := mapstructure.Decode(configAny, &config)
 	if err != nil {
-		panic(err)
+		slog.Error("failed to decode config", "err", err)
+		return nil, err
 	}
-	return stage.ParserResult{
-		Score:   config.Score,
-		Comment: config.Comment,
-	}
+	return &stage.ParserResult{
+		Score: config.Score,
+		Comment: fmt.Sprintf(
+			"%s, executor status: run time: %d ns, memory: %d bytes",
+			config.Comment, result.RunTime, result.Memory,
+		),
+	}, nil
 }

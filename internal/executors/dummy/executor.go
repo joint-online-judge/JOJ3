@@ -7,8 +7,8 @@ import (
 
 type Dummy struct{}
 
-func (e *Dummy) Run(model.Cmd) model.Result {
-	return model.Result{
+func (e *Dummy) Run(model.Cmd) (*model.Result, error) {
+	return &model.Result{
 		Status:     model.Status(envexec.StatusInvalid),
 		ExitStatus: 0,
 		Error:      "I'm a dummy",
@@ -17,5 +17,5 @@ func (e *Dummy) Run(model.Cmd) model.Result {
 		RunTime:    0,
 		Files:      map[string]string{},
 		FileIDs:    map[string]string{},
-	}
+	}, nil
 }

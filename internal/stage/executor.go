@@ -7,7 +7,7 @@ import (
 var executorMap = map[string]Executor{}
 
 type Executor interface {
-	Run(model.Cmd) model.Result
+	Run(model.Cmd) (*model.Result, error)
 }
 
 func RegisterExecutor(name string, executor Executor) {

@@ -10,28 +10,30 @@ import (
 
 func main() {
 	tomlConfig := `
-	[[stages]]
-	name = "stage 0"
-	  [stages.executor]
-	  name = "dummy"
-	  [stages.executor.with]
-	    args = [ "/usr/bin/cat", "/dev/null" ]
-	  [stages.parser]
-	  name = "dummy"
-	  [stages.parser.with]
-	    score = 100
-	    comment = "dummy comment for stage 0"
-	[[stages]]
-	name = "stage 1"
-	  [stages.executor]
-	  name = "dummy"
-	  [stages.executor.with]
-	    args = [ "/usr/bin/cat", "/dev/null" ]
-	  [stages.parser]
-	  name = "dummy"
-	  [stages.parser.with]
-	    score = 101
-	    comment = "dummy comment for stage 1"
+[[stages]]
+name = "stage 0"
+	[stages.executor]
+	name = "sandbox"
+	[stages.executor.with]
+	args = [ "ls" ]
+	env = [ "PATH=/usr/bin:/bin" ]
+	cpuLimit = 10_000_000_000
+	memoryLimit = 104_857_600
+	procLimit = 50
+	copyOut = [ "stdout", "stderr" ]
+		[[stages.executor.with.files]]
+		content = ""
+		[[stages.executor.with.files]]
+		name = "stdout"
+		max = 4_096
+		[[stages.executor.with.files]]
+		name = "stderr"
+		max = 4_096
+	[stages.parser]
+	name = "dummy"
+	[stages.parser.with]
+	score = 100
+	comment = "dummy comment for stage 0"
 	`
 	stages := stage.ParseStages(tomlConfig)
 	results := stage.Run(stages)
