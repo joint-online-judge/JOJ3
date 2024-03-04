@@ -1,3 +1,4 @@
+logLevel = 8
 [[stages]]
 name = "compile"
 [stages.executor]

@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"fmt"
 	"os"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
@@ -30,7 +31,10 @@ func (e *Diff) Run(result *stage.ExecutorResult, configAny any) (
 		score = config.Score
 	}
 	return &stage.ParserResult{
-		Score:   score,
-		Comment: "",
+		Score: score,
+		Comment: fmt.Sprintf(
+			"executor status: run time: %d ns, memory: %d bytes",
+			result.RunTime, result.Memory,
+		),
 	}, nil
 }

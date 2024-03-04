@@ -151,10 +151,8 @@ func (r ExecutorResult) String() string {
 type Stage struct {
 	Name         string
 	ExecutorName string
-	Executor     Executor
 	ExecutorCmd  Cmd
 	ParserName   string
-	Parser       Parser
 	ParserConfig any
 }
 
@@ -166,18 +164,4 @@ type ParserResult struct {
 type StageResult struct {
 	Name string
 	*ParserResult
-}
-
-type StagesConfig struct {
-	Stages []struct {
-		Name     string
-		Executor struct {
-			Name string
-			With Cmd
-		}
-		Parser struct {
-			Name string
-			With interface{}
-		}
-	}
 }

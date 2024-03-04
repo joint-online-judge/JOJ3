@@ -2,46 +2,23 @@ package stage
 
 import (
 	"log/slog"
-	"os"
-
-	"github.com/pelletier/go-toml/v2"
 )
-
-func ParseStages(tomlConfig []byte) []Stage {
-	var stagesConfig StagesConfig
-	err := toml.Unmarshal(tomlConfig, &stagesConfig)
-	if err != nil {
-		slog.Error("parse stages config", "error", err)
-		os.Exit(1)
-	}
-	stages := []Stage{}
-	for _, stage := range stagesConfig.Stages {
-		stages = append(stages, Stage{
-			Name:         stage.Name,
-			ExecutorName: stage.Executor.Name,
-			Executor:     executorMap[stage.Executor.Name],
-			ExecutorCmd:  stage.Executor.With,
-			ParserName:   stage.Parser.Name,
-			Parser:       parserMap[stage.Parser.Name],
-			ParserConfig: stage.Parser.With,
-		})
-	}
-	return stages
-}
 
 func Run(stages []Stage) []StageResult {
 	var parserResults []StageResult
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
 		slog.Info("executor run start", "cmd", stage.ExecutorCmd)
-		executorResult, err := stage.Executor.Run(stage.ExecutorCmd)
+		executor := executorMap[stage.ExecutorName]
+		executorResult, err := executor.Run(stage.ExecutorCmd)
 		if err != nil {
 			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
 		slog.Info("executor run done", "result", executorResult)
 		slog.Info("parser run start", "config", stage.ParserConfig)
-		parserResult, err := stage.Parser.Run(executorResult, stage.ParserConfig)
+		parser := parserMap[stage.ParserName]
+		parserResult, err := parser.Run(executorResult, stage.ParserConfig)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
 			break
