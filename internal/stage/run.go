@@ -33,18 +33,20 @@ func Run(stages []Stage) []StageResult {
 	var parserResults []StageResult
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
+		slog.Info("executor run start", "cmd", stage.ExecutorCmd)
 		executorResult, err := stage.Executor.Run(stage.ExecutorCmd)
 		if err != nil {
-			slog.Error("executor error", "name", stage.ExecutorName, "error", err)
+			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
-		slog.Info("executor done", "result", executorResult)
+		slog.Info("executor run done", "result", executorResult)
+		slog.Info("parser run start", "config", stage.ParserConfig)
 		parserResult, err := stage.Parser.Run(executorResult, stage.ParserConfig)
 		if err != nil {
-			slog.Error("parser error", "name", stage.ExecutorName, "error", err)
+			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
-		slog.Info("parser done", "result", parserResult)
+		slog.Info("parser run done", "result", parserResult)
 		parserResults = append(parserResults, StageResult{
 			Name:         stage.Name,
 			ParserResult: parserResult,
@@ -54,10 +56,12 @@ func Run(stages []Stage) []StageResult {
 }
 
 func Cleanup() {
-	for _, executor := range executorMap {
+	for name, executor := range executorMap {
+		slog.Info("executor cleanup start", "name", name)
 		err := executor.Cleanup()
 		if err != nil {
-			slog.Error("executor cleanup error", "error", err)
+			slog.Error("executor cleanup error", "name", name, "error", err)
 		}
+		slog.Info("executor cleanup done", "name", name)
 	}
 }

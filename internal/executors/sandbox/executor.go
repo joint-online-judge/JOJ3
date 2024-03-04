@@ -15,7 +15,6 @@ type Sandbox struct {
 }
 
 func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
-	slog.Info("sandbox run", "cmd", cmd)
 	if cmd.CopyIn == nil {
 		cmd.CopyIn = make(map[string]stage.CmdFile)
 	}
@@ -24,24 +23,22 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 			cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
 		}
 	}
-	req := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
-	ret, err := e.execClient.Exec(context.TODO(), req)
+	pbReq := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
+	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
 	}
-	if ret.Error != "" {
-		return nil, fmt.Errorf("compile error: %s", ret.Error)
+	if pbRet.Error != "" {
+		return nil, fmt.Errorf("sandbox execute error: %s", pbRet.Error)
 	}
-	slog.Info("sandbox run", "ret", ret)
-	res := &convertPBResult(ret.Results)[0]
-	for fileName, fileID := range res.FileIDs {
+	executorRes := &convertPBResult(pbRet.Results)[0]
+	for fileName, fileID := range executorRes.FileIDs {
 		e.cachedMap[fileName] = fileID
 	}
-	return res, nil
+	return executorRes, nil
 }
 
 func (e *Sandbox) Cleanup() error {
-	slog.Info("sandbox cleanup")
 	for _, fileID := range e.cachedMap {
 		_, err := e.execClient.FileDelete(context.TODO(), &pb.FileID{
 			FileID: fileID,
