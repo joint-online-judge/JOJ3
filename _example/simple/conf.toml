@@ -1,0 +1,52 @@
+[[stages]]
+name = "compile"
+[stages.executor]
+name = "sandbox"
+[stages.executor.with]
+args = ["/usr/bin/g++", "a.cc", "-o", "a"]
+env = ["PATH=/usr/bin:/bin"]
+cpuLimit = 10_000_000_000
+memoryLimit = 104_857_600
+procLimit = 50
+copyInCwd = true
+copyOut = ["stdout", "stderr"]
+copyOutCached = ["a"]
+[[stages.executor.with.files]]
+content = ""
+[[stages.executor.with.files]]
+name = "stdout"
+max = 4_096
+[[stages.executor.with.files]]
+name = "stderr"
+max = 4_096
+[stages.parser]
+name = "dummy"
+[stages.parser.with]
+score = 100
+comment = "compile done"
+[[stages]]
+name = "run"
+[stages.executor]
+name = "sandbox"
+[stages.executor.with]
+args = ["./a"]
+env = ["PATH=/usr/bin:/bin"]
+cpuLimit = 10_000_000_000
+memoryLimit = 104_857_600
+procLimit = 50
+copyOut = ["stdout", "stderr"]
+[stages.executor.with.copyInCached]
+a = "a"
+[[stages.executor.with.files]]
+content = "1 1"
+[[stages.executor.with.files]]
+name = "stdout"
+max = 4_096
+[[stages.executor.with.files]]
+name = "stderr"
+max = 4_096
+[stages.parser]
+name = "dummy"
+[stages.parser.with]
+score = 100
+comment = "run done"
