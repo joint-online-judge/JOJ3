@@ -2,10 +2,8 @@ package dummy
 
 import (
 	"fmt"
-	"log/slog"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
-	"github.com/mitchellh/mapstructure"
 )
 
 type Config struct {
@@ -18,10 +16,8 @@ type Dummy struct{}
 func (e *Dummy) Run(result *stage.ExecutorResult, configAny any) (
 	*stage.ParserResult, error,
 ) {
-	var config Config
-	err := mapstructure.Decode(configAny, &config)
+	config, err := stage.DecodeConfig[Config](configAny)
 	if err != nil {
-		slog.Error("failed to decode config", "err", err)
 		return nil, err
 	}
 	return &stage.ParserResult{

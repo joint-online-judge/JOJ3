@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"path/filepath"
 	"strings"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
@@ -142,4 +143,15 @@ func convertPBFileError(fe []*pb.Response_FileError) []stage.FileError {
 		})
 	}
 	return ret
+}
+
+func convertAbsPath(cmdFile *stage.CmdFile) error {
+	if cmdFile.Src != nil && !filepath.IsAbs(*cmdFile.Src) {
+		absPath, err := filepath.Abs(*cmdFile.Src)
+		if err != nil {
+			return err
+		}
+		cmdFile.Src = &absPath
+	}
+	return nil
 }

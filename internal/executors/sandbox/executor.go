@@ -46,6 +46,16 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 			return nil, err
 		}
 	}
+	for _, file := range cmd.Files {
+		if err := convertAbsPath(file); err != nil {
+			return nil, err
+		}
+	}
+	for _, file := range cmd.CopyIn {
+		if err := convertAbsPath(&file); err != nil {
+			return nil, err
+		}
+	}
 	req := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
 	ret, err := e.execClient.Exec(context.TODO(), req)
 	if err != nil {

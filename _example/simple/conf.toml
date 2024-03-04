@@ -38,7 +38,7 @@ copyOut = ["stdout", "stderr"]
 [stages.executor.with.copyInCached]
 a = "a"
 [[stages.executor.with.files]]
-content = "1 1"
+src = "1.stdin"
 [[stages.executor.with.files]]
 name = "stdout"
 max = 4_096
@@ -46,7 +46,7 @@ max = 4_096
 name = "stderr"
 max = 4_096
 [stages.parser]
-name = "dummy"
+name = "diff"
 [stages.parser.with]
 score = 100
-comment = "run done"
+stdoutPath = "1.stdout"
