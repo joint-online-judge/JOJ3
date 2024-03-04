@@ -7,9 +7,9 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
-func ParseStages(tomlConfig string) []Stage {
+func ParseStages(tomlConfig []byte) []Stage {
 	var stagesConfig StagesConfig
-	err := toml.Unmarshal([]byte(tomlConfig), &stagesConfig)
+	err := toml.Unmarshal(tomlConfig, &stagesConfig)
 	if err != nil {
 		slog.Error("parse stages config", "error", err)
 		os.Exit(1)
