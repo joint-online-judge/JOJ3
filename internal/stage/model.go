@@ -104,8 +104,8 @@ func (s *Status) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Result defines single command result
-type Result struct {
+// ExecutorResult defines single command result
+type ExecutorResult struct {
 	Status     Status            `json:"status"`
 	ExitStatus int               `json:"exitStatus"`
 	Error      string            `json:"error,omitempty"`
@@ -119,7 +119,7 @@ type Result struct {
 	Buffs map[string][]byte `json:"-"`
 }
 
-func (r Result) String() string {
+func (r ExecutorResult) String() string {
 	type Result struct {
 		Status     Status
 		ExitStatus int

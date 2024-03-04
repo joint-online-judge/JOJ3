@@ -16,7 +16,7 @@ type Sandbox struct {
 	cachedMap  map[string]string
 }
 
-func (e *Sandbox) Run(cmd stage.Cmd) (*stage.Result, error) {
+func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 	slog.Info("sandbox run", "cmd", cmd)
 	if cmd.CopyIn == nil {
 		cmd.CopyIn = make(map[string]stage.CmdFile)

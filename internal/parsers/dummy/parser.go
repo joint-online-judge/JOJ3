@@ -15,7 +15,7 @@ type Config struct {
 
 type Dummy struct{}
 
-func (e *Dummy) Run(result *stage.Result, configAny any) (
+func (e *Dummy) Run(result *stage.ExecutorResult, configAny any) (
 	*stage.ParserResult, error,
 ) {
 	var config Config

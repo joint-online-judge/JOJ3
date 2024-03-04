@@ -36,22 +36,22 @@ The program parse the TOML file to run multiple stages.
 
 Each stage contains a executor and parser.
 
-Executor takes a `Cmd` and returns a `Result`.
+Executor takes a `Cmd` and returns a `ExecutorResult`.
 
-Parser takes a `Result` and its config and returns a `ParserResult`.
+Parser takes a `ExecutorResult` and its config and returns a `ParserResult`.
 
 ### `Cmd`
 
-Check <https://github.com/criyle/go-judge#rest-api-interface>.
+Check `Cmd` in <https://github.com/criyle/go-judge#rest-api-interface>.
 
 Some extra fields:
 
 -   `CopyInCwd bool`: set to `true` to add everything in the current working directory to `CopyIn`.
 -   `CopyInCached map[string]string`: key: file name in sandbox, value: file name used in `CopyOutCached`.
 
-### `Result`
+### `ExecutorResult`
 
-Check <https://github.com/criyle/go-judge#rest-api-interface>.
+Check `Result` in <https://github.com/criyle/go-judge#rest-api-interface>.
 
 ### `ParserResult`
 

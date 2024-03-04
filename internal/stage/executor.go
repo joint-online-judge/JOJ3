@@ -3,7 +3,7 @@ package stage
 var executorMap = map[string]Executor{}
 
 type Executor interface {
-	Run(Cmd) (*Result, error)
+	Run(Cmd) (*ExecutorResult, error)
 	Cleanup() error
 }
 

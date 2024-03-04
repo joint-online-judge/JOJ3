@@ -7,8 +7,8 @@ import (
 
 type Dummy struct{}
 
-func (e *Dummy) Run(stage.Cmd) (*stage.Result, error) {
-	return &stage.Result{
+func (e *Dummy) Run(stage.Cmd) (*stage.ExecutorResult, error) {
+	return &stage.ExecutorResult{
 		Status:     stage.Status(envexec.StatusInvalid),
 		ExitStatus: 0,
 		Error:      "I'm a dummy",

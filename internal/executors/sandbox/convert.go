@@ -105,10 +105,10 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 	return nil
 }
 
-func convertPBResult(res []*pb.Response_Result) []stage.Result {
-	var ret []stage.Result
+func convertPBResult(res []*pb.Response_Result) []stage.ExecutorResult {
+	var ret []stage.ExecutorResult
 	for _, r := range res {
-		ret = append(ret, stage.Result{
+		ret = append(ret, stage.ExecutorResult{
 			Status:     stage.Status(r.Status),
 			ExitStatus: int(r.ExitStatus),
 			Error:      r.Error,
