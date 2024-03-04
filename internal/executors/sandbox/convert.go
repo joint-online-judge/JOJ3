@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -26,7 +27,7 @@ func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 			CpuSetLimit:       c.CPUSetLimit,
 			DataSegmentLimit:  c.DataSegmentLimit,
 			AddressSpaceLimit: c.AddressSpaceLimit,
-			CopyIn:            convertPBCopyIn(c.CopyIn),
+			CopyIn:            convertPBCopyIn(c.CopyIn, c.CopyInCwd),
 			CopyOut:           convertPBCopyOut(c.CopyOut),
 			CopyOutCached:     convertPBCopyOut(c.CopyOutCached),
 			CopyOutMax:        c.CopyOutMax,
@@ -37,7 +38,23 @@ func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 	return ret
 }
 
-func convertPBCopyIn(copyIn map[string]stage.CmdFile) map[string]*pb.Request_File {
+func convertPBCopyIn(copyIn map[string]stage.CmdFile, copyInCwd bool) map[string]*pb.Request_File {
+	if copyInCwd {
+		_ = filepath.Walk(".",
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return nil
+				}
+				absPath, err := filepath.Abs(path)
+				if err != nil {
+					return nil
+				}
+				if !info.IsDir() {
+					copyIn[path] = stage.CmdFile{Src: &absPath}
+				}
+				return nil
+			})
+	}
 	rt := make(map[string]*pb.Request_File, len(copyIn))
 	for k, i := range copyIn {
 		if i.Symlink != nil {
@@ -90,6 +107,12 @@ func convertPBFiles(files []*stage.CmdFile) []*pb.Request_File {
 func convertPBFile(i stage.CmdFile) *pb.Request_File {
 	switch {
 	case i.Src != nil:
+		if !filepath.IsAbs(*i.Src) {
+			absPath, err := filepath.Abs(*i.Src)
+			if err == nil {
+				i.Src = &absPath
+			}
+		}
 		return &pb.Request_File{File: &pb.Request_File_Local{Local: &pb.Request_LocalFile{Src: *i.Src}}}
 	case i.Content != nil:
 		s := strToBytes(*i.Content)
@@ -102,6 +125,17 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 		return &pb.Request_File{File: &pb.Request_File_StreamIn{}}
 	case i.StreamOut:
 		return &pb.Request_File{File: &pb.Request_File_StreamOut{}}
+	}
+	return nil
+}
+
+func convertAbsPath(cmdFile *stage.CmdFile) error {
+	if cmdFile.Src != nil && !filepath.IsAbs(*cmdFile.Src) {
+		absPath, err := filepath.Abs(*cmdFile.Src)
+		if err != nil {
+			return err
+		}
+		cmdFile.Src = &absPath
 	}
 	return nil
 }
@@ -143,15 +177,4 @@ func convertPBFileError(fe []*pb.Response_FileError) []stage.FileError {
 		})
 	}
 	return ret
-}
-
-func convertAbsPath(cmdFile *stage.CmdFile) error {
-	if cmdFile.Src != nil && !filepath.IsAbs(*cmdFile.Src) {
-		absPath, err := filepath.Abs(*cmdFile.Src)
-		if err != nil {
-			return err
-		}
-		cmdFile.Src = &absPath
-	}
-	return nil
 }

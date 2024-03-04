@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/pb"
@@ -24,35 +22,6 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 	for k, v := range cmd.CopyInCached {
 		if fileID, ok := e.cachedMap[v]; ok {
 			cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
-		}
-	}
-	if cmd.CopyInCwd {
-		err := filepath.Walk(".",
-			func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				absPath, err := filepath.Abs(path)
-				if err != nil {
-					return err
-				}
-				if !info.IsDir() {
-					cmd.CopyIn[path] = stage.CmdFile{Src: &absPath}
-				}
-				return nil
-			})
-		if err != nil {
-			return nil, err
-		}
-	}
-	for _, file := range cmd.Files {
-		if err := convertAbsPath(file); err != nil {
-			return nil, err
-		}
-	}
-	for _, file := range cmd.CopyIn {
-		if err := convertAbsPath(&file); err != nil {
-			return nil, err
 		}
 	}
 	req := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
