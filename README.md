@@ -1,5 +1,7 @@
 # JOJ3
 
+## Quick Start
+
 In order to register sandbox executor, you need to run go-judge before running this program.
 
 ```bash
@@ -27,3 +29,31 @@ go build -o ./build/joj3 ./cmd/joj3
 2024/03/04 02:09:42 INFO sandbox cleanup
 + cd -
 ```
+
+## Models
+
+The program parse the TOML file to run multiple stages.
+
+Each stage contains a executor and parser.
+
+Executor takes a `Cmd` and returns a `Result`.
+
+Parser takes a `Result` and its config and returns a `ParserResult`.
+
+### `Cmd`
+
+Check <https://github.com/criyle/go-judge#rest-api-interface>.
+
+Some extra fields:
+
+-   `CopyInCwd bool`: set to `true` to add everything in the current working directory to `CopyIn`.
+-   `CopyInCached map[string]string`: key: file name in sandbox, value: file name used in `CopyOutCached`.
+
+### `Result`
+
+Check <https://github.com/criyle/go-judge#rest-api-interface>.
+
+### `ParserResult`
+
+-   `Score int`: score of the stage.
+-   `Comment string`: comment of the stage.
