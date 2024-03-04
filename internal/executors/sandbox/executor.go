@@ -27,7 +27,6 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 		}
 	}
 	if cmd.CopyInCwd {
-		slog.Info("sandbox run", "copyInCwd", true)
 		err := filepath.Walk(".",
 			func(path string, info os.FileInfo, err error) error {
 				if err != nil {

@@ -15,7 +15,6 @@ go build -o ./build/joj3 ./cmd/joj3
 + ./../../build/joj3
 2024/03/04 02:57:50 INFO stage start name=compile
 2024/03/04 02:57:50 INFO sandbox run cmd="{Args:[/usr/bin/g++ a.cc -o a] Env:[PATH=/usr/bin:/bin] Files:[0xc00007f540 0xc00007f580 0xc00007f5c0] CPULimit:10000000000 RealCPULimit:0 ClockLimit:0 MemoryLimit:104857600 StackLimit:0 ProcLimit:50 CPURateLimit:0 CPUSetLimit: CopyIn:map[] CopyInCached:map[] CopyInCwd:true CopyOut:[stdout stderr] CopyOutCached:[a] CopyOutMax:0 CopyOutDir: TTY:false StrictMemoryLimit:false DataSegmentLimit:false AddressSpaceLimit:false}"
-2024/03/04 02:57:50 INFO sandbox run copyInCwd=true
 2024/03/04 02:57:50 INFO sandbox run ret="results:{status:Accepted  time:298002000  runTime:298694146  memory:57880576  files:{key:\"stderr\"  value:\"\"}  files:{key:\"stdout\"  value:\"\"}  fileIDs:{key:\"a\"  value:\"DMTRJR3V\"}}"
 2024/03/04 02:57:50 INFO executor done result="{Status:Accepted ExitStatus:0 Error: Time:298.002ms RunTime:298.694146ms Memory:55.2 MiB Files:map[stderr:len:0 stdout:len:0] FileIDs:map[a:DMTRJR3V] FileError:[]}"
 2024/03/04 02:57:50 INFO parser done result="&{Score:100 Comment:compile done, executor status: run time: 298694146 ns, memory: 57880576 bytes}"
