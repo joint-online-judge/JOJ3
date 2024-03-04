@@ -1,13 +1,9 @@
 package stage
 
-import (
-	"github.com/criyle/go-judge/cmd/go-judge/model"
-)
-
 var executorMap = map[string]Executor{}
 
 type Executor interface {
-	Run(model.Cmd) (*model.Result, error)
+	Run(Cmd) (*Result, error)
 }
 
 func RegisterExecutor(name string, executor Executor) {

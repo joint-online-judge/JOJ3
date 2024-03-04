@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
-	"github.com/criyle/go-judge/cmd/go-judge/model"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -16,7 +15,7 @@ type Config struct {
 
 type Dummy struct{}
 
-func (e *Dummy) Run(result *model.Result, configAny any) (
+func (e *Dummy) Run(result *stage.Result, configAny any) (
 	*stage.ParserResult, error,
 ) {
 	var config Config

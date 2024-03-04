@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/criyle/go-judge/cmd/go-judge/model"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/pb"
 )
 
@@ -13,9 +13,9 @@ type Sandbox struct {
 	execClient pb.ExecutorClient
 }
 
-func (e *Sandbox) Run(cmd model.Cmd) (*model.Result, error) {
+func (e *Sandbox) Run(cmd stage.Cmd) (*stage.Result, error) {
 	slog.Info("sandbox run", "cmd", cmd)
-	req := &pb.Request{Cmd: convertPBCmd([]model.Cmd{cmd})}
+	req := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
 	ret, err := e.execClient.Exec(context.TODO(), req)
 	if err != nil {
 		return nil, err

@@ -3,12 +3,12 @@ package sandbox
 import (
 	"strings"
 
-	"github.com/criyle/go-judge/cmd/go-judge/model"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/pb"
 )
 
 // copied from https://github.com/criyle/go-judge/blob/master/cmd/go-judge-shell/grpc.go
-func convertPBCmd(cmd []model.Cmd) []*pb.Request_CmdType {
+func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 	var ret []*pb.Request_CmdType
 	for _, c := range cmd {
 		ret = append(ret, &pb.Request_CmdType{
@@ -36,7 +36,7 @@ func convertPBCmd(cmd []model.Cmd) []*pb.Request_CmdType {
 	return ret
 }
 
-func convertPBCopyIn(copyIn map[string]model.CmdFile) map[string]*pb.Request_File {
+func convertPBCopyIn(copyIn map[string]stage.CmdFile) map[string]*pb.Request_File {
 	rt := make(map[string]*pb.Request_File, len(copyIn))
 	for k, i := range copyIn {
 		if i.Symlink != nil {
@@ -63,7 +63,7 @@ func convertPBCopyOut(copyOut []string) []*pb.Request_CmdCopyOutFile {
 	return rt
 }
 
-func convertSymlink(copyIn map[string]model.CmdFile) map[string]string {
+func convertSymlink(copyIn map[string]stage.CmdFile) map[string]string {
 	ret := make(map[string]string)
 	for k, v := range copyIn {
 		if v.Symlink == nil {
@@ -74,7 +74,7 @@ func convertSymlink(copyIn map[string]model.CmdFile) map[string]string {
 	return ret
 }
 
-func convertPBFiles(files []*model.CmdFile) []*pb.Request_File {
+func convertPBFiles(files []*stage.CmdFile) []*pb.Request_File {
 	var ret []*pb.Request_File
 	for _, f := range files {
 		if f == nil {
@@ -86,7 +86,7 @@ func convertPBFiles(files []*model.CmdFile) []*pb.Request_File {
 	return ret
 }
 
-func convertPBFile(i model.CmdFile) *pb.Request_File {
+func convertPBFile(i stage.CmdFile) *pb.Request_File {
 	switch {
 	case i.Src != nil:
 		return &pb.Request_File{File: &pb.Request_File_Local{Local: &pb.Request_LocalFile{Src: *i.Src}}}
@@ -105,29 +105,11 @@ func convertPBFile(i model.CmdFile) *pb.Request_File {
 	return nil
 }
 
-func convertPBPipeMapping(pm []model.PipeMap) []*pb.Request_PipeMap {
-	var ret []*pb.Request_PipeMap
-	for _, p := range pm {
-		ret = append(ret, &pb.Request_PipeMap{
-			In:    convertPBPipeIndex(p.In),
-			Out:   convertPBPipeIndex(p.Out),
-			Name:  p.Name,
-			Proxy: p.Proxy,
-			Max:   uint64(p.Max),
-		})
-	}
-	return ret
-}
-
-func convertPBPipeIndex(pi model.PipeIndex) *pb.Request_PipeMap_PipeIndex {
-	return &pb.Request_PipeMap_PipeIndex{Index: int32(pi.Index), Fd: int32(pi.Fd)}
-}
-
-func convertPBResult(res []*pb.Response_Result) []model.Result {
-	var ret []model.Result
+func convertPBResult(res []*pb.Response_Result) []stage.Result {
+	var ret []stage.Result
 	for _, r := range res {
-		ret = append(ret, model.Result{
-			Status:     model.Status(r.Status),
+		ret = append(ret, stage.Result{
+			Status:     stage.Status(r.Status),
 			ExitStatus: int(r.ExitStatus),
 			Error:      r.Error,
 			Time:       r.Time,
@@ -150,25 +132,12 @@ func convertFiles(buf map[string][]byte) map[string]string {
 	return ret
 }
 
-func convertPBRequest(req *model.Request) *pb.StreamRequest {
-	ret := &pb.StreamRequest{
-		Request: &pb.StreamRequest_ExecRequest{
-			ExecRequest: &pb.Request{
-				RequestID:   req.RequestID,
-				Cmd:         convertPBCmd(req.Cmd),
-				PipeMapping: convertPBPipeMapping(req.PipeMapping),
-			},
-		},
-	}
-	return ret
-}
-
-func convertPBFileError(fe []*pb.Response_FileError) []model.FileError {
-	var ret []model.FileError
+func convertPBFileError(fe []*pb.Response_FileError) []stage.FileError {
+	var ret []stage.FileError
 	for _, v := range fe {
-		ret = append(ret, model.FileError{
+		ret = append(ret, stage.FileError{
 			Name:    v.Name,
-			Type:    model.FileErrorType(v.Type),
+			Type:    stage.FileErrorType(v.Type),
 			Message: v.Message,
 		})
 	}

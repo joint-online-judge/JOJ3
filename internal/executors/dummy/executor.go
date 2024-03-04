@@ -1,15 +1,15 @@
 package dummy
 
 import (
-	"github.com/criyle/go-judge/cmd/go-judge/model"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/envexec"
 )
 
 type Dummy struct{}
 
-func (e *Dummy) Run(model.Cmd) (*model.Result, error) {
-	return &model.Result{
-		Status:     model.Status(envexec.StatusInvalid),
+func (e *Dummy) Run(stage.Cmd) (*stage.Result, error) {
+	return &stage.Result{
+		Status:     stage.Status(envexec.StatusInvalid),
 		ExitStatus: 0,
 		Error:      "I'm a dummy",
 		Time:       0,
