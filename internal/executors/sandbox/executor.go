@@ -43,9 +43,12 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.Result, error) {
 func (e *Sandbox) Cleanup() error {
 	slog.Info("sandbox cleanup")
 	for _, fileID := range e.cachedMap {
-		e.execClient.FileDelete(context.TODO(), &pb.FileID{
+		_, err := e.execClient.FileDelete(context.TODO(), &pb.FileID{
 			FileID: fileID,
 		})
+		if err != nil {
+			slog.Error("sandbox cleanup", "error", err)
+		}
 	}
 	return nil
 }

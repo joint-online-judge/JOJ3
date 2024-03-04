@@ -115,7 +115,6 @@ type Result struct {
 	FileIDs    map[string]string `json:"fileIds,omitempty"`
 	FileError  []FileError       `json:"fileError,omitempty"`
 
-	files []string
 	Buffs map[string][]byte `json:"-"`
 }
 

@@ -55,6 +55,9 @@ func Run(stages []Stage) []StageResult {
 
 func Cleanup() {
 	for _, executor := range executorMap {
-		executor.Cleanup()
+		err := executor.Cleanup()
+		if err != nil {
+			slog.Error("executor cleanup error", "error", err)
+		}
 	}
 }
