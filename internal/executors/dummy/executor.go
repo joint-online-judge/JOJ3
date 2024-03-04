@@ -19,3 +19,7 @@ func (e *Dummy) Run(stage.Cmd) (*stage.Result, error) {
 		FileIDs:    map[string]string{},
 	}, nil
 }
+
+func (e *Dummy) Cleanup() error {
+	return nil
+}

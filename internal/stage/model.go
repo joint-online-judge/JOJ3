@@ -43,7 +43,8 @@ type Cmd struct {
 	CPURateLimit uint64 `json:"cpuRateLimit"`
 	CPUSetLimit  string `json:"cpuSetLimit"`
 
-	CopyIn map[string]CmdFile `json:"copyIn"`
+	CopyIn       map[string]CmdFile `json:"copyIn"`
+	CopyInCached map[string]string  `json:"copyInCached"`
 
 	CopyOut       []string `json:"copyOut"`
 	CopyOutCached []string `json:"copyOutCached"`

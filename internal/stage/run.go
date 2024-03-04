@@ -52,3 +52,9 @@ func Run(stages []Stage) []StageResult {
 	}
 	return parserResults
 }
+
+func Cleanup() {
+	for _, executor := range executorMap {
+		executor.Cleanup()
+	}
+}
