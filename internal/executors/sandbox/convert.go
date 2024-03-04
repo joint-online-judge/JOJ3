@@ -48,7 +48,7 @@ func convertPBCopyIn(copyIn map[string]stage.CmdFile) map[string]*pb.Request_Fil
 }
 
 func convertPBCopyOut(copyOut []string) []*pb.Request_CmdCopyOutFile {
-	rt := make([]*pb.Request_CmdCopyOutFile, 0)
+	rt := make([]*pb.Request_CmdCopyOutFile, 0, len(copyOut))
 	for _, n := range copyOut {
 		optional := false
 		if strings.HasSuffix(n, "?") {
