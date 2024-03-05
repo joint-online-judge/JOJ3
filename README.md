@@ -14,7 +14,7 @@ go build -o ./build/joj3 ./cmd/joj3
 + cd ./_example/simple
 + ./../../build/joj3
 + cat ./joj3_result.json
-[{"Name":"compile","ParserResults":[{"Score":100,"Comment":"compile done, executor status: run time: 265269232 ns, memory: 57790464 bytes"}]},{"Name":"run","ParserResults":[{"Score":100,"Comment":"executor status: run time: 2033735 ns, memory: 13225984 bytes"},{"Score":100,"Comment":"executor status: run time: 3117399 ns, memory: 14548992 bytes"}]}]
+[{"Name":"compile","Results":[{"Score":100,"Comment":"compile done, executor status: run time: 265269232 ns, memory: 57790464 bytes"}]},{"Name":"run","Results":[{"Score":100,"Comment":"executor status: run time: 2033735 ns, memory: 13225984 bytes"},{"Score":100,"Comment":"executor status: run time: 3117399 ns, memory: 14548992 bytes"}]}]
 + rm -f ./joj3_result.json
 + cd -
 ```
@@ -27,7 +27,7 @@ Each stage contains a executor and parser.
 
 Executor takes a `Cmd` and returns a `ExecutorResult`.
 
-Parser takes a `ExecutorResult` and its config and returns a `ParserResult`.
+Parser takes a `ExecutorResult` and its config and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
 
 ### `Cmd`
 

@@ -164,6 +164,6 @@ type ParserResult struct {
 }
 
 type StageResult struct {
-	Name          string
-	ParserResults []ParserResult
+	Name    string
+	Results []ParserResult
 }

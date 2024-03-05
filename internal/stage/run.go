@@ -25,8 +25,8 @@ func Run(stages []Stage) []StageResult {
 		}
 		slog.Debug("parser run done", "results", parserResults)
 		stageResults = append(stageResults, StageResult{
-			Name:          stage.Name,
-			ParserResults: parserResults,
+			Name:    stage.Name,
+			Results: parserResults,
 		})
 		if end {
 			break
