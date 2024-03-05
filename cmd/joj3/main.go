@@ -49,7 +49,11 @@ func generateStages(conf Conf) []stage.Stage {
 		var cmds []stage.Cmd
 		for _, optionalCmd := range s.Executor.With.Cases {
 			cmd := s.Executor.With.Default
-			copier.Copy(&cmd, &optionalCmd)
+			err := copier.Copy(&cmd, &optionalCmd)
+			if err != nil {
+				slog.Error("generate stages", "error", err)
+				os.Exit(1)
+			}
 			cmds = append(cmds, cmd)
 		}
 		if len(s.Executor.With.Cases) == 0 {

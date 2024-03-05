@@ -129,17 +129,6 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 	return nil
 }
 
-func convertAbsPath(cmdFile *stage.CmdFile) error {
-	if cmdFile.Src != nil && !filepath.IsAbs(*cmdFile.Src) {
-		absPath, err := filepath.Abs(*cmdFile.Src)
-		if err != nil {
-			return err
-		}
-		cmdFile.Src = &absPath
-	}
-	return nil
-}
-
 func convertPBResult(res []*pb.Response_Result) []stage.ExecutorResult {
 	var ret []stage.ExecutorResult
 	for _, r := range res {
