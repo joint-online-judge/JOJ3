@@ -5,13 +5,13 @@
 In order to register sandbox executor, you need to run go-judge before running this program.
 
 ```bash
-$ make clean && make && ./_example/simple/run.sh
+$ make clean && make && ./_example/success/run.sh
 rm -rf ./build/*
 rm -rf *.out
 go build -o ./build/joj3 ./cmd/joj3
-++ dirname -- ./_example/simple/run.sh
-+ DIRNAME=./_example/simple
-+ cd ./_example/simple
+++ dirname -- ./_example/success/run.sh
++ DIRNAME=./_example/success
++ cd ./_example/success
 + ./../../build/joj3
 + cat ./joj3_result.json
 [{"Name":"compile","Results":[{"Score":100,"Comment":"compile done, executor status: run time: 265269232 ns, memory: 57790464 bytes"}]},{"Name":"run","Results":[{"Score":100,"Comment":"executor status: run time: 2033735 ns, memory: 13225984 bytes"},{"Score":100,"Comment":"executor status: run time: 3117399 ns, memory: 14548992 bytes"}]}]
