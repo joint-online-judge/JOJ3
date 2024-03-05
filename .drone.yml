@@ -1,0 +1,16 @@
+---
+kind: pipeline
+type: ssh
+name: CI
+server:
+  host: 111.186.59.59
+  user: drone
+  ssh_key:
+    from_secret: joj3-test
+
+steps:
+- name: build
+  commands:
+  - make
+  - ./_example/simple/run.sh
+  - cp build/joj3 ~/.local/bin/joj3
