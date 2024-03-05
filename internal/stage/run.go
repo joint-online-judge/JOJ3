@@ -5,31 +5,31 @@ import (
 )
 
 func Run(stages []Stage) []StageResult {
-	var parserResults []StageResult
+	var stageResults []StageResult
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
-		slog.Info("executor run start", "cmd", stage.ExecutorCmd)
+		slog.Info("executor run start", "cmds", stage.ExecutorCmds)
 		executor := executorMap[stage.ExecutorName]
-		executorResult, err := executor.Run(stage.ExecutorCmd)
+		executorResults, err := executor.Run(stage.ExecutorCmds)
 		if err != nil {
 			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
-		slog.Info("executor run done", "result", executorResult)
+		slog.Info("executor run done", "results", executorResults)
 		slog.Info("parser run start", "config", stage.ParserConfig)
 		parser := parserMap[stage.ParserName]
-		parserResult, err := parser.Run(executorResult, stage.ParserConfig)
+		parserResults, err := parser.Run(executorResults, stage.ParserConfig)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
-		slog.Info("parser run done", "result", parserResult)
-		parserResults = append(parserResults, StageResult{
-			Name:         stage.Name,
-			ParserResult: parserResult,
+		slog.Info("parser run done", "results", parserResults)
+		stageResults = append(stageResults, StageResult{
+			Name:          stage.Name,
+			ParserResults: parserResults,
 		})
 	}
-	return parserResults
+	return stageResults
 }
 
 func Cleanup() {

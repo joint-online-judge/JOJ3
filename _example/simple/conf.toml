@@ -3,7 +3,7 @@ logLevel = 8
 name = "compile"
 [stages.executor]
 name = "sandbox"
-[stages.executor.with]
+[stages.executor.with.default]
 args = ["/usr/bin/g++", "a.cc", "-o", "a"]
 env = ["PATH=/usr/bin:/bin"]
 cpuLimit = 10_000_000_000
@@ -12,12 +12,12 @@ procLimit = 50
 copyInCwd = true
 copyOut = ["stdout", "stderr"]
 copyOutCached = ["a"]
-[[stages.executor.with.files]]
+[[stages.executor.with.default.files]]
 content = ""
-[[stages.executor.with.files]]
+[[stages.executor.with.default.files]]
 name = "stdout"
 max = 4_096
-[[stages.executor.with.files]]
+[[stages.executor.with.default.files]]
 name = "stderr"
 max = 4_096
 [stages.parser]
@@ -29,25 +29,38 @@ comment = "compile done"
 name = "run"
 [stages.executor]
 name = "sandbox"
-[stages.executor.with]
+[stages.executor.with.default]
 args = ["./a"]
 env = ["PATH=/usr/bin:/bin"]
 cpuLimit = 10_000_000_000
 memoryLimit = 104_857_600
 procLimit = 50
 copyOut = ["stdout", "stderr"]
-[stages.executor.with.copyInCached]
+[stages.executor.with.default.copyInCached]
 a = "a"
-[[stages.executor.with.files]]
+[[stages.executor.with.cases]]
+[[stages.executor.with.cases.files]]
 src = "1.stdin"
-[[stages.executor.with.files]]
+[[stages.executor.with.cases.files]]
 name = "stdout"
 max = 4_096
-[[stages.executor.with.files]]
+[[stages.executor.with.cases.files]]
+name = "stderr"
+max = 4_096
+[[stages.executor.with.cases]]
+[[stages.executor.with.cases.files]]
+src = "1.stdin"
+[[stages.executor.with.cases.files]]
+name = "stdout"
+max = 4_096
+[[stages.executor.with.cases.files]]
 name = "stderr"
 max = 4_096
 [stages.parser]
 name = "diff"
-[stages.parser.with]
+[[stages.parser.with.cases]]
 score = 100
 stdoutPath = "1.stdout"
+[[stages.parser.with.cases]]
+score = 100
+stdoutPath = "2.stdout"

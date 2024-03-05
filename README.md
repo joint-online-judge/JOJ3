@@ -14,7 +14,7 @@ go build -o ./build/joj3 ./cmd/joj3
 + cd ./_example/simple
 + ./../../build/joj3
 + cat ./joj3_result.json
-[{"Name":"compile","Score":100,"Comment":"compile done, executor status: run time: 239591301 ns, memory: 57176064 bytes"},{"Name":"run","Score":100,"Comment":"executor status: run time: 1839200 ns, memory: 16826368 bytes"}]
+[{"Name":"compile","ParserResults":[{"Score":100,"Comment":"compile done, executor status: run time: 274901520 ns, memory: 57880576 bytes"}]},{"Name":"run","ParserResults":[{"Score":100,"Comment":"executor status: run time: 2343025 ns, memory: 13225984 bytes"},{"Score":0,"Comment":"executor status: run time: 2071433 ns, memory: 14544896 bytes"}]}]
 + rm -f ./joj3_result.json
 + cd -
 ```

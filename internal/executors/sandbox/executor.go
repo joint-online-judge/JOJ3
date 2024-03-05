@@ -14,16 +14,20 @@ type Sandbox struct {
 	cachedMap  map[string]string
 }
 
-func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
-	if cmd.CopyIn == nil {
-		cmd.CopyIn = make(map[string]stage.CmdFile)
-	}
-	for k, v := range cmd.CopyInCached {
-		if fileID, ok := e.cachedMap[v]; ok {
-			cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
+func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+	// cannot use range loop since we need to change the value
+	for i := 0; i < len(cmds); i++ {
+		cmd := &cmds[i]
+		if cmd.CopyIn == nil {
+			cmd.CopyIn = make(map[string]stage.CmdFile)
+		}
+		for k, v := range cmd.CopyInCached {
+			if fileID, ok := e.cachedMap[v]; ok {
+				cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
+			}
 		}
 	}
-	pbReq := &pb.Request{Cmd: convertPBCmd([]stage.Cmd{cmd})}
+	pbReq := &pb.Request{Cmd: convertPBCmd(cmds)}
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
@@ -31,11 +35,13 @@ func (e *Sandbox) Run(cmd stage.Cmd) (*stage.ExecutorResult, error) {
 	if pbRet.Error != "" {
 		return nil, fmt.Errorf("sandbox execute error: %s", pbRet.Error)
 	}
-	executorRes := &convertPBResult(pbRet.Results)[0]
-	for fileName, fileID := range executorRes.FileIDs {
-		e.cachedMap[fileName] = fileID
+	results := convertPBResult(pbRet.Results)
+	for _, result := range results {
+		for fileName, fileID := range result.FileIDs {
+			e.cachedMap[fileName] = fileID
+		}
 	}
-	return executorRes, nil
+	return results, nil
 }
 
 func (e *Sandbox) Cleanup() error {

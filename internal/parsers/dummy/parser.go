@@ -13,18 +13,22 @@ type Config struct {
 
 type Dummy struct{}
 
-func (e *Dummy) Run(result *stage.ExecutorResult, configAny any) (
-	*stage.ParserResult, error,
+func (e *Dummy) Run(results []stage.ExecutorResult, configAny any) (
+	[]stage.ParserResult, error,
 ) {
 	config, err := stage.DecodeConfig[Config](configAny)
 	if err != nil {
 		return nil, err
 	}
-	return &stage.ParserResult{
-		Score: config.Score,
-		Comment: fmt.Sprintf(
-			"%s, executor status: run time: %d ns, memory: %d bytes",
-			config.Comment, result.RunTime, result.Memory,
-		),
-	}, nil
+	var res []stage.ParserResult
+	for _, result := range results {
+		res = append(res, stage.ParserResult{
+			Score: config.Score,
+			Comment: fmt.Sprintf(
+				"%s, executor status: run time: %d ns, memory: %d bytes",
+				config.Comment, result.RunTime, result.Memory,
+			),
+		})
+	}
+	return res, nil
 }

@@ -7,17 +7,21 @@ import (
 
 type Dummy struct{}
 
-func (e *Dummy) Run(stage.Cmd) (*stage.ExecutorResult, error) {
-	return &stage.ExecutorResult{
-		Status:     stage.Status(envexec.StatusInvalid),
-		ExitStatus: 0,
-		Error:      "I'm a dummy",
-		Time:       0,
-		Memory:     0,
-		RunTime:    0,
-		Files:      map[string]string{},
-		FileIDs:    map[string]string{},
-	}, nil
+func (e *Dummy) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+	var res []stage.ExecutorResult
+	for range cmds {
+		res = append(res, stage.ExecutorResult{
+			Status:     stage.Status(envexec.StatusInvalid),
+			ExitStatus: 0,
+			Error:      "I'm a dummy",
+			Time:       0,
+			Memory:     0,
+			RunTime:    0,
+			Files:      map[string]string{},
+			FileIDs:    map[string]string{},
+		})
+	}
+	return res, nil
 }
 
 func (e *Dummy) Cleanup() error {

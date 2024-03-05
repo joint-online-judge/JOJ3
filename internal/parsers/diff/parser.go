@@ -8,33 +8,43 @@ import (
 )
 
 type Config struct {
-	Score      int
-	StdoutPath string
+	Cases []struct {
+		Score      int
+		StdoutPath string
+	}
 }
 
 type Diff struct{}
 
-func (e *Diff) Run(result *stage.ExecutorResult, configAny any) (
-	*stage.ParserResult, error,
+func (e *Diff) Run(results []stage.ExecutorResult, configAny any) (
+	[]stage.ParserResult, error,
 ) {
 	config, err := stage.DecodeConfig[Config](configAny)
 	if err != nil {
 		return nil, err
 	}
-	score := 0
-	stdout, err := os.ReadFile(config.StdoutPath)
-	if err != nil {
-		return nil, err
+	if len(config.Cases) != len(results) {
+		return nil, fmt.Errorf("cases number not match")
 	}
-	// TODO: more compare strategies
-	if string(stdout) == result.Files["stdout"] {
-		score = config.Score
+	var res []stage.ParserResult
+	for i, caseConfig := range config.Cases {
+		result := results[i]
+		score := 0
+		stdout, err := os.ReadFile(caseConfig.StdoutPath)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: more compare strategies
+		if string(stdout) == result.Files["stdout"] {
+			score = caseConfig.Score
+		}
+		res = append(res, stage.ParserResult{
+			Score: score,
+			Comment: fmt.Sprintf(
+				"executor status: run time: %d ns, memory: %d bytes",
+				result.RunTime, result.Memory,
+			),
+		})
 	}
-	return &stage.ParserResult{
-		Score: score,
-		Comment: fmt.Sprintf(
-			"executor status: run time: %d ns, memory: %d bytes",
-			result.RunTime, result.Memory,
-		),
-	}, nil
+	return res, nil
 }
