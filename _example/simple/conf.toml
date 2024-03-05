@@ -32,7 +32,7 @@ name = "sandbox"
 [stages.executor.with.default]
 args = ["./a"]
 env = ["PATH=/usr/bin:/bin"]
-cpuLimit = 10_000_000_000
+cpuLimit = 1_000_000_000
 memoryLimit = 104_857_600
 procLimit = 50
 copyOut = ["stdout", "stderr"]
