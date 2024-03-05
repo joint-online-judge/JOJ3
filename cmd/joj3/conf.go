@@ -21,6 +21,13 @@ type Conf struct {
 	}
 }
 
+func DefaultConf() Conf {
+	return Conf{
+		LogLevel:   0,
+		OutputPath: "joj3_result.json",
+	}
+}
+
 type OptionalCmd struct {
 	Args   *[]string
 	Env    *[]string

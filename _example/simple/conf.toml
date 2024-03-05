@@ -1,10 +1,10 @@
-logLevel = 8
+logLevel = 0
 [[stages]]
 name = "compile"
 [stages.executor]
 name = "sandbox"
 [stages.executor.with.default]
-args = ["/usr/bin/g++", "a.cc", "-o", "a"]
+args = ["g++", "a.cc", "-o", "a"]
 env = ["PATH=/usr/bin:/bin"]
 cpuLimit = 10_000_000_000
 memoryLimit = 104_857_600
@@ -36,31 +36,25 @@ cpuLimit = 10_000_000_000
 memoryLimit = 104_857_600
 procLimit = 50
 copyOut = ["stdout", "stderr"]
+[stages.executor.with.default.stdout]
+name = "stdout"
+max = 4_096
+[stages.executor.with.default.stderr]
+name = "stderr"
+max = 4_096
 [stages.executor.with.default.copyInCached]
 a = "a"
 [[stages.executor.with.cases]]
 [stages.executor.with.cases.stdin]
-src = "1.stdin"
-[stages.executor.with.cases.stdout]
-name = "stdout"
-max = 4_096
-[stages.executor.with.cases.stderr]
-name = "stderr"
-max = 4_096
+src = "./cases/1.in"
 [[stages.executor.with.cases]]
 [stages.executor.with.cases.stdin]
-src = "2.stdin"
-[stages.executor.with.cases.stdout]
-name = "stdout"
-max = 4_096
-[stages.executor.with.cases.stderr]
-name = "stderr"
-max = 4_096
+src = "./cases/2.in"
 [stages.parser]
 name = "diff"
 [[stages.parser.with.cases]]
 score = 100
-stdoutPath = "1.stdout"
+stdoutPath = "./cases/1.out"
 [[stages.parser.with.cases]]
 score = 100
-stdoutPath = "2.stdout"
+stdoutPath = "./cases/2.out"

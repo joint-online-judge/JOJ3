@@ -21,11 +21,7 @@ func parseConfFile(tomlPath *string) Conf {
 		slog.Error("read toml config", "error", err)
 		os.Exit(1)
 	}
-	// fill in default value of config file
-	conf := Conf{
-		LogLevel:   0,
-		OutputPath: "joj3_result.json",
-	}
+	conf := DefaultConf()
 	err = toml.Unmarshal(tomlConfig, &conf)
 	if err != nil {
 		slog.Error("parse stages config", "error", err)
@@ -47,6 +43,7 @@ func generateStages(conf Conf) []stage.Stage {
 	stages := []stage.Stage{}
 	for _, s := range conf.Stages {
 		var cmds []stage.Cmd
+		defaultCmd := s.Executor.With.Default
 		for _, optionalCmd := range s.Executor.With.Cases {
 			cmd := s.Executor.With.Default
 			err := copier.Copy(&cmd, &optionalCmd)
@@ -54,10 +51,21 @@ func generateStages(conf Conf) []stage.Stage {
 				slog.Error("generate stages", "error", err)
 				os.Exit(1)
 			}
+			// since these 3 values are pointers, copier will always copy
+			// them, so we need to check them manually
+			if defaultCmd.Stdin != nil && optionalCmd.Stdin == nil {
+				cmd.Stdin = defaultCmd.Stdin
+			}
+			if defaultCmd.Stdout != nil && optionalCmd.Stdout == nil {
+				cmd.Stdout = defaultCmd.Stdout
+			}
+			if defaultCmd.Stderr != nil && optionalCmd.Stderr == nil {
+				cmd.Stderr = defaultCmd.Stderr
+			}
 			cmds = append(cmds, cmd)
 		}
 		if len(s.Executor.With.Cases) == 0 {
-			cmds = append(cmds, s.Executor.With.Default)
+			cmds = []stage.Cmd{defaultCmd}
 		}
 		slog.Info("parse stages config", "cmds", cmds)
 		stages = append(stages, stage.Stage{
