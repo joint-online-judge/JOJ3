@@ -12,12 +12,12 @@ procLimit = 50
 copyInCwd = true
 copyOut = ["stdout", "stderr"]
 copyOutCached = ["a"]
-[[stages.executor.with.default.files]]
+[stages.executor.with.default.stdin]
 content = ""
-[[stages.executor.with.default.files]]
+[stages.executor.with.default.stdout]
 name = "stdout"
 max = 4_096
-[[stages.executor.with.default.files]]
+[stages.executor.with.default.stderr]
 name = "stderr"
 max = 4_096
 [stages.parser]
@@ -39,21 +39,21 @@ copyOut = ["stdout", "stderr"]
 [stages.executor.with.default.copyInCached]
 a = "a"
 [[stages.executor.with.cases]]
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stdin]
 src = "1.stdin"
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stdout]
 name = "stdout"
 max = 4_096
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stderr]
 name = "stderr"
 max = 4_096
 [[stages.executor.with.cases]]
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stdin]
 src = "2.stdin"
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stdout]
 name = "stdout"
 max = 4_096
-[[stages.executor.with.cases.files]]
+[stages.executor.with.cases.stderr]
 name = "stderr"
 max = 4_096
 [stages.parser]

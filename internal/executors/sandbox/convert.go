@@ -17,7 +17,7 @@ func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 			Args:              c.Args,
 			Env:               c.Env,
 			Tty:               c.TTY,
-			Files:             convertPBFiles(c.Files),
+			Files:             convertPBFiles([]*stage.CmdFile{c.Stdin, c.Stdout, c.Stderr}),
 			CpuTimeLimit:      c.CPULimit,
 			ClockTimeLimit:    c.ClockLimit,
 			MemoryLimit:       c.MemoryLimit,

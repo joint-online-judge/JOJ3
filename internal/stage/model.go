@@ -30,9 +30,11 @@ type CmdFile struct {
 
 // Cmd defines command and limits to start a program using in envexec
 type Cmd struct {
-	Args  []string   `json:"args"`
-	Env   []string   `json:"env,omitempty"`
-	Files []*CmdFile `json:"files,omitempty"`
+	Args   []string `json:"args"`
+	Env    []string `json:"env,omitempty"`
+	Stdin  *CmdFile `json:"stdin,omitempty"`
+	Stdout *CmdFile `json:"stdout,omitempty"`
+	Stderr *CmdFile `json:"stderr,omitempty"`
 
 	CPULimit     uint64 `json:"cpuLimit"`
 	RealCPULimit uint64 `json:"realCpuLimit"`

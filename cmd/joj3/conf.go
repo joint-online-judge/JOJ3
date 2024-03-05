@@ -22,9 +22,11 @@ type Conf struct {
 }
 
 type OptionalCmd struct {
-	Args  *[]string
-	Env   *[]string
-	Files *[]*stage.CmdFile
+	Args   *[]string
+	Env    *[]string
+	Stdin  *stage.CmdFile
+	Stdout *stage.CmdFile
+	Stderr *stage.CmdFile
 
 	CPULimit     *uint64
 	RealCPULimit *uint64
