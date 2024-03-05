@@ -67,7 +67,7 @@ func generateStages(conf Conf) []stage.Stage {
 		if len(s.Executor.With.Cases) == 0 {
 			cmds = []stage.Cmd{defaultCmd}
 		}
-		slog.Info("parse stages config", "cmds", cmds)
+		slog.Debug("parse stages config", "cmds", cmds)
 		stages = append(stages, stage.Stage{
 			Name:         s.Name,
 			ExecutorName: s.Executor.Name,
