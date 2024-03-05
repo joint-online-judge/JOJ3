@@ -11,6 +11,7 @@ server:
 steps:
 - name: build
   commands:
+  - export PATH=$PATH:/usr/local/go/bin
   - make
   - ./_example/simple/run.sh
   - cp build/joj3 ~/.local/bin/joj3
