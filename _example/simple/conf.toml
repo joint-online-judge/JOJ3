@@ -49,7 +49,7 @@ name = "stderr"
 max = 4_096
 [[stages.executor.with.cases]]
 [[stages.executor.with.cases.files]]
-src = "1.stdin"
+src = "2.stdin"
 [[stages.executor.with.cases.files]]
 name = "stdout"
 max = 4_096
