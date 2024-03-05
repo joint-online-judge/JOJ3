@@ -11,6 +11,7 @@ server:
 steps:
 - name: build
   commands:
+  - go env -w GOPROXY=https://goproxy.cn,direct
   - export PATH=$PATH:/usr/local/go/bin
   - make
   - ./_example/simple/run.sh
