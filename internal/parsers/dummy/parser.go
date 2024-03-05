@@ -13,12 +13,12 @@ type Config struct {
 
 type Dummy struct{}
 
-func (e *Dummy) Run(results []stage.ExecutorResult, configAny any) (
-	[]stage.ParserResult, error,
+func (*Dummy) Run(results []stage.ExecutorResult, configAny any) (
+	[]stage.ParserResult, bool, error,
 ) {
 	config, err := stage.DecodeConfig[Config](configAny)
 	if err != nil {
-		return nil, err
+		return nil, true, err
 	}
 	var res []stage.ParserResult
 	for _, result := range results {
@@ -30,5 +30,5 @@ func (e *Dummy) Run(results []stage.ExecutorResult, configAny any) (
 			),
 		})
 	}
-	return res, nil
+	return res, false, nil
 }

@@ -18,7 +18,7 @@ func Run(stages []Stage) []StageResult {
 		slog.Info("executor run done", "results", executorResults)
 		slog.Info("parser run start", "config", stage.ParserConfig)
 		parser := parserMap[stage.ParserName]
-		parserResults, err := parser.Run(executorResults, stage.ParserConfig)
+		parserResults, end, err := parser.Run(executorResults, stage.ParserConfig)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
 			break
@@ -28,6 +28,9 @@ func Run(stages []Stage) []StageResult {
 			Name:          stage.Name,
 			ParserResults: parserResults,
 		})
+		if end {
+			break
+		}
 	}
 	return stageResults
 }

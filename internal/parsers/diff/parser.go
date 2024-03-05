@@ -16,15 +16,15 @@ type Config struct {
 
 type Diff struct{}
 
-func (e *Diff) Run(results []stage.ExecutorResult, configAny any) (
-	[]stage.ParserResult, error,
+func (*Diff) Run(results []stage.ExecutorResult, configAny any) (
+	[]stage.ParserResult, bool, error,
 ) {
 	config, err := stage.DecodeConfig[Config](configAny)
 	if err != nil {
-		return nil, err
+		return nil, true, err
 	}
 	if len(config.Cases) != len(results) {
-		return nil, fmt.Errorf("cases number not match")
+		return nil, true, fmt.Errorf("cases number not match")
 	}
 	var res []stage.ParserResult
 	for i, caseConfig := range config.Cases {
@@ -32,7 +32,7 @@ func (e *Diff) Run(results []stage.ExecutorResult, configAny any) (
 		score := 0
 		stdout, err := os.ReadFile(caseConfig.StdoutPath)
 		if err != nil {
-			return nil, err
+			return nil, true, err
 		}
 		// TODO: more compare strategies
 		if string(stdout) == result.Files["stdout"] {
@@ -46,5 +46,5 @@ func (e *Diff) Run(results []stage.ExecutorResult, configAny any) (
 			),
 		})
 	}
-	return res, nil
+	return res, false, nil
 }

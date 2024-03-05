@@ -1,4 +1,4 @@
-logLevel = 0
+logLevel = 8
 [[stages]]
 name = "compile"
 [stages.executor]
@@ -21,7 +21,7 @@ max = 4_096
 name = "stderr"
 max = 4_096
 [stages.parser]
-name = "dummy"
+name = "result-status"
 [stages.parser.with]
 score = 100
 comment = "compile done"
