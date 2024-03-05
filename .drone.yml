@@ -15,4 +15,4 @@ steps:
   - go env -w GOPROXY=https://goproxy.cn,direct
   - make
   - ./_example/simple/run.sh
-  - cp build/joj3 ~/.local/bin/joj3
+  - cp build/joj3 /home/drone/.local/bin/joj3
