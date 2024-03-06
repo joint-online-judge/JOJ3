@@ -91,8 +91,16 @@ func main() {
 	stages := generateStages(conf)
 	defer stage.Cleanup()
 	results := stage.Run(stages)
-	err := outputResult(conf, results)
-	if err != nil {
+	if err := outputResult(conf, results); err != nil {
 		slog.Error("output result", "error", err)
+	}
+	if err := stage.Submit(
+		conf.GiteaUrl,
+		conf.GiteaToken,
+		conf.GiteaOwner,
+		conf.GiteaRepo,
+		results,
+	); err != nil {
+		slog.Error("submit result", "error", err)
 	}
 }

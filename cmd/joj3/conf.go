@@ -5,6 +5,10 @@ import "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 type Conf struct {
 	LogLevel   int    `default:"0"`
 	OutputPath string `default:"joj3_result.json"`
+	GiteaUrl   string `default:"https://focs.ji.sjtu.edu.cn/git"`
+	GiteaToken string `default:""`
+	GiteaOwner string `default:"tests"`
+	GiteaRepo  string `default:"joj3-dev"`
 	Stages     []struct {
 		Name     string
 		Executor struct {

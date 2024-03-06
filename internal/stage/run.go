@@ -1,7 +1,10 @@
 package stage
 
 import (
+	"fmt"
 	"log/slog"
+
+	"code.gitea.io/sdk/gitea"
 )
 
 func Run(stages []Stage) []StageResult {
@@ -44,4 +47,32 @@ func Cleanup() {
 		}
 		slog.Debug("executor cleanup done", "name", name)
 	}
+}
+
+func Submit(url, token, owner, repo string, results []StageResult) error {
+	c, err := gitea.NewClient(url, gitea.SetToken(token))
+	if err != nil {
+		return err
+	}
+	body := "# Stages\n"
+	totalScore := 0
+	for _, result := range results {
+		content := fmt.Sprintf("## %s\n", result.Name)
+		for _, r := range result.Results {
+			content += fmt.Sprintf(
+				"Score: %d\nComment: %s\n\n", r.Score, r.Comment,
+			)
+			totalScore += r.Score
+		}
+		body += content
+	}
+	body += fmt.Sprintf("# Total Score\n%d\n", totalScore)
+	issue, resp, err := c.CreateIssue(owner, repo, gitea.CreateIssueOption{
+		Title: "JOJ3 result test", Body: body,
+	})
+	slog.Debug("create issue", "issue", issue, "resp", resp)
+	if err != nil {
+		return err
+	}
+	return nil
 }
