@@ -10,19 +10,14 @@ import (
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
-	// "github.com/pelletier/go-toml/v2" may panic on some error
-	"github.com/BurntSushi/toml"
 	"github.com/jinzhu/copier"
+	"github.com/koding/multiconfig"
 )
 
-func parseConfFile(tomlPath *string) Conf {
-	tomlConfig, err := os.ReadFile(*tomlPath)
-	if err != nil {
-		slog.Error("read toml config", "error", err)
-		os.Exit(1)
-	}
-	conf := DefaultConf()
-	err = toml.Unmarshal(tomlConfig, &conf)
+func parseConfFile(path string) Conf {
+	m := multiconfig.NewWithPath(path)
+	conf := Conf{}
+	err := m.Load(&conf)
 	if err != nil {
 		slog.Error("parse stages config", "error", err)
 		os.Exit(1)
@@ -89,9 +84,9 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 }
 
 func main() {
-	tomlPath := flag.String("c", "conf.toml", "file path of the toml config")
+	tomlPath := flag.String("c", "conf.toml", "file path of the config file")
 	flag.Parse()
-	conf := parseConfFile(tomlPath)
+	conf := parseConfFile(*tomlPath)
 	setupSlog(conf)
 	stages := generateStages(conf)
 	defer stage.Cleanup()

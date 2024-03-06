@@ -3,8 +3,8 @@ package main
 import "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
 type Conf struct {
-	LogLevel   int
-	OutputPath string
+	LogLevel   int    `default:"0"`
+	OutputPath string `default:"joj3_result.json"`
 	Stages     []struct {
 		Name     string
 		Executor struct {
@@ -18,13 +18,6 @@ type Conf struct {
 			Name string
 			With interface{}
 		}
-	}
-}
-
-func DefaultConf() Conf {
-	return Conf{
-		LogLevel:   0,
-		OutputPath: "joj3_result.json",
 	}
 }
 
