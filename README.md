@@ -5,7 +5,7 @@
 In order to register sandbox executor, you need to run go-judge before running this program.
 
 ```bash
-$ make clean && make && ./_example/success/run.sh && ./_example/compile_error/run.sh
+$ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./_example/success/run.sh && ./_example/compile_error/run.sh
 rm -rf ./build/*
 rm -rf *.out
 go build -o ./build/joj3 ./cmd/joj3
