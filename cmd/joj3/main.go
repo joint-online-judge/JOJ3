@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
+	"errors"
 	"log/slog"
 	"os"
 
@@ -10,20 +10,9 @@ import (
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/jinzhu/copier"
-	"github.com/koding/multiconfig"
 )
-
-func parseConfFile(path string) Conf {
-	m := multiconfig.NewWithPath(path)
-	conf := Conf{}
-	err := m.Load(&conf)
-	if err != nil {
-		slog.Error("parse stages config", "error", err)
-		os.Exit(1)
-	}
-	return conf
-}
 
 func setupSlog(conf Conf) {
 	lvl := new(slog.LevelVar)
@@ -84,9 +73,16 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 }
 
 func main() {
-	tomlPath := flag.String("c", "conf.toml", "file path of the config file")
-	flag.Parse()
-	conf := parseConfFile(*tomlPath)
+	conf, err := commitMsgToConf()
+	if err != nil {
+		// FIXME: just for local testing purpose
+		if errors.Is(err, git.ErrRepositoryNotExists) {
+			conf = parseConfFile("conf.toml")
+		} else {
+			slog.Error("no conf found", "error", err)
+			os.Exit(0)
+		}
+	}
 	setupSlog(conf)
 	stages := generateStages(conf)
 	defer stage.Cleanup()
