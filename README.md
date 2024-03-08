@@ -5,21 +5,21 @@
 In order to register sandbox executor, you need to run go-judge before running this program.
 
 ```bash
-$ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./_example/success/run.sh && ./_example/compile_error/run.sh
+$ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./examples/success/run.sh && ./examples/compile_error/run.sh
 rm -rf ./build/*
 rm -rf *.out
 go build -o ./build/joj3 ./cmd/joj3
-++ dirname -- ./_example/success/run.sh
-+ DIRNAME=./_example/success
-+ cd ./_example/success
+++ dirname -- ./examples/success/run.sh
++ DIRNAME=./examples/success
++ cd ./examples/success
 + ./../../build/joj3
 + cat ./joj3_result.json
 [{"Name":"compile","Results":[{"Score":0,"Comment":""}]},{"Name":"run","Results":[{"Score":100,"Comment":"executor status: run time: 2811900 ns, memory: 16658432 bytes"},{"Score":100,"Comment":"executor status: run time: 2578200 ns, memory: 13094912 bytes"}]}]
 + rm -f ./joj3_result.json
 + cd -
-++ dirname -- ./_example/compile_error/run.sh
-+ DIRNAME=./_example/compile_error
-+ cd ./_example/compile_error
+++ dirname -- ./examples/compile_error/run.sh
++ DIRNAME=./examples/compile_error
++ cd ./examples/compile_error
 + ./../../build/joj3
 + cat ./joj3_result.json
 [{"Name":"compile","Results":[{"Score":0,"Comment":"Unexpected executor status: Nonzero Exit Status."}]}]

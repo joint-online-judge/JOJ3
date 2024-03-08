@@ -8,3 +8,4 @@ cd $DIRNAME
 cat ./joj3_result.json
 rm -f ./joj3_result.json
 cd -
+w
