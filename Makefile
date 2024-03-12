@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean test
 
 BUILD_DIR = ./build
 APP_NAME = joj3
@@ -9,3 +9,6 @@ all:
 clean:
 	rm -rf $(BUILD_DIR)/*
 	rm -rf *.out
+
+test:
+	go test -v ./...

@@ -3,20 +3,20 @@ kind: pipeline
 type: ssh
 name: CI
 server:
-  host: 111.186.59.59
-  user: drone
-  ssh_key:
-    from_secret: joj3-test
+    host: 111.186.59.59
+    user: drone
+    ssh_key:
+        from_secret: joj3-test
 
 steps:
-- name: build
-  environment:
-    CONF_GITEATOKEN:
-      from_secret: gitea-token
-  commands:
-  - export PATH=$PATH:/usr/local/go/bin
-  - go env -w GOPROXY=https://goproxy.cn,direct
-  - make
-  - ./examples/success/run.sh
-  - ./examples/compile_error/run.sh
-  - cp build/joj3 /home/drone/.local/bin/joj3
+    - name: build
+      environment:
+          CONF_GITEATOKEN:
+              from_secret: gitea-token
+      commands:
+          - export PATH=$PATH:/usr/local/go/bin
+          - go env -w GOPROXY=https://goproxy.cn,direct
+          - make
+          - ./examples/success/run.sh
+          - ./examples/compile_error/run.sh
+          - cp build/joj3 /home/drone/.local/bin/joj3

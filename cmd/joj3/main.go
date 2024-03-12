@@ -69,7 +69,7 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 		return err
 	}
 	return os.WriteFile(conf.OutputPath,
-		append(content, []byte("\n")...), 0o666)
+		append(content, []byte("\n")...), 0o600)
 }
 
 func main() {

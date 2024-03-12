@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-In order to register sandbox executor, you need to run go-judge before running this program.
+In order to register the sandbox executor, you need to run go-judge before running this program.
 
 ```bash
 $ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./examples/success/run.sh && ./examples/compile_error/run.sh
@@ -25,6 +25,17 @@ go build -o ./build/joj3 ./cmd/joj3
 [{"Name":"compile","Results":[{"Score":0,"Comment":"Unexpected executor status: Nonzero Exit Status."}]}]
 + rm -f ./joj3_result.json
 + cd -
+```
+
+### For developers
+
+Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports).
+
+Then install the pre-commit hooks. It will run some checks before you commit.
+
+```bash
+$ pre-commit install
+pre-commit installed at .git/hooks/pre-commit
 ```
 
 ## Models

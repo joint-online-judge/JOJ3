@@ -1,0 +1,11 @@
+---
+linters:
+    enable:
+        - gosec
+        - gocritic
+        - gofmt
+issues:
+    exclude-rules:
+        - linters:
+              - gosec
+          text: G601   # false positive since go 1.22
