@@ -1,10 +1,10 @@
 .PHONY: all clean test
 
 BUILD_DIR = ./build
-APP_NAME = joj3
+APPS := $(notdir $(wildcard ./cmd/*))
 
 all:
-	go build -o $(BUILD_DIR)/$(APP_NAME) ./cmd/$(APP_NAME)
+	$(foreach APP,$(APPS), go build -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
 
 clean:
 	rm -rf $(BUILD_DIR)/*

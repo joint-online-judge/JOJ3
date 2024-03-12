@@ -51,13 +51,13 @@ func generateStages(conf Conf) []stage.Stage {
 		if len(s.Executor.With.Cases) == 0 {
 			cmds = []stage.Cmd{defaultCmd}
 		}
-		slog.Debug("parse stages config", "cmds", cmds)
+		slog.Debug("parse stages conf", "cmds", cmds)
 		stages = append(stages, stage.Stage{
 			Name:         s.Name,
 			ExecutorName: s.Executor.Name,
 			ExecutorCmds: cmds,
 			ParserName:   s.Parser.Name,
-			ParserConfig: s.Parser.With,
+			ParserConf:   s.Parser.With,
 		})
 	}
 	return stages

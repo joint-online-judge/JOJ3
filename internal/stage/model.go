@@ -155,7 +155,7 @@ type Stage struct {
 	ExecutorName string
 	ExecutorCmds []Cmd
 	ParserName   string
-	ParserConfig any
+	ParserConf   any
 }
 
 type ParserResult struct {

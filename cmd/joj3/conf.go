@@ -68,7 +68,7 @@ func parseConfFile(path string) Conf {
 	conf := Conf{}
 	err := m.Load(&conf)
 	if err != nil {
-		slog.Error("parse stages config", "error", err)
+		slog.Error("parse stages conf", "error", err)
 		os.Exit(1)
 	}
 	return conf

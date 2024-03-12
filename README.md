@@ -46,7 +46,7 @@ Each stage contains a executor and parser.
 
 Executor takes a `Cmd` and returns a `ExecutorResult`.
 
-Parser takes a `ExecutorResult` and its config and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
+Parser takes a `ExecutorResult` and its conf and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
 
 ### `Cmd`
 

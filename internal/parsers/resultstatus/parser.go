@@ -7,15 +7,15 @@ import (
 	"github.com/criyle/go-judge/envexec"
 )
 
-type Config struct{}
+type Conf struct{}
 
 type ResultStatus struct{}
 
-func (*ResultStatus) Run(results []stage.ExecutorResult, configAny any) (
+func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
-	// TODO: more config options
-	_, err := stage.DecodeConfig[Config](configAny)
+	// TODO: more conf options
+	_, err := stage.DecodeConf[Conf](confAny)
 	if err != nil {
 		return nil, true, err
 	}

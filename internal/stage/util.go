@@ -2,11 +2,11 @@ package stage
 
 import "github.com/mitchellh/mapstructure"
 
-func DecodeConfig[T any](configAny any) (*T, error) {
-	var config T
-	err := mapstructure.Decode(configAny, &config)
+func DecodeConf[T any](confAny any) (*T, error) {
+	var conf T
+	err := mapstructure.Decode(confAny, &conf)
 	if err != nil {
 		return nil, err
 	}
-	return &config, nil
+	return &conf, nil
 }
