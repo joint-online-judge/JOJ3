@@ -12,7 +12,11 @@ func Run(stages []Stage) []StageResult {
 	for _, stage := range stages {
 		slog.Debug("stage start", "name", stage.Name)
 		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)
-		executor := executorMap[stage.ExecutorName]
+		executor, ok := executorMap[stage.ExecutorName]
+		if !ok {
+			slog.Error("executor not found", "name", stage.ExecutorName)
+			break
+		}
 		executorResults, err := executor.Run(stage.ExecutorCmds)
 		if err != nil {
 			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
@@ -20,7 +24,11 @@ func Run(stages []Stage) []StageResult {
 		}
 		slog.Debug("executor run done", "results", executorResults)
 		slog.Debug("parser run start", "conf", stage.ParserConf)
-		parser := parserMap[stage.ParserName]
+		parser, ok := parserMap[stage.ParserName]
+		if !ok {
+			slog.Error("parser not found", "name", stage.ParserName)
+			break
+		}
 		parserResults, end, err := parser.Run(executorResults, stage.ParserConf)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
