@@ -14,6 +14,10 @@ repos:
       rev: 0.2.2
       hooks:
           - id: checkmake
+    - repo: https://github.com/Bahjat/pre-commit-golang
+      rev: v1.0.2
+      hooks:
+          - id: gofumpt
     - repo: https://github.com/dnephin/pre-commit-golang
       rev: v0.5.1
       hooks:

@@ -3,7 +3,9 @@ linters:
     enable:
         - gosec
         - gocritic
+        - gofumpt
         - gofmt
+        - goimports
 issues:
     exclude-rules:
         - linters:

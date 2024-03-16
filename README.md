@@ -29,7 +29,7 @@ go build -o ./build/joj3 ./cmd/joj3
 
 ### For developers
 
-Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports).
+Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports), [`gofumpt`](https://github.com/mvdan/gofumpt).
 
 Then install the pre-commit hooks. It will run some checks before you commit.
 
