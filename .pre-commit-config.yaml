@@ -10,10 +10,6 @@ repos:
       rev: 0.2.3
       hooks:
           - id: yamlfmt
-    - repo: https://github.com/mrtazz/checkmake.git
-      rev: 0.2.2
-      hooks:
-          - id: checkmake
     - repo: https://github.com/Bahjat/pre-commit-golang
       rev: v1.0.2
       hooks:
