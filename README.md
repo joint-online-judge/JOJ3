@@ -5,26 +5,36 @@
 To register the sandbox executor, you need to run go-judge before running this program.
 
 ```bash
-$ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./examples/success/run.sh && ./examples/compile_error/run.sh
-rm -rf ./build/*
-rm -rf *.out
-go build -o ./build/joj3 ./cmd/joj3
-++ dirname -- ./examples/success/run.sh
-+ DIRNAME=./examples/success
-+ cd ./examples/success
-+ ./../../build/joj3
-+ cat ./joj3_result.json
-[{"Name":"compile","Results":[{"Score":0,"Comment":""}]},{"Name":"run","Results":[{"Score":100,"Comment":"executor status: run time: 2811900 ns, memory: 16658432 bytes"},{"Score":100,"Comment":"executor status: run time: 2578200 ns, memory: 13094912 bytes"}]}]
-+ rm -f ./joj3_result.json
-+ cd -
-++ dirname -- ./examples/compile_error/run.sh
-+ DIRNAME=./examples/compile_error
-+ cd ./examples/compile_error
-+ ./../../build/joj3
-+ cat ./joj3_result.json
-[{"Name":"compile","Results":[{"Score":0,"Comment":"Unexpected executor status: Nonzero Exit Status."}]}]
-+ rm -f ./joj3_result.json
-+ cd -
+$ make test
+go test -v ./...
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/dummy [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors        [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/dummy  [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy    [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers  [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/diff     [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/sandbox        [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/resultstatus     [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage    [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/dummy [no test files]
+?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/healthcheck   [no test files]
+=== RUN   TestMain
+=== RUN   TestMain/success
+    main_test.go:96: stageResults: [{Name:compile Results:[{Score:0 Comment:}]} {Name:run Results:[{Score:100 Comment:executor status: run time: 1910200 ns, memory: 13529088 bytes} {Score:100 Comment:executor status: run time: 1703000 ns, memory: 15536128 bytes}]}]
+=== RUN   TestMain/compile_error
+    main_test.go:96: stageResults: [{Name:compile Results:[{Score:0 Comment:Unexpected executor status: Nonzero Exit Status.}]}]
+=== RUN   TestMain/dummy
+    main_test.go:96: stageResults: [{Name:dummy Results:[{Score:110 Comment:dummy comment + comment from toml conf}]}]
+=== RUN   TestMain/dummy_error
+    main_test.go:96: stageResults: [{Name:dummy Results:[{Score:0 Comment:Unexpected executor status: Nonzero Exit Status.
+        Stderr: dummy negative score: -1}]}]
+--- PASS: TestMain (0.29s)
+    --- PASS: TestMain/success (0.27s)
+    --- PASS: TestMain/compile_error (0.01s)
+    --- PASS: TestMain/dummy (0.01s)
+    --- PASS: TestMain/dummy_error (0.01s)
+PASS
+ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  0.295s
 ```
 
 ### For developers

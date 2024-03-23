@@ -1,3 +1,4 @@
+skipGitea = true
 logLevel = 0
 [[stages]]
 name = "compile"

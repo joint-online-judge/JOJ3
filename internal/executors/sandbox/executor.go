@@ -53,13 +53,14 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 }
 
 func (e *Sandbox) Cleanup() error {
-	for _, fileID := range e.cachedMap {
+	for k, fileID := range e.cachedMap {
 		_, err := e.execClient.FileDelete(context.TODO(), &pb.FileID{
 			FileID: fileID,
 		})
 		if err != nil {
 			slog.Error("sandbox cleanup", "error", err)
 		}
+		delete(e.cachedMap, k)
 	}
 	return nil
 }

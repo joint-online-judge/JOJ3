@@ -12,6 +12,7 @@ import (
 type Conf struct {
 	LogLevel   int    `default:"0"`
 	OutputPath string `default:"joj3_result.json"`
+	SkipGitea  bool
 	GiteaUrl   string `default:"https://focs.ji.sjtu.edu.cn/git"`
 	GiteaToken string `default:""`
 	GiteaOwner string `default:"tests"`

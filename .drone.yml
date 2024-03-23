@@ -17,6 +17,5 @@ steps:
           - export PATH=$PATH:/usr/local/go/bin
           - go env -w GOPROXY=https://goproxy.cn,direct
           - make
-          - ./examples/success/run.sh
-          - ./examples/compile_error/run.sh
+          - make test
           - cp build/joj3 /home/drone/.local/bin/joj3

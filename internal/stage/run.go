@@ -8,7 +8,7 @@ import (
 )
 
 func Run(stages []Stage) []StageResult {
-	var stageResults []StageResult
+	stageResults := []StageResult{}
 	for _, stage := range stages {
 		slog.Debug("stage start", "name", stage.Name)
 		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)

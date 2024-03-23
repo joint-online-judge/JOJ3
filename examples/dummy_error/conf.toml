@@ -1,3 +1,4 @@
+skipGitea = true
 [[stages]]
 name = "dummy"
 [stages.executor]
