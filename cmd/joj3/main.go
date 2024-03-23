@@ -80,7 +80,7 @@ func main() {
 			conf = parseConfFile("conf.toml")
 		} else {
 			slog.Error("no conf found", "error", err)
-			os.Exit(0)
+			os.Exit(1)
 		}
 	}
 	setupSlog(conf)
