@@ -16,8 +16,12 @@ type Sandbox struct {
 }
 
 func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+	var err error
 	if e.execClient == nil {
-		e.execClient = createExecClient(e.execServer, e.token)
+		e.execClient, err = createExecClient(e.execServer, e.token)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// cannot use range loop since we need to change the value
 	for i := 0; i < len(cmds); i++ {

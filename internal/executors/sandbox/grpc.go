@@ -3,7 +3,6 @@ package sandbox
 import (
 	"context"
 	"log/slog"
-	"os"
 
 	"github.com/criyle/go-judge/pb"
 	"google.golang.org/grpc"
@@ -12,13 +11,13 @@ import (
 )
 
 // copied from https://github.com/criyle/go-judger-demo/blob/master/apigateway/main.go
-func createExecClient(execServer, token string) pb.ExecutorClient {
+func createExecClient(execServer, token string) (pb.ExecutorClient, error) {
 	conn, err := createGRPCConnection(execServer, token)
 	if err != nil {
 		slog.Error("gRPC connection", "error", err)
-		os.Exit(1)
+		return nil, err
 	}
-	return pb.NewExecutorClient(conn)
+	return pb.NewExecutorClient(conn), nil
 }
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
