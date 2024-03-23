@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-In order to register the sandbox executor, you need to run go-judge before running this program.
+To register the sandbox executor, you need to run go-judge before running this program.
 
 ```bash
 $ export CONF_GITEATOKEN="<YOUR_TOKEN>" && make clean && make && ./examples/success/run.sh && ./examples/compile_error/run.sh
@@ -39,30 +39,29 @@ pre-commit installed at .git/hooks/pre-commit
 ```
 
 ## Models
+The program parses the TOML file to run multiple stages.
 
-The program parse the TOML file to run multiple stages.
+Each stage contains an executor and parser.
 
-Each stage contains a executor and parser.
+Executor takes a `Cmd` and returns an `ExecutorResult`.
 
-Executor takes a `Cmd` and returns a `ExecutorResult`.
-
-Parser takes a `ExecutorResult` and its conf and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
+Parser takes an `ExecutorResult` and its conf and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
 
 ### `Cmd`
 
-Check `Cmd` in <https://github.com/criyle/go-judge#rest-api-interface>.
+Check `Cmd` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 Some difference:
 
 -   `CopyInCwd bool`: set to `true` to add everything in the current working directory to `CopyIn`.
--   `CopyInCached map[string]string`: key: file name in sandbox, value: file name used in `CopyOutCached`.
--   `LocalFile`: now support relative path
+-   `CopyInCached map[string]string`: key: file name in the sandbox, value: file name used in `CopyOutCached`.
+-   `LocalFile`: now supports the relative path
 
 ### `ExecutorResult`
 
-Check `Result` in <https://github.com/criyle/go-judge#rest-api-interface>.
+Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 ### `ParserResult`
 
 -   `Score int`: score of the stage.
--   `Comment string`: comment of the stage.
+-   `Comment string`: comment on the stage.
