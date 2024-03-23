@@ -10,11 +10,15 @@ import (
 )
 
 type Sandbox struct {
-	execClient pb.ExecutorClient
-	cachedMap  map[string]string
+	execServer, token string
+	cachedMap         map[string]string
+	execClient        pb.ExecutorClient
 }
 
 func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+	if e.execClient == nil {
+		e.execClient = createExecClient(e.execServer, e.token)
+	}
 	// cannot use range loop since we need to change the value
 	for i := 0; i < len(cmds); i++ {
 		cmd := &cmds[i]

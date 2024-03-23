@@ -9,7 +9,8 @@ var name = "sandbox"
 func init() {
 	stage.RegisterExecutor(name, &Sandbox{
 		// TODO: read from conf
-		execClient: createExecClient("localhost:5051", ""),
+		execServer: "localhost:5051",
+		token:      "",
 		cachedMap:  make(map[string]string),
 	})
 }
