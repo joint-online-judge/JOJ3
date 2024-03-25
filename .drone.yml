@@ -9,13 +9,24 @@ server:
         from_secret: joj3-test
 
 steps:
+    - name: prepare
+      commands:
+          - export PATH=$PATH:/usr/local/go/bin
+          - go env -w GOPROXY=https://goproxy.cn,direct
+          - echo $SHELL
+          - echo $PATH
+          - go version
     - name: build
+      commands:
+          - export PATH=$PATH:/usr/local/go/bin
+          - make
+    - name: test
       environment:
           CONF_GITEATOKEN:
               from_secret: gitea-token
       commands:
           - export PATH=$PATH:/usr/local/go/bin
-          - go env -w GOPROXY=https://goproxy.cn,direct
-          - make
           - make test
+    - name: store
+      commands:
           - cp build/joj3 /home/drone/.local/bin/joj3
