@@ -11,21 +11,20 @@ server:
 steps:
     - name: prepare
       commands:
-          - export PATH=$PATH:/usr/local/go/bin
           - go env -w GOPROXY=https://goproxy.cn,direct
-          - echo $SHELL
-          - echo $PATH
+          - whoami
+          - pwd
+          - env
           - go version
+          - go env
     - name: build
       commands:
-          - export PATH=$PATH:/usr/local/go/bin
           - make
     - name: test
       environment:
           CONF_GITEATOKEN:
               from_secret: gitea-token
       commands:
-          - export PATH=$PATH:/usr/local/go/bin
           - make test
     - name: store
       commands:
