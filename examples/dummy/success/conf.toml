@@ -4,14 +4,14 @@ name = "dummy"
 [stages.executor]
 name = "sandbox"
 [stages.executor.with.default]
-args = ["./dummy", "--score", "-1"]
+args = ["./dummy", "--score", "100"]
 env = ["PATH=/usr/bin:/bin"]
 cpuLimit = 10_000_000_000
 memoryLimit = 104_857_600
 procLimit = 50
 copyInCwd = true
 [stages.executor.with.default.copyIn.dummy]
-src = "./../../build/dummy"
+src = "./../../../build/dummy"
 copyOut = ["stdout", "stderr"]
 [stages.executor.with.default.stdin]
 content = ""

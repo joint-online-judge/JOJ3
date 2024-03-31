@@ -44,7 +44,7 @@ func TestMain(t *testing.T) {
 		name string
 		want []stage.StageResult
 	}{
-		{"success", []stage.StageResult{
+		{"compile/success", []stage.StageResult{
 			{Name: "compile", Results: []stage.ParserResult{
 				{Score: 0, Comment: ""},
 			}},
@@ -53,17 +53,17 @@ func TestMain(t *testing.T) {
 				{Score: 100, Comment: "executor status: run time: \\d+ ns, memory: \\d+ bytes"},
 			}},
 		}},
-		{"compile_error", []stage.StageResult{
+		{"compile/error", []stage.StageResult{
 			{Name: "compile", Results: []stage.ParserResult{
 				{Score: 0, Comment: "Unexpected executor status: Nonzero Exit Status\\."},
 			}},
 		}},
-		{"dummy", []stage.StageResult{
+		{"dummy/success", []stage.StageResult{
 			{Name: "dummy", Results: []stage.ParserResult{
 				{Score: 110, Comment: "dummy comment \\+ comment from toml conf"},
 			}},
 		}},
-		{"dummy_error", []stage.StageResult{
+		{"dummy/error", []stage.StageResult{
 			{Name: "dummy", Results: []stage.ParserResult{
 				{Score: 0, Comment: "Unexpected executor status: Nonzero Exit Status\\.\\s*Stderr: dummy negative score: -1"},
 			}},
