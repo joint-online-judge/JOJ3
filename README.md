@@ -2,13 +2,27 @@
 
 ## Quick Start
 
-To register the sandbox executor, you need to run [go-judge](https://github.com/criyle/go-judge) before running this program.
+1. Make sure you are in a Unix-like OS (Linux, MacOS). For Windows, use [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-**Hint for `go-judge`:** `go build -o ./tmp/go-judge ./cmd/go-judge && ./tmp/go-judge -enable-grpc -enable-debug -enable-metrics`
+2. Install [Go](https://go.dev/doc/install). Also make sure `make` and `git` are installed and all 3 programs are presented in `$PATH`.
 
-Then you can check the functions of `joj3` with the `make test`. The cases used here are in `/examples`.
+3. Enable cgroups v2 for your OS. Check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
 
+4. Clone [go-judge](https://github.com/criyle/go-judge).
 ```bash
+$ git clone https://github.com/criyle/go-judge && cd go-judge
+$ go build -o ./tmp/go-judge ./cmd/go-judge
+```
+
+5. Run `go-judge`.
+```bash
+$ # make sure you are in go-judge directory
+$ ./tmp/go-judge -enable-grpc -enable-debug -enable-metrics
+```
+
+6. Check the functions of `joj3` with the `make test`, which should pass all the test cases. The cases used here are in `/examples`.
+```bash
+$ # make sure you are in JOJ3 directory
 $ make test
 go test -coverprofile cover.out -v ./...
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/dummy         coverage: 0.0% of statements
@@ -44,14 +58,15 @@ ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  0.403s  coverage: 68.5% 
 
 ### For developers
 
-Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports), [`gofumpt`](https://github.com/mvdan/gofumpt).
+1. Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports), [`gofumpt`](https://github.com/mvdan/gofumpt).
 
-Then install the pre-commit hooks. It will run some checks before you commit.
-
+2. Install the pre-commit hooks. It will run some checks before you commit.
 ```bash
 $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
+
+3. You only need to run step 5 and 6 in quick start during development.
 
 ## Models
 
