@@ -159,11 +159,11 @@ type Stage struct {
 }
 
 type ParserResult struct {
-	Score   int
-	Comment string
+	Score   int    `json:"score"`
+	Comment string `json:"comment"`
 }
 
 type StageResult struct {
-	Name    string
-	Results []ParserResult
+	Name    string         `json:"name"`
+	Results []ParserResult `json:"results"`
 }
