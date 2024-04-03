@@ -10,72 +10,70 @@ import (
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 )
 
-func compareStageResults(t *testing.T, actual, want []stage.StageResult) {
+func compareStageResults(t *testing.T, actual, expected []stage.StageResult, regex bool) {
 	t.Helper()
-	if len(actual) != len(want) {
-		t.Fatalf("len(actual) = %d, want %d", len(actual), len(want))
+	if len(actual) != len(expected) {
+		t.Fatalf("len(actual) = %d, expected %d", len(actual), len(expected))
 	}
 	for i := range actual {
-		if actual[i].Name != want[i].Name {
-			t.Errorf("actual[%d].Name = %s, want = %s", i, actual[i].Name,
-				want[i].Name)
+		if actual[i].Name != expected[i].Name {
+			t.Errorf("actual[%d].Name = %s, expected = %s", i, actual[i].Name,
+				expected[i].Name)
 		}
-		if len(actual[i].Results) != len(want[i].Results) {
-			t.Fatalf("len(actual[%d].Results) = %d, want = %d", i,
-				len(actual[i].Results), len(want[i].Results))
+		if len(actual[i].Results) != len(expected[i].Results) {
+			t.Fatalf("len(actual[%d].Results) = %d, expected = %d", i,
+				len(actual[i].Results), len(expected[i].Results))
 		}
 		for j := range actual[i].Results {
-			if actual[i].Results[j].Score != want[i].Results[j].Score {
-				t.Errorf("actual[%d].Results[%d].Score = %d, want = %d", i, j,
-					actual[i].Results[j].Score, want[i].Results[j].Score)
+			if actual[i].Results[j].Score != expected[i].Results[j].Score {
+				t.Errorf("actual[%d].Results[%d].Score = %d, expected = %d", i, j,
+					actual[i].Results[j].Score, expected[i].Results[j].Score)
 			}
-			r := regexp.MustCompile(want[i].Results[j].Comment)
-			if !r.MatchString(actual[i].Results[j].Comment) {
-				t.Errorf("actual[%d].Results[%d].Comment = %s, want RegExp = %s",
-					i, j, actual[i].Results[j].Comment,
-					want[i].Results[j].Comment)
+			if regex {
+				r := regexp.MustCompile(expected[i].Results[j].Comment)
+				if !r.MatchString(actual[i].Results[j].Comment) {
+					t.Errorf("actual[%d].Results[%d].Comment = %s, expected RegExp = %s",
+						i, j, actual[i].Results[j].Comment,
+						expected[i].Results[j].Comment)
+				}
+			} else if actual[i].Results[j].Comment != expected[i].Results[j].Comment {
+				t.Errorf("actual[%d].Results[%d].Comment = %s, expected = %s", i, j,
+					actual[i].Results[j].Comment, expected[i].Results[j].Comment)
 			}
 		}
 	}
 }
 
+func readStageResults(t *testing.T, path string) []stage.StageResult {
+	t.Helper()
+	file, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	var results []stage.StageResult
+	err = json.NewDecoder(file).Decode(&results)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return results
+}
+
 func TestMain(t *testing.T) {
-	tests := []struct {
-		name string
-		want []stage.StageResult
-	}{
-		{"compile/success", []stage.StageResult{
-			{Name: "compile", Results: []stage.ParserResult{
-				{Score: 0, Comment: ""},
-			}},
-			{Name: "run", Results: []stage.ParserResult{
-				{Score: 100, Comment: "executor status: run time: \\d+ ns, memory: \\d+ bytes"},
-				{Score: 100, Comment: "executor status: run time: \\d+ ns, memory: \\d+ bytes"},
-			}},
-		}},
-		{"compile/error", []stage.StageResult{
-			{Name: "compile", Results: []stage.ParserResult{
-				{Score: 0, Comment: "Unexpected executor status: Nonzero Exit Status\\."},
-			}},
-		}},
-		{"dummy/success", []stage.StageResult{
-			{Name: "dummy", Results: []stage.ParserResult{
-				{Score: 110, Comment: "dummy comment \\+ comment from toml conf"},
-			}},
-		}},
-		{"dummy/error", []stage.StageResult{
-			{Name: "dummy", Results: []stage.ParserResult{
-				{Score: 0, Comment: "Unexpected executor status: Nonzero Exit Status\\.\\s*Stderr: dummy negative score: -1"},
-			}},
-		}},
+	tests := []string{
+		"compile/success",
+		"compile/error",
+		"dummy/success",
+		"dummy/error",
+		"cpplint/sillycode",
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt, func(t *testing.T) {
 			origDir, err := os.Getwd()
 			if err != nil {
 				t.Fatal(err)
 			}
-			err = os.Chdir(fmt.Sprintf("../../examples/%s", tt.name))
+			err = os.Chdir(fmt.Sprintf("../../examples/%s", tt))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -86,20 +84,18 @@ func TestMain(t *testing.T) {
 				}
 			}()
 			os.Args = []string{"./joj3"}
-			main()
 			outputFile := "joj3_result.json"
-			data, err := os.ReadFile(outputFile)
-			if err != nil {
-				t.Fatal(err)
-			}
 			defer os.Remove(outputFile)
-			var stageResults []stage.StageResult
-			err = json.Unmarshal(data, &stageResults)
-			if err != nil {
-				t.Fatal(err)
+			main()
+			stageResults := readStageResults(t, outputFile)
+			regex := true
+			expectedFile := "expected_regex.json"
+			if _, err := os.Stat(expectedFile); os.IsNotExist(err) {
+				regex = false
+				expectedFile = "expected.json"
 			}
-			t.Logf("stageResults: %+v", stageResults)
-			compareStageResults(t, stageResults, tt.want)
+			expectedStageResults := readStageResults(t, expectedFile)
+			compareStageResults(t, stageResults, expectedStageResults, regex)
 		})
 	}
 }

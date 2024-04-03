@@ -1,6 +1,7 @@
 package parsers
 
 import (
+	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/cpplint"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/diff"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/resultstatus"

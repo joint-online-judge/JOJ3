@@ -89,7 +89,7 @@ func commitMsgToConf() (conf Conf, err error) {
 		return
 	}
 	msg := commit.Message
-	slog.Info("commit msg to conf", "msg", msg)
+	slog.Debug("commit msg to conf", "msg", msg)
 	// TODO: parse msg to conf name
 	conf = parseConfFile("conf.toml")
 	return

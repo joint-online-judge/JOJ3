@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"os"
 
@@ -10,7 +9,6 @@ import (
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/jinzhu/copier"
 )
 
@@ -75,13 +73,8 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 func main() {
 	conf, err := commitMsgToConf()
 	if err != nil {
-		// FIXME: just for local testing purpose
-		if errors.Is(err, git.ErrRepositoryNotExists) {
-			conf = parseConfFile("conf.toml")
-		} else {
-			slog.Error("no conf found", "error", err)
-			os.Exit(1)
-		}
+		slog.Error("no conf found", "error", err)
+		os.Exit(1)
 	}
 	setupSlog(conf)
 	stages := generateStages(conf)

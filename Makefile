@@ -11,5 +11,8 @@ clean:
 	rm -rf $(BUILD_DIR)/*
 	rm -rf *.out
 
+prepare-test:
+	git submodule update --init --remote
+
 test:
 	go test -coverprofile cover.out -v ./...

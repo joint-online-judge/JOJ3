@@ -1,0 +1,20 @@
+[submodule "examples/cpplint/sillycode"]
+	path = examples/cpplint/sillycode
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = cpplint/sillycode
+[submodule "examples/compile/success"]
+	path = examples/compile/success
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = compile/success
+[submodule "examples/compile/error"]
+	path = examples/compile/error
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = compile/error
+[submodule "examples/dummy/success"]
+	path = examples/dummy/success
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = dummy/success
+[submodule "examples/dummy/error"]
+	path = examples/dummy/error
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = dummy/error

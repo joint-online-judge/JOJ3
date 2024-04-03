@@ -4,9 +4,9 @@
 
 1. Make sure you are in a Unix-like OS (Linux, MacOS). For Windows, use [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-2. Install [Go](https://go.dev/doc/install). Also make sure `make` and `git` are installed and all 3 programs are presented in `$PATH`.
+2. Install [Go](https://go.dev/doc/install). Also, make sure `make` and `git` are installed and all 3 programs are presented in `$PATH`.
 
-3. Enable cgroups v2 for your OS. Check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
+3. Enable cgroup v2 for your OS. Check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
 
 4. Clone [go-judge](https://github.com/criyle/go-judge).
 ```bash
@@ -20,40 +20,47 @@ $ # make sure you are in go-judge directory
 $ ./tmp/go-judge -enable-grpc -enable-debug -enable-metrics
 ```
 
-6. Check the functions of `joj3` with the `make test`, which should pass all the test cases. The cases used here are in `/examples`.
+6. Pull submodules. It might be slow, so only run it when necessary.
+
 ```bash
 $ # make sure you are in JOJ3 directory
+$ make prepare-test
+```
+
+7. Check the functions of `joj3` with the `make test`, which should pass all the test cases. The cases used here are in `/examples`.
+
+Note: you may fail the test if the checking tools are not installed. e.g. For the test case `cpplint/sillycode`, you need to install `cpplint` in `/usr/bin` or `/usr/local/bin`.
+
+```bash
 $ make test
 go test -coverprofile cover.out -v ./...
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/dummy         coverage: 0.0% of statements
 ?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors        [no test files]
 ?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers  [no test files]
 ?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/healthcheck   [no test files]
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/sandbox                coverage: 0.0% of statements
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/dummy          coverage: 0.0% of statements
+        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/cpplint          coverage: 0.0% of statements
+        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/sandbox                coverage: 0.0% of statements
+        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy            coverage: 0.0% of statements
+        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage            coverage: 0.0% of statements
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/diff             coverage: 0.0% of statements
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/dummy         coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage            coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy            coverage: 0.0% of statements
         focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/resultstatus             coverage: 0.0% of statements
 === RUN   TestMain
 === RUN   TestMain/compile/success
-    main_test.go:101: stageResults: [{Name:compile Results:[{Score:0 Comment:}]} {Name:run Results:[{Score:100 Comment:executor status: run time: 1867950 ns, memory: 10813440 bytes} {Score:100 Comment:executor status: run time: 1948947 ns, memory: 10813440 bytes}]}]
 === RUN   TestMain/compile/error
-    main_test.go:101: stageResults: [{Name:compile Results:[{Score:0 Comment:Unexpected executor status: Nonzero Exit Status.}]}]
 === RUN   TestMain/dummy/success
-    main_test.go:101: stageResults: [{Name:dummy Results:[{Score:110 Comment:dummy comment + comment from toml conf}]}]
 === RUN   TestMain/dummy/error
-    main_test.go:101: stageResults: [{Name:dummy Results:[{Score:0 Comment:Unexpected executor status: Nonzero Exit Status.
-        Stderr: dummy negative score: -1}]}]
---- PASS: TestMain (0.39s)
-    --- PASS: TestMain/compile/success (0.36s)
+=== RUN   TestMain/cpplint/sillycode
+--- PASS: TestMain (0.42s)
+    --- PASS: TestMain/compile/success (0.28s)
     --- PASS: TestMain/compile/error (0.01s)
-    --- PASS: TestMain/dummy/success (0.02s)
+    --- PASS: TestMain/dummy/success (0.01s)
     --- PASS: TestMain/dummy/error (0.01s)
+    --- PASS: TestMain/cpplint/sillycode (0.11s)
 PASS
-coverage: 68.5% of statements
-ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  0.403s  coverage: 68.5% of statements
+coverage: 72.4% of statements
+ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  0.425s  coverage: 72.4% of statements
 ```
 
 ### For developers
@@ -66,7 +73,7 @@ $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
 
-3. You only need to run step 5 and 6 in quick start during development.
+3. You only need to run steps 5 and 7 in the quick start during development. If the test cases need to be updated, step 6 is also needed.
 
 ## Models
 
