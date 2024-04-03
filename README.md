@@ -27,7 +27,13 @@ $ # make sure you are in JOJ3 directory
 $ make prepare-test
 ```
 
-7. Check the functions of `joj3` with the `make test`, which should pass all the test cases. The cases used here are in `/examples`.
+7. Build binaries in `/cmd`.
+
+```bash
+$ make
+```
+
+8. Check the functions of `joj3` with the `make test`, which should pass all the test cases. The cases used here are in `/examples`.
 
 Note: you may fail the test if the checking tools are not installed. e.g. For the test case `cpplint/sillycode`, you need to install `cpplint` in `/usr/bin` or `/usr/local/bin`.
 
@@ -73,7 +79,7 @@ $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
 ```
 
-3. You only need to run steps 5 and 7 in the quick start during development. If the test cases need to be updated, step 6 is also needed.
+3. You only need to run steps 5, 7, and 8 in the quick start during development. If the test cases need to be updated, step 6 is also needed.
 
 ## Models
 
