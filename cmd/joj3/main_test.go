@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
@@ -60,12 +62,29 @@ func readStageResults(t *testing.T, path string) []stage.StageResult {
 }
 
 func TestMain(t *testing.T) {
-	tests := []string{
-		"compile/success",
-		"compile/error",
-		"dummy/success",
-		"dummy/error",
-		"cpplint/sillycode",
+	var tests []string
+	root := "../../examples/"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if path == root {
+				return nil
+			}
+			path0 := filepath.Join(path, "expected_regex.json")
+			path1 := filepath.Join(path, "expected.json")
+			_, err0 := os.Stat(path0)
+			_, err1 := os.Stat(path1)
+			if err0 != nil && err1 != nil {
+				return nil
+			}
+			tests = append(tests, strings.TrimPrefix(path, root))
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
 	}
 	for _, tt := range tests {
 		t.Run(tt, func(t *testing.T) {
@@ -73,7 +92,7 @@ func TestMain(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			err = os.Chdir(fmt.Sprintf("../../examples/%s", tt))
+			err = os.Chdir(fmt.Sprintf("%s%s", root, tt))
 			if err != nil {
 				t.Fatal(err)
 			}
