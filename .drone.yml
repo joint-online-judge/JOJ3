@@ -17,6 +17,8 @@ steps:
           - env
           - go version
           - go env
+          - git status -v
+          - git log -1
     - name: build
       commands:
           - make
