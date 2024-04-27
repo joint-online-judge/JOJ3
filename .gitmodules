@@ -18,3 +18,7 @@
 	path = examples/dummy/error
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
 	branch = dummy/error
+[submodule "examples/keyword/sillycode"]
+	path = examples/keyword/sillycode
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = keyword/sillycode
