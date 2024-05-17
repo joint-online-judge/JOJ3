@@ -22,7 +22,11 @@
 	path = examples/keyword/cpplint/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
 	branch = keyword/cpplint/sillycode
-[submodule "examples/keyword/clang-tidy/sillycode"]
-	path = examples/keyword/clang-tidy/sillycode
+[submodule "examples/clangtidy/sillycode"]
+	path = examples/clangtidy/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
-	branch = keyword/clang-tidy/sillycode
+	branch = clangtidy/sillycode
+[submodule "examples/keyword/clangtidy/sillycode"]
+	path = examples/keyword/clangtidy/sillycode
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = keyword/clangtidy/sillycode
