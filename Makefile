@@ -15,4 +15,5 @@ prepare-test:
 	git submodule update --init --remote
 
 test:
+	./scripts/prepare_test_repos.sh
 	go test -coverprofile cover.out -v ./...
