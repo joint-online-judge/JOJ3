@@ -88,7 +88,7 @@ pre-commit installed at .git/hooks/pre-commit
 
 ## Models
 
-The program parses the configuration file to run multiple stages. It can create an issue on Gitea to report the result of each stage after all stages are done.
+The program parses the configuration file to run multiple stages.
 
 Each stage contains an executor and parser. An executor just executes a command and returns the original result (stdout, stderr, output files). We can limit the time and memory used by each command in the executor. We run all kinds of commands in executors of different stages, including code formatting, static check, compilation, and execution. A parser takes the result and the configuration of the stage to parse the result and return the score and comment. e.g. If in the current stage, the executor runs a `clang-tidy` command, then we can use the clang-tidy parser in the configuration file to parse the stdout of the executor result and check whether some of the rules are followed. We can deduct the score and add some comments based on the result, and return the score and comment as the output of this stage. This stage ends here and the next stage starts.
 

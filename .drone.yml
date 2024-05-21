@@ -23,9 +23,6 @@ steps:
       commands:
           - make
     - name: test
-      environment:
-          CONF_GITEATOKEN:
-              from_secret: gitea-token
       commands:
           - make prepare-test
           - make test

@@ -83,15 +83,4 @@ func main() {
 	if err := outputResult(conf, results); err != nil {
 		slog.Error("output result", "error", err)
 	}
-	if !conf.SkipGitea {
-		if err := stage.Submit(
-			conf.GiteaUrl,
-			conf.GiteaToken,
-			conf.GiteaOwner,
-			conf.GiteaRepo,
-			results,
-		); err != nil {
-			slog.Error("submit result", "error", err)
-		}
-	}
 }
