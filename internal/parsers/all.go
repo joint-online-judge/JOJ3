@@ -2,6 +2,7 @@ package parsers
 
 import (
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/clangtidy"
+	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/cppcheck"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/cpplint"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/diff"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy"
