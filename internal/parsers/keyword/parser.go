@@ -55,13 +55,13 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 		return nil, true, err
 	}
 	var res []stage.ParserResult
-	end := false
+	forceQuit := false
 	for _, result := range results {
 		tmp, matched := Parse(result, *conf)
 		if matched && conf.EndOnMatch {
-			end = true
+			forceQuit = true
 		}
 		res = append(res, tmp)
 	}
-	return res, end, nil
+	return res, forceQuit, nil
 }

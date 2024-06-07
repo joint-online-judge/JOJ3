@@ -164,6 +164,7 @@ type ParserResult struct {
 }
 
 type StageResult struct {
-	Name    string         `json:"name"`
-	Results []ParserResult `json:"results"`
+	Name      string         `json:"name"`
+	Results   []ParserResult `json:"results"`
+	ForceQuit bool           `json:"force_quit"`
 }

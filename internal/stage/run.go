@@ -26,17 +26,18 @@ func Run(stages []Stage) []StageResult {
 			slog.Error("parser not found", "name", stage.ParserName)
 			break
 		}
-		parserResults, end, err := parser.Run(executorResults, stage.ParserConf)
+		parserResults, forceQuit, err := parser.Run(executorResults, stage.ParserConf)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
 			break
 		}
 		slog.Debug("parser run done", "results", parserResults)
 		stageResults = append(stageResults, StageResult{
-			Name:    stage.Name,
-			Results: parserResults,
+			Name:      stage.Name,
+			Results:   parserResults,
+			ForceQuit: forceQuit,
 		})
-		if end {
+		if forceQuit {
 			break
 		}
 	}
