@@ -20,12 +20,12 @@ type Report struct {
 
 type Case struct {
 	Binders        []Binder `mapstructure:"binders"`
-	Context        *string  `mapstructure:"context"`
-	Depths         *int     `mapstructure:"depths"`
-	Code           *string  `mapstructure:"code"`
-	Plain          *int     `mapstructure:"plain"`
-	Weighed        *float64 `mapstructure:"weighed"`
-	Detail         *string  `mapstructure:"detail"`
+	Context        string   `mapstructure:"context"`
+	Depths         int      `mapstructure:"depths"`
+	Code           string   `mapstructure:"code"`
+	Plain          int      `mapstructure:"plain"`
+	Weighed        float64  `mapstructure:"weighed"`
+	Detail         string   `mapstructure:"detail"`
 	SimilarityRate float64  `mapstructure:"similarity_rate"`
 	Sources        []Source `mapstructure:"srcs"`
 }
