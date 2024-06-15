@@ -2,7 +2,7 @@
 
 set -ex
 declare -A repo_names
-tmp_dir="./tmp"
+tmp_dir=${1:-./tmp}
 submodules_dir="$tmp_dir/submodules"
 rm -rf $submodules_dir
 mkdir -p $submodules_dir
