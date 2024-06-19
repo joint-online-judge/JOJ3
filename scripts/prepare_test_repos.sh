@@ -24,6 +24,7 @@ for submodule in $submodules; do
     repo_names[$repo_name]=1
     cd $repo_dir
     git checkout -q $branch
+    git reset -q --hard origin/$branch
     cd -
     submodule_dir="$submodules_dir/$repo_name/$submodule"
     mkdir -p $submodule_dir
