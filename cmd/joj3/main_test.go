@@ -63,7 +63,7 @@ func readStageResults(t *testing.T, path string) []stage.StageResult {
 
 func TestMain(t *testing.T) {
 	var tests []string
-	root := "../../tmp/submodules/JOJ3-examples"
+	root := "../../tmp/submodules/JOJ3-examples/examples/"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
