@@ -18,6 +18,7 @@ type Sandbox struct {
 func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var err error
 	if e.execClient == nil {
+		slog.Debug("create exec client", "server", e.execServer)
 		e.execClient, err = createExecClient(e.execServer, e.token)
 		if err != nil {
 			return nil, err
