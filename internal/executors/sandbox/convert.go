@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,7 +114,12 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 				i.Src = &absPath
 			}
 		}
-		return &pb.Request_File{File: &pb.Request_File_Local{Local: &pb.Request_LocalFile{Src: *i.Src}}}
+		s, err := os.ReadFile(*i.Src)
+		if err != nil {
+			s = []byte{}
+			slog.Error("read file error", "path", *i.Src, "error", err)
+		}
+		return &pb.Request_File{File: &pb.Request_File_Memory{Memory: &pb.Request_MemoryFile{Content: s}}}
 	case i.Content != nil:
 		s := strToBytes(*i.Content)
 		return &pb.Request_File{File: &pb.Request_File_Memory{Memory: &pb.Request_MemoryFile{Content: s}}}
