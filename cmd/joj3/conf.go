@@ -10,9 +10,11 @@ import (
 )
 
 type Conf struct {
-	LogLevel   int    `default:"0"`
-	OutputPath string `default:"joj3_result.json"`
-	Stages     []struct {
+	SandboxExecServer string `default:"localhost:5051"`
+	SandboxToken      string `default:""`
+	LogLevel          int    `default:"0"`
+	OutputPath        string `default:"joj3_result.json"`
+	Stages            []struct {
 		Name     string
 		Executor struct {
 			Name string

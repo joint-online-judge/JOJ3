@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors"
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
@@ -77,6 +77,7 @@ func main() {
 		os.Exit(1)
 	}
 	setupSlog(conf)
+	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages := generateStages(conf)
 	defer stage.Cleanup()
 	results := stage.Run(stages)

@@ -8,9 +8,17 @@ var name = "sandbox"
 
 func init() {
 	stage.RegisterExecutor(name, &Sandbox{
-		// TODO: read from conf
 		execServer: "localhost:5051",
 		token:      "",
+		cachedMap:  make(map[string]string),
+	})
+}
+
+// overwrite the default registered executor
+func InitWithConf(execServer, token string) {
+	stage.RegisterExecutor(name, &Sandbox{
+		execServer: execServer,
+		token:      token,
 		cachedMap:  make(map[string]string),
 	})
 }
