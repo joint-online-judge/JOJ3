@@ -1,11 +1,11 @@
 package stage
 
 import (
-	"errors"
 	"log/slog"
 )
 
-func Run(stages []Stage) (stageResults []StageResult, stageErr error) {
+func Run(stages []Stage) []StageResult {
+	stageResults := []StageResult{}
 	for _, stage := range stages {
 		slog.Debug("stage start", "name", stage.Name)
 		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)
@@ -38,11 +38,10 @@ func Run(stages []Stage) (stageResults []StageResult, stageErr error) {
 			ForceQuit: forceQuit,
 		})
 		if forceQuit {
-			stageErr = errors.New("parser force quit")
 			break
 		}
 	}
-	return
+	return stageResults
 }
 
 func Cleanup() {
