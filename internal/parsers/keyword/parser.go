@@ -2,6 +2,7 @@ package keyword
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
@@ -30,6 +31,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (
 	matched := false
 	for _, file := range conf.Files {
 		content := executorResult.Files[file]
+		slog.Debug("file content", "file", file, "content", content)
 		for _, match := range conf.Matches {
 			count := strings.Count(content, match.Keyword)
 			if count > 0 {
