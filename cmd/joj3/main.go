@@ -71,17 +71,26 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 }
 
 func main() {
+	retCode := 0
+	defer func() {
+		os.Exit(retCode)
+	}()
 	conf, err := commitMsgToConf()
 	if err != nil {
 		slog.Error("no conf found", "error", err)
-		os.Exit(1)
+		retCode = 1
+		return
 	}
 	setupSlog(conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages := generateStages(conf)
 	defer stage.Cleanup()
-	results := stage.Run(stages)
+	results, stageErr := stage.Run(stages)
 	if err := outputResult(conf, results); err != nil {
 		slog.Error("output result", "error", err)
+	}
+	if stageErr != nil {
+		retCode = 1
+		return
 	}
 }
