@@ -39,13 +39,13 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			return nil, true, err
 		}
 
+		comment = fmt.Sprintf(
+			"executor status: run time: %d ns, memory: %d bytes\n",
+			result.RunTime, result.Memory,
+		)
 		// If no difference, assign score
 		if string(stdout) == result.Files["stdout"] {
 			score = caseConf.Score
-			comment = fmt.Sprintf(
-				"executor status: run time: %d ns, memory: %d bytes",
-				result.RunTime, result.Memory,
-			)
 		} else {
 			// Convert stdout to string and split by lines
 			stdoutLines := strings.Split(string(stdout), "\n")
@@ -54,14 +54,12 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			// Find the first difference
 			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines)
 			if diffIndex != -1 {
-				// Get the surrounding lines from both stdout and result
-				stdoutContext := getContextLines(stdoutLines, diffIndex, 10)
-				resultContext := getContextLines(resultLines, diffIndex, 10)
-				comment = comment + fmt.Sprintf(
-					"difference found at line %d:\nExpected output:\n%s\nActual output:\n%s",
+				// Generate diff block with surrounding context
+				diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffIndex, 10)
+				comment += fmt.Sprintf(
+					"difference found at line %d:\n```diff\n%s```",
 					diffIndex+1,
-					resultContext,
-					stdoutContext,
+					diffOutput,
 				)
 			}
 		}
@@ -90,20 +88,89 @@ func findFirstDifferenceIndex(stdoutLines, resultLines []string) int {
 	return -1
 }
 
-// getContextLines returns the surrounding lines of the specified index.
-func getContextLines(lines []string, index, contextSize int) string {
+// generateDiffWithContext creates a diff block with surrounding context from stdout and result.
+func generateDiffWithContext(stdoutLines, resultLines []string, index, contextSize int) string {
+	var diffBuilder strings.Builder
+
 	start := index - contextSize
 	if start < 0 {
 		start = 0
 	}
 	end := index + contextSize + 1
-	if end > len(lines) {
-		end = len(lines)
+	if end > len(stdoutLines) {
+		end = len(stdoutLines)
 	}
 
-	var context strings.Builder
-	for i := start; i < end; i++ {
-		context.WriteString(fmt.Sprintf("%d: %s\n", i+1, lines[i]))
+	// Adding context before the diff
+	for i := start; i < index; i++ {
+		if i < len(stdoutLines) || i < len(resultLines) {
+			stdoutLine := ""
+			if i < len(stdoutLines) {
+				stdoutLine = stdoutLines[i]
+			}
+			resultLine := ""
+			if i < len(resultLines) {
+				resultLine = resultLines[i]
+			}
+
+			if stdoutLine != resultLine {
+				if stdoutLine != "" {
+					diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+				}
+				if resultLine != "" {
+					diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
+				}
+			} else {
+				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
+			}
+		}
 	}
-	return context.String()
+
+	// Adding the diff line
+	if index < len(stdoutLines) || index < len(resultLines) {
+		stdoutLine := ""
+		if index < len(stdoutLines) {
+			stdoutLine = stdoutLines[index]
+		}
+		resultLine := ""
+		if index < len(resultLines) {
+			resultLine = resultLines[index]
+		}
+
+		if stdoutLine != resultLine {
+			if stdoutLine != "" {
+				diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+			}
+			if resultLine != "" {
+				diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
+			}
+		}
+	}
+
+	// Adding context after the diff
+	for i := index + 1; i < end; i++ {
+		if i < len(stdoutLines) || i < len(resultLines) {
+			stdoutLine := ""
+			if i < len(stdoutLines) {
+				stdoutLine = stdoutLines[i]
+			}
+			resultLine := ""
+			if i < len(resultLines) {
+				resultLine = resultLines[i]
+			}
+
+			if stdoutLine != resultLine {
+				if stdoutLine != "" {
+					diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+				}
+				if resultLine != "" {
+					diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
+				}
+			} else {
+				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
+			}
+		}
+	}
+
+	return diffBuilder.String()
 }
