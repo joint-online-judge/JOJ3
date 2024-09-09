@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 )
 
 type Conf struct {
 	Cases []struct {
-		Score      int
-		StdoutPath string
+		Score            int
+		StdoutPath       string
+		ignoreWhitespace bool
 	}
 }
 
@@ -43,8 +45,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			"executor status: run time: %d ns, memory: %d bytes\n",
 			result.RunTime, result.Memory,
 		)
+
 		// If no difference, assign score
-		if string(stdout) == result.Files["stdout"] {
+		if compareChars(string(stdout), result.Files["stdout"], caseConf.ignoreWhitespace) {
 			score = caseConf.Score
 		} else {
 			// Convert stdout to string and split by lines
@@ -52,7 +55,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			resultLines := strings.Split(result.Files["stdout"], "\n")
 
 			// Find the first difference
-			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines)
+			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines, caseConf.ignoreWhitespace)
 			if diffIndex != -1 {
 				// Generate diff block with surrounding context
 				diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffIndex, 10)
@@ -73,15 +76,43 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 	return res, false, nil
 }
 
+// compareChars compares two strings character by character, optionally ignoring whitespace.
+func compareChars(stdout, result string, ignoreWhitespace bool) bool {
+	if ignoreWhitespace {
+		stdout = removeWhitespace(stdout)
+		result = removeWhitespace(result)
+	}
+	return stdout == result
+}
+
+// removeWhitespace removes all whitespace characters from the string.
+func removeWhitespace(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
 // findFirstDifferenceIndex finds the index of the first line where stdout and result differ.
-func findFirstDifferenceIndex(stdoutLines, resultLines []string) int {
+func findFirstDifferenceIndex(stdoutLines, resultLines []string, ignoreWhitespace bool) int {
 	maxLines := len(stdoutLines)
 	if len(resultLines) > maxLines {
 		maxLines = len(resultLines)
 	}
 
 	for i := 0; i < maxLines; i++ {
-		if i >= len(stdoutLines) || i >= len(resultLines) || stdoutLines[i] != resultLines[i] {
+		stdoutLine := stdoutLines[i]
+		resultLine := resultLines[i]
+
+		if ignoreWhitespace {
+			stdoutLine = removeWhitespace(stdoutLine)
+			resultLine = removeWhitespace(resultLine)
+		}
+
+		if stdoutLine != resultLine {
 			return i
 		}
 	}
@@ -103,74 +134,43 @@ func generateDiffWithContext(stdoutLines, resultLines []string, index, contextSi
 
 	// Adding context before the diff
 	for i := start; i < index; i++ {
-		if i < len(stdoutLines) || i < len(resultLines) {
-			stdoutLine := ""
-			if i < len(stdoutLines) {
-				stdoutLine = stdoutLines[i]
-			}
-			resultLine := ""
-			if i < len(resultLines) {
-				resultLine = resultLines[i]
-			}
-
-			if stdoutLine != resultLine {
-				if stdoutLine != "" {
-					diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-				}
-				if resultLine != "" {
-					diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-				}
-			} else {
-				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
-			}
+		stdoutLine, resultLine := getLine(stdoutLines, resultLines, i)
+		if stdoutLine != resultLine {
+			diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+			diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
+		} else {
+			diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
 		}
 	}
 
 	// Adding the diff line
-	if index < len(stdoutLines) || index < len(resultLines) {
-		stdoutLine := ""
-		if index < len(stdoutLines) {
-			stdoutLine = stdoutLines[index]
-		}
-		resultLine := ""
-		if index < len(resultLines) {
-			resultLine = resultLines[index]
-		}
-
-		if stdoutLine != resultLine {
-			if stdoutLine != "" {
-				diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-			}
-			if resultLine != "" {
-				diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-			}
-		}
+	stdoutLine, resultLine := getLine(stdoutLines, resultLines, index)
+	if stdoutLine != resultLine {
+		diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+		diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
 	}
 
 	// Adding context after the diff
 	for i := index + 1; i < end; i++ {
-		if i < len(stdoutLines) || i < len(resultLines) {
-			stdoutLine := ""
-			if i < len(stdoutLines) {
-				stdoutLine = stdoutLines[i]
-			}
-			resultLine := ""
-			if i < len(resultLines) {
-				resultLine = resultLines[i]
-			}
-
-			if stdoutLine != resultLine {
-				if stdoutLine != "" {
-					diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-				}
-				if resultLine != "" {
-					diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-				}
-			} else {
-				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
-			}
+		stdoutLine, resultLine := getLine(stdoutLines, resultLines, i)
+		if stdoutLine != resultLine {
+			diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
+			diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
+		} else {
+			diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
 		}
 	}
 
 	return diffBuilder.String()
+}
+
+// getLine safely retrieves lines from both stdout and result
+func getLine(stdoutLines, resultLines []string, i int) (stdoutLine, resultLine string) {
+	if i < len(stdoutLines) {
+		stdoutLine = stdoutLines[i]
+	}
+	if i < len(resultLines) {
+		resultLine = resultLines[i]
+	}
+	return
 }
