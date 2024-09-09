@@ -13,7 +13,7 @@ type Conf struct {
 	Cases []struct {
 		Score            int
 		StdoutPath       string
-		ignoreWhitespace bool
+		IgnoreWhitespace bool
 	}
 }
 
@@ -47,7 +47,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		)
 
 		// If no difference, assign score
-		if compareChars(string(stdout), result.Files["stdout"], caseConf.ignoreWhitespace) {
+		if compareChars(string(stdout), result.Files["stdout"], caseConf.IgnoreWhitespace) {
 			score = caseConf.Score
 		} else {
 			// Convert stdout to string and split by lines
@@ -55,7 +55,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			resultLines := strings.Split(result.Files["stdout"], "\n")
 
 			// Find the first difference
-			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines, caseConf.ignoreWhitespace)
+			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines, caseConf.IgnoreWhitespace)
 			if diffIndex != -1 {
 				// Generate diff block with surrounding context
 				diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffIndex, 10)
