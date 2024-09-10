@@ -1,3 +1,11 @@
+[submodule "examples/diff/basic"]
+	path = examples/diff/basic
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = diff/basic
+[submodule "examples/diff/complex"]
+	path = examples/diff/complex
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	branch = diff/complex
 [submodule "examples/cpplint/sillycode"]
 	path = examples/cpplint/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
