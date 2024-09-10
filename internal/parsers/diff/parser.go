@@ -9,6 +9,15 @@ import (
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 )
 
+// operation represents the type of edit operation.
+type operation uint
+
+const (
+	INSERT operation = iota + 1
+	DELETE
+	MOVE
+)
+
 type Conf struct {
 	Cases []struct {
 		Score            int
@@ -54,17 +63,15 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			stdoutLines := strings.Split(string(stdout), "\n")
 			resultLines := strings.Split(result.Files["stdout"], "\n")
 
-			// Find the first difference
-			diffIndex := findFirstDifferenceIndex(stdoutLines, resultLines, caseConf.IgnoreWhitespace)
-			if diffIndex != -1 {
-				// Generate diff block with surrounding context
-				diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffIndex, 10)
-				comment += fmt.Sprintf(
-					"difference found at line %d:\n```diff\n%s```",
-					diffIndex+1,
-					diffOutput,
-				)
-			}
+			// Generate Myers diff
+			diffOps := myersDiff(stdoutLines, resultLines)
+
+			// Generate diff block with surrounding context
+			diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffOps)
+			comment += fmt.Sprintf(
+				"difference found:\n```diff\n%s```",
+				diffOutput,
+			)
 		}
 
 		res = append(res, stage.ParserResult{
@@ -96,81 +103,133 @@ func removeWhitespace(s string) string {
 	return b.String()
 }
 
-// findFirstDifferenceIndex finds the index of the first line where stdout and result differ.
-func findFirstDifferenceIndex(stdoutLines, resultLines []string, ignoreWhitespace bool) int {
-	maxLines := len(stdoutLines)
-	if len(resultLines) > maxLines {
-		maxLines = len(resultLines)
-	}
+// myersDiff computes the Myers' diff between two slices of strings.
+func myersDiff(src, dst []string) []operation {
+	n := len(src)
+	m := len(dst)
+	max := n + m
+	var trace []map[int]int
+	var x, y int
 
-	for i := 0; i < maxLines; i++ {
-		stdoutLine := stdoutLines[i]
-		resultLine := resultLines[i]
+loop:
+	for d := 0; d <= max; d++ {
+		v := make(map[int]int, d+2)
+		trace = append(trace, v)
 
-		if ignoreWhitespace {
-			stdoutLine = removeWhitespace(stdoutLine)
-			resultLine = removeWhitespace(resultLine)
+		if d == 0 {
+			t := 0
+			for len(src) > t && len(dst) > t && src[t] == dst[t] {
+				t++
+			}
+			v[0] = t
+			if t == len(src) && t == len(dst) {
+				break loop
+			}
+			continue
 		}
 
-		if stdoutLine != resultLine {
-			return i
+		lastV := trace[d-1]
+
+		for k := -d; k <= d; k += 2 {
+			if k == -d || (k != d && lastV[k-1] < lastV[k+1]) {
+				x = lastV[k+1]
+			} else {
+				x = lastV[k-1] + 1
+			}
+
+			y = x - k
+
+			for x < n && y < m && src[x] == dst[y] {
+				x, y = x+1, y+1
+			}
+
+			v[k] = x
+
+			if x == n && y == m {
+				break loop
+			}
 		}
 	}
-	return -1
+
+	var script []operation
+	x = n
+	y = m
+	var k, prevK, prevX, prevY int
+
+	for d := len(trace) - 1; d > 0; d-- {
+		k = x - y
+		lastV := trace[d-1]
+
+		if k == -d || (k != d && lastV[k-1] < lastV[k+1]) {
+			prevK = k + 1
+		} else {
+			prevK = k - 1
+		}
+
+		prevX = lastV[prevK]
+		prevY = prevX - prevK
+
+		for x > prevX && y > prevY {
+			script = append(script, MOVE)
+			x -= 1
+			y -= 1
+		}
+
+		if x == prevX {
+			script = append(script, INSERT)
+		} else {
+			script = append(script, DELETE)
+		}
+
+		x, y = prevX, prevY
+	}
+
+	if trace[0][0] != 0 {
+		for i := 0; i < trace[0][0]; i++ {
+			script = append(script, MOVE)
+		}
+	}
+
+	return reverse(script)
+}
+
+// reverse reverses a slice of operations.
+func reverse(s []operation) []operation {
+	result := make([]operation, len(s))
+	for i, v := range s {
+		result[len(s)-1-i] = v
+	}
+	return result
 }
 
 // generateDiffWithContext creates a diff block with surrounding context from stdout and result.
-func generateDiffWithContext(stdoutLines, resultLines []string, index, contextSize int) string {
+func generateDiffWithContext(stdoutLines, resultLines []string, ops []operation) string {
 	var diffBuilder strings.Builder
 
-	start := index - contextSize
-	if start < 0 {
-		start = 0
-	}
-	end := index + contextSize + 1
-	if end > len(stdoutLines) {
-		end = len(stdoutLines)
-	}
+	srcIndex, dstIndex := 0, 0
 
-	// Adding context before the diff
-	for i := start; i < index; i++ {
-		stdoutLine, resultLine := getLine(stdoutLines, resultLines, i)
-		if stdoutLine != resultLine {
-			diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-			diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-		} else {
-			diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
-		}
-	}
+	for _, op := range ops {
+		switch op {
+		case INSERT:
+			if dstIndex < len(resultLines) {
+				diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLines[dstIndex]))
+				dstIndex++
+			}
 
-	// Adding the diff line
-	stdoutLine, resultLine := getLine(stdoutLines, resultLines, index)
-	if stdoutLine != resultLine {
-		diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-		diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-	}
+		case MOVE:
+			if srcIndex < len(stdoutLines) {
+				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLines[srcIndex]))
+				srcIndex++
+				dstIndex++
+			}
 
-	// Adding context after the diff
-	for i := index + 1; i < end; i++ {
-		stdoutLine, resultLine := getLine(stdoutLines, resultLines, i)
-		if stdoutLine != resultLine {
-			diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLine))
-			diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLine))
-		} else {
-			diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLine))
+		case DELETE:
+			if srcIndex < len(stdoutLines) {
+				diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLines[srcIndex]))
+				srcIndex++
+			}
 		}
 	}
 
 	return diffBuilder.String()
-}
-
-// getLine safely retrieves lines from both stdout and result
-func getLine(stdoutLines, resultLines []string, i int) (stdoutLine, resultLine string) {
-	if i < len(stdoutLines) {
-		stdoutLine = stdoutLines[i]
-	}
-	if i < len(resultLines) {
-		resultLine = resultLines[i]
-	}
-	return
 }
