@@ -9,12 +9,14 @@
 3. Enable cgroup v2 for your OS. Check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
 
 4. Clone [go-judge](https://github.com/criyle/go-judge).
+
 ```bash
 $ git clone https://github.com/criyle/go-judge && cd go-judge
 $ go build -o ./tmp/go-judge ./cmd/go-judge
 ```
 
 5. Run `go-judge`.
+
 ```bash
 $ # make sure you are in go-judge directory
 $ ./tmp/go-judge -http-addr 0.0.0.0:5050 -grpc-addr 0.0.0.0:5051 -monitor-addr 0.0.0.0:5052 -enable-grpc -enable-debug -enable-metrics
@@ -51,6 +53,7 @@ ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  2.290s  coverage: 74.0% 
 1. Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports), [`gofumpt`](https://github.com/mvdan/gofumpt).
 
 2. Install the pre-commit hooks. It will run some checks before you commit.
+
 ```bash
 $ pre-commit install
 pre-commit installed at .git/hooks/pre-commit
@@ -84,3 +87,11 @@ Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 -   `Score int`: score of the stage.
 -   `Comment string`: comment on the stage.
+
+### HealthCheck
+
+The repohealth check will return a json list to for check result. The structure follows the score-comment pattern.
+
+HealthCheck currently includes, `reposize`, `forbidden file`, `Metafile existence`, `non-ascii character` in file and message, `release tag`, and `ci files invariance` check.
+
+The workflow is `joj3` pass cli args to healthcheck binary. See `./cmd/healthcheck/main.go` to view all flags.
