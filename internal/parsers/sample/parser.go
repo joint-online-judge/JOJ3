@@ -1,11 +1,11 @@
-package dummy
+package sample
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/dummy"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/sample"
 	"github.com/criyle/go-judge/envexec"
 )
 
@@ -14,7 +14,7 @@ type Conf struct {
 	Comment string
 }
 
-type Dummy struct{}
+type Sample struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files["stdout"]
@@ -28,8 +28,8 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 			),
 		}
 	}
-	var dummyResult dummy.Result
-	err := json.Unmarshal([]byte(stdout), &dummyResult)
+	var sampleResult sample.Result
+	err := json.Unmarshal([]byte(stdout), &sampleResult)
 	if err != nil {
 		return stage.ParserResult{
 			Score:   0,
@@ -37,12 +37,12 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 		}
 	}
 	return stage.ParserResult{
-		Score:   dummyResult.Score + conf.Score,
-		Comment: dummyResult.Comment + conf.Comment,
+		Score:   sampleResult.Score + conf.Score,
+		Comment: sampleResult.Comment + conf.Comment,
 	}
 }
 
-func (*Dummy) Run(results []stage.ExecutorResult, confAny any) (
+func (*Sample) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)

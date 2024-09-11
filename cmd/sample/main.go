@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"os"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/dummy"
+	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/sample"
 )
 
 func main() {
 	score := flag.Int("score", 0, "score")
 	flag.Parse()
-	res, err := dummy.Run(dummy.Conf{Score: *score})
+	res, err := sample.Run(sample.Conf{Score: *score})
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)

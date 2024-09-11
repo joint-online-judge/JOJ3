@@ -40,35 +40,7 @@ Note: you may fail the test if the checking tools are not installed. e.g. For th
 ```bash
 $ make test
 go test -coverprofile cover.out -v ./...
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/dummy         coverage: 0.0% of statements
-?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors        [no test files]
-?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers  [no test files]
-?       focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/healthcheck   [no test files]
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/dummy          coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/cpplint          coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/diff             coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage            coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/dummy         coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/keyword          coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/dummy            coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors/sandbox                coverage: 0.0% of statements
-        focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers/resultstatus             coverage: 0.0% of statements
-=== RUN   TestMain
-=== RUN   TestMain/compile/error
-=== RUN   TestMain/compile/success
-=== RUN   TestMain/cpplint/sillycode
-=== RUN   TestMain/dummy/error
-=== RUN   TestMain/dummy/success
-=== RUN   TestMain/keyword/clang-tidy/sillycode
-=== RUN   TestMain/keyword/cpplint/sillycode
---- PASS: TestMain (2.28s)
-    --- PASS: TestMain/compile/error (0.03s)
-    --- PASS: TestMain/compile/success (0.42s)
-    --- PASS: TestMain/cpplint/sillycode (0.14s)
-    --- PASS: TestMain/dummy/error (0.01s)
-    --- PASS: TestMain/dummy/success (0.01s)
-    --- PASS: TestMain/keyword/clang-tidy/sillycode (1.57s)
-    --- PASS: TestMain/keyword/cpplint/sillycode (0.11s)
+...
 PASS
 coverage: 74.0% of statements
 ok      focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/cmd/joj3  2.290s  coverage: 74.0% of statements

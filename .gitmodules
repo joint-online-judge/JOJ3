@@ -10,14 +10,14 @@
 	path = examples/compile/error
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
 	branch = compile/error
-[submodule "examples/dummy/success"]
-	path = examples/dummy/success
+[submodule "examples/sample/success"]
+	path = examples/sample/success
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
-	branch = dummy/success
-[submodule "examples/dummy/error"]
-	path = examples/dummy/error
+	branch = sample/success
+[submodule "examples/sample/error"]
+	path = examples/sample/error
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
-	branch = dummy/error
+	branch = sample/error
 [submodule "examples/keyword/cpplint/sillycode"]
 	path = examples/keyword/cpplint/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
