@@ -11,9 +11,9 @@ func (e *Dummy) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var res []stage.ExecutorResult
 	for range cmds {
 		res = append(res, stage.ExecutorResult{
-			Status:     stage.Status(envexec.StatusInvalid),
+			Status:     stage.Status(envexec.StatusAccepted),
 			ExitStatus: 0,
-			Error:      "I'm a dummy",
+			Error:      "",
 			Time:       0,
 			Memory:     0,
 			RunTime:    0,
