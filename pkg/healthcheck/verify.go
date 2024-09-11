@@ -47,6 +47,10 @@ func VerifyFiles(rootDir string, checkFileNameList string, checkFileSumList stri
 	}
 	fileNames := strings.Split(checkFileNameList, ",")
 	checkSums := strings.Split(checkFileSumList, ",")
+	// Check if the number of files matches the number of checksums
+	if len(fileNames) != len(checkSums) {
+		return fmt.Errorf("Error: The number of files and checksums do not match.")
+	}
 	// Check each file's checksum
 	for i, fileName := range fileNames {
 		expectedChecksum := strings.TrimSpace(checkSums[i])
