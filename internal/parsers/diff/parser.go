@@ -104,6 +104,7 @@ func removeWhitespace(s string) string {
 }
 
 // myersDiff computes the Myers' diff between two slices of strings.
+// src: https://github.com/cj1128/myers-diff/blob/master/main.go
 func myersDiff(src, dst []string) []operation {
 	n := len(src)
 	m := len(dst)
@@ -122,7 +123,7 @@ loop:
 				t++
 			}
 			v[0] = t
-			if t == len(src) && t == len(dst) {
+			if t == len(src) && len(src) == len(dst) {
 				break loop
 			}
 			continue
