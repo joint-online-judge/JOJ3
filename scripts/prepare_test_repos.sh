@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 declare -A repo_names
 tmp_dir=${1:-./tmp}
 submodules_dir="$tmp_dir/submodules"

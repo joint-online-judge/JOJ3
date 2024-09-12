@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 tmp_dir=${1:-./tmp}
 JOJ3=$(git rev-parse --show-toplevel)/build/joj3
 command=${2:-$JOJ3}
