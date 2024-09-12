@@ -1,10 +1,11 @@
 package stage
 
 import (
+	"fmt"
 	"log/slog"
 )
 
-func Run(stages []Stage) []StageResult {
+func Run(stages []Stage) ([]StageResult, error) {
 	stageResults := []StageResult{}
 	for _, stage := range stages {
 		slog.Debug("stage start", "name", stage.Name)
@@ -12,24 +13,24 @@ func Run(stages []Stage) []StageResult {
 		executor, ok := executorMap[stage.ExecutorName]
 		if !ok {
 			slog.Error("executor not found", "name", stage.ExecutorName)
-			break
+			return stageResults, fmt.Errorf("executor not found: %s", stage.ExecutorName)
 		}
 		executorResults, err := executor.Run(stage.ExecutorCmds)
 		if err != nil {
 			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
-			break
+			return stageResults, err
 		}
 		slog.Debug("executor run done", "results", executorResults)
 		slog.Debug("parser run start", "conf", stage.ParserConf)
 		parser, ok := parserMap[stage.ParserName]
 		if !ok {
 			slog.Error("parser not found", "name", stage.ParserName)
-			break
+			return stageResults, err
 		}
 		parserResults, forceQuit, err := parser.Run(executorResults, stage.ParserConf)
 		if err != nil {
 			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
-			break
+			return stageResults, err
 		}
 		slog.Debug("parser run done", "results", parserResults)
 		stageResults = append(stageResults, StageResult{
@@ -38,10 +39,11 @@ func Run(stages []Stage) []StageResult {
 			ForceQuit: forceQuit,
 		})
 		if forceQuit {
+			slog.Error("parser force quit", "name", stage.ExecutorName)
 			break
 		}
 	}
-	return stageResults
+	return stageResults, nil
 }
 
 func Cleanup() {

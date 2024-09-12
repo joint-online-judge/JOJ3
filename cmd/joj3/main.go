@@ -21,7 +21,7 @@ func setupSlog(conf Conf) {
 	slog.SetDefault(logger)
 }
 
-func generateStages(conf Conf) []stage.Stage {
+func generateStages(conf Conf) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	for _, s := range conf.Stages {
 		var cmds []stage.Cmd
@@ -31,7 +31,7 @@ func generateStages(conf Conf) []stage.Stage {
 			err := copier.Copy(&cmd, &optionalCmd)
 			if err != nil {
 				slog.Error("generate stages", "error", err)
-				os.Exit(1)
+				return stages, err
 			}
 			// since these 3 values are pointers, copier will always copy
 			// them, so we need to check them manually
@@ -58,7 +58,7 @@ func generateStages(conf Conf) []stage.Stage {
 			ParserConf:   s.Parser.With,
 		})
 	}
-	return stages
+	return stages, nil
 }
 
 func outputResult(conf Conf, results []stage.StageResult) error {
@@ -70,18 +70,34 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 		append(content, []byte("\n")...), 0o600)
 }
 
-func main() {
+func mainImpl() error {
 	conf, err := commitMsgToConf()
 	if err != nil {
 		slog.Error("no conf found", "error", err)
-		os.Exit(1)
+		return err
 	}
 	setupSlog(conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
-	stages := generateStages(conf)
+	stages, err := generateStages(conf)
+	if err != nil {
+		slog.Error("generate stages", "error", err)
+		return err
+	}
 	defer stage.Cleanup()
-	results := stage.Run(stages)
+	results, err := stage.Run(stages)
+	if err != nil {
+		slog.Error("run stages", "error", err)
+		return err
+	}
 	if err := outputResult(conf, results); err != nil {
 		slog.Error("output result", "error", err)
+		return err
+	}
+	return nil
+}
+
+func main() {
+	if err := mainImpl(); err != nil {
+		os.Exit(1)
 	}
 }

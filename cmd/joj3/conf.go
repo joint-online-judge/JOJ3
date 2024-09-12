@@ -2,7 +2,6 @@ package main
 
 import (
 	"log/slog"
-	"os"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/go-git/go-git/v5"
@@ -61,15 +60,13 @@ type OptionalCmd struct {
 	AddressSpaceLimit *bool
 }
 
-func parseConfFile(path string) Conf {
+func parseConfFile(path string) (conf Conf, err error) {
 	m := multiconfig.NewWithPath(path)
-	conf := Conf{}
-	err := m.Load(&conf)
-	if err != nil {
+	if err = m.Load(&conf); err != nil {
 		slog.Error("parse stages conf", "error", err)
-		os.Exit(1)
+		return
 	}
-	return conf
+	return
 }
 
 func commitMsgToConf() (conf Conf, err error) {
@@ -88,6 +85,6 @@ func commitMsgToConf() (conf Conf, err error) {
 	msg := commit.Message
 	slog.Debug("commit msg to conf", "msg", msg)
 	// TODO: parse msg to conf name
-	conf = parseConfFile("conf.toml")
+	conf, err = parseConfFile("conf.toml")
 	return
 }
