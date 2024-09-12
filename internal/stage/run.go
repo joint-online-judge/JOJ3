@@ -5,32 +5,36 @@ import (
 	"log/slog"
 )
 
-func Run(stages []Stage) ([]StageResult, error) {
-	stageResults := []StageResult{}
+func Run(stages []Stage) (stageResults []StageResult, err error) {
+	var executorResults []ExecutorResult
+	var parserResults []ParserResult
+	var forceQuit bool
 	for _, stage := range stages {
 		slog.Debug("stage start", "name", stage.Name)
 		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)
 		executor, ok := executorMap[stage.ExecutorName]
 		if !ok {
 			slog.Error("executor not found", "name", stage.ExecutorName)
-			return stageResults, fmt.Errorf("executor not found: %s", stage.ExecutorName)
+			err = fmt.Errorf("executor not found: %s", stage.ExecutorName)
+			return
 		}
-		executorResults, err := executor.Run(stage.ExecutorCmds)
+		executorResults, err = executor.Run(stage.ExecutorCmds)
 		if err != nil {
 			slog.Error("executor run error", "name", stage.ExecutorName, "error", err)
-			return stageResults, err
+			return
 		}
 		slog.Debug("executor run done", "results", executorResults)
 		slog.Debug("parser run start", "conf", stage.ParserConf)
 		parser, ok := parserMap[stage.ParserName]
 		if !ok {
 			slog.Error("parser not found", "name", stage.ParserName)
-			return stageResults, err
+			err = fmt.Errorf("parser not found: %s", stage.ParserName)
+			return
 		}
-		parserResults, forceQuit, err := parser.Run(executorResults, stage.ParserConf)
+		parserResults, forceQuit, err = parser.Run(executorResults, stage.ParserConf)
 		if err != nil {
-			slog.Error("parser run error", "name", stage.ExecutorName, "error", err)
-			return stageResults, err
+			slog.Error("parser run error", "name", stage.ParserName, "error", err)
+			return
 		}
 		slog.Debug("parser run done", "results", parserResults)
 		stageResults = append(stageResults, StageResult{
@@ -39,11 +43,11 @@ func Run(stages []Stage) ([]StageResult, error) {
 			ForceQuit: forceQuit,
 		})
 		if forceQuit {
-			slog.Error("parser force quit", "name", stage.ExecutorName)
-			break
+			slog.Error("parser force quit", "name", stage.ParserName)
+			return
 		}
 	}
-	return stageResults, nil
+	return
 }
 
 func Cleanup() {
