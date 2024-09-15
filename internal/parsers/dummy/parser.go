@@ -5,6 +5,7 @@ import (
 )
 
 type Conf struct {
+	Score   int
 	Comment string
 }
 
@@ -19,7 +20,7 @@ func (*Dummy) Run(results []stage.ExecutorResult, confAny any) (
 	}
 	var res []stage.ParserResult
 	for range results {
-		res = append(res, stage.ParserResult{Score: 0, Comment: conf.Comment})
+		res = append(res, stage.ParserResult{Score: conf.Score, Comment: conf.Comment})
 	}
 	return res, false, nil
 }

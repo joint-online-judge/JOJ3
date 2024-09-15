@@ -7,22 +7,24 @@ import (
 	"github.com/criyle/go-judge/envexec"
 )
 
-type Conf struct{}
+type Conf struct {
+	Score   int
+	Comment string
+}
 
 type ResultStatus struct{}
 
 func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
-	// TODO: more conf options
-	_, err := stage.DecodeConf[Conf](confAny)
+	conf, err := stage.DecodeConf[Conf](confAny)
 	if err != nil {
 		return nil, true, err
 	}
 	forceQuit := false
 	var res []stage.ParserResult
 	for _, result := range results {
-		comment := ""
+		comment := conf.Comment
 		if result.Status != stage.Status(envexec.StatusAccepted) {
 			forceQuit = true
 			comment = fmt.Sprintf(
@@ -30,7 +32,7 @@ func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 			)
 		}
 		res = append(res, stage.ParserResult{
-			Score:   0,
+			Score:   conf.Score,
 			Comment: comment,
 		})
 	}
