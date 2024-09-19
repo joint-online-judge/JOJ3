@@ -61,11 +61,21 @@ type OptionalCmd struct {
 }
 
 func parseConfFile(path string) (conf Conf, err error) {
-	m := multiconfig.NewWithPath(path)
-	if err = m.Load(&conf); err != nil {
+	d := &multiconfig.DefaultLoader{}
+	d.Loader = multiconfig.MultiLoader(
+		&multiconfig.TagLoader{},
+		&multiconfig.JSONLoader{Path: path},
+	)
+	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
+	if err = d.Load(&conf); err != nil {
 		slog.Error("parse stages conf", "error", err)
 		return
 	}
+	if err = d.Validate(&conf); err != nil {
+		slog.Error("validate stages conf", "error", err)
+		return
+	}
+	slog.Error("parse stages conf", "conf", conf)
 	return
 }
 
