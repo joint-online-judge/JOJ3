@@ -75,7 +75,6 @@ func parseConfFile(path string) (conf Conf, err error) {
 		slog.Error("validate stages conf", "error", err)
 		return
 	}
-	slog.Error("parse stages conf", "conf", conf)
 	return
 }
 
