@@ -1,0 +1,44 @@
+---
+name: checks
+on:
+    - push
+    - pull_request
+
+jobs:
+    build:
+        container:
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            volumes:
+                - /home/actions/.ssh:/root/.ssh
+        steps:
+            - name: Check out repository code
+              uses: https://gitea.com/BoYanZh/checkout@focs
+            - name: Setup Go 1.23.1
+              run: |
+                  wget -q https://studygolang.com/dl/golang/go1.23.1.linux-amd64.tar.gz
+                  rm -rf /usr/local/go
+                  tar -C /usr/local -xzf go1.23.1.linux-amd64.tar.gz
+                  rm -rf go1.23.1.linux-amd64.tar.gz
+                  echo "PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> $GITHUB_ENV
+            - name: Display Go version
+              run: go version
+            - name: Prepare
+              run: |
+                  go env -w GO111MODULE=on
+                  go env -w GOPROXY=https://goproxy.io,direct
+                  chown -R root:root /root/.ssh
+            - name: Setup golangci-lint
+              run: |
+                  wget -q https://ghp.ci/https://github.com/golangci/golangci-lint/releases/download/v1.61.0/golangci-lint-1.61.0-linux-amd64.tar.gz
+                  tar -C /tmp -xzf golangci-lint-1.61.0-linux-amd64.tar.gz
+                  rm -rf golangci-lint-1.61.0-linux-amd64.tar.gz
+                  mkdir -p /root/go/bin
+                  mv /tmp/golangci-lint-1.61.0-linux-amd64/golangci-lint /root/go/bin
+            - name: Lint
+              run: make lint
+            - name: Build
+              run: make build
+            - name: Test
+              run: |
+                  make prepare-test
+                  make ci-test

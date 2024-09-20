@@ -3,7 +3,6 @@ package stage
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/criyle/go-judge/envexec"
 )
@@ -126,8 +125,8 @@ func (r ExecutorResult) String() string {
 		Status     Status
 		ExitStatus int
 		Error      string
-		Time       time.Duration
-		RunTime    time.Duration
+		Time       uint64
+		RunTime    uint64
 		Memory     envexec.Size
 		Files      map[string]string
 		FileIDs    map[string]string
@@ -137,8 +136,8 @@ func (r ExecutorResult) String() string {
 		Status:     r.Status,
 		ExitStatus: r.ExitStatus,
 		Error:      r.Error,
-		Time:       time.Duration(r.Time),
-		RunTime:    time.Duration(r.RunTime),
+		Time:       r.Time,
+		RunTime:    r.RunTime,
 		Memory:     envexec.Size(r.Memory),
 		Files:      make(map[string]string),
 		FileIDs:    r.FileIDs,
