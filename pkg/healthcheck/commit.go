@@ -7,7 +7,6 @@ import (
 	"unicode"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 // nonAsciiMsg checks for non-ASCII characters in the commit message.
@@ -28,38 +27,52 @@ func NonAsciiMsg(root string) error {
 		slog.Error("getting reference", "err", err)
 		return fmt.Errorf("error getting reference: %v", err)
 	}
-	commits, err := repo.Log(&git.LogOptions{From: ref.Hash()})
+
+	commit, err := repo.CommitObject(ref.Hash())
 	if err != nil {
-		slog.Error("getting commits", "err", err)
-		return fmt.Errorf("error getting commits from reference %s: %v", ref.Hash(), err)
+		slog.Error("getting latest commit", "err", err)
+		return fmt.Errorf("error getting latest commit: %v", err)
 	}
 
-	var msgs []string
-	err = commits.ForEach(func(c *object.Commit) error {
-		msgs = append(msgs, c.Message)
+	msg := commit.Message
+	if msg == "" {
 		return nil
-	})
-	if err != nil {
-		slog.Error("iterating commits", "err", err)
-		return fmt.Errorf("error iterating commits: %v", err)
 	}
 
-	var nonAsciiMsgs []string
-	for _, msg := range msgs {
-		if msg == "" {
+	var isCommitLegal bool = true
+	// List of prefixes to ignore in the commit message
+	ignoredPrefixes := []string{
+		"Co-authored-by:",
+		"Reviewed-by:",
+		"Co-committed-by:",
+		"Reviewed-on:",
+	}
+
+	// Split message by lines and ignore specific lines with prefixes
+	lines := strings.Split(msg, "\n")
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		ignore := false
+		for _, prefix := range ignoredPrefixes {
+			if strings.HasPrefix(trimmedLine, prefix) {
+				ignore = true
+				break
+			}
+		}
+		if ignore {
 			continue
 		}
-		if strings.HasPrefix(msg, "Merge pull request") {
-			continue
-		}
-		for _, c := range msg {
+		// Check for non-ASCII characters in the rest of the lines
+		for _, c := range line {
 			if c > unicode.MaxASCII {
-				nonAsciiMsgs = append(nonAsciiMsgs, msg)
+				isCommitLegal = false
+				break
 			}
 		}
 	}
-	if len(nonAsciiMsgs) > 0 {
-		return fmt.Errorf("Non-ASCII characters in commit messages:\n%s", strings.Join(nonAsciiMsgs, "\n"))
+
+	if !isCommitLegal {
+		return fmt.Errorf("Non-ASCII characters in commit messages:\n%s", msg)
 	}
 	return nil
 }
