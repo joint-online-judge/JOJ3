@@ -22,7 +22,7 @@ $ # make sure you are in go-judge directory
 $ ./tmp/go-judge -http-addr 0.0.0.0:5050 -grpc-addr 0.0.0.0:5051 -monitor-addr 0.0.0.0:5052 -enable-grpc -enable-debug -enable-metrics
 ```
 
-6. Pull submodules. It might be slow, so only run it when necessary.
+6. Pull submodules. It might be slow, so only run it when the test branches are out of date.
 
 ```bash
 $ # make sure you are in JOJ3 directory
