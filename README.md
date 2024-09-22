@@ -88,6 +88,12 @@ Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 -   `Score int`: score of the stage.
 -   `Comment string`: comment on the stage.
 
+## Binaries (under `/cmd` and `/pkg`)
+
+### Sample
+
+Just a sample on how to write an executable that can be called by the executor.
+
 ### HealthCheck
 
 The repohealth check will return a json list to for check result. The structure follows the score-comment pattern.
@@ -95,3 +101,53 @@ The repohealth check will return a json list to for check result. The structure 
 HealthCheck currently includes, `reposize`, `forbidden file`, `Metafile existence`, `non-ascii character` in file and message, `release tag`, and `ci files invariance` check.
 
 The workflow is `joj3` pass cli args to healthcheck binary. See `./cmd/healthcheck/main.go` to view all flags.
+
+## Executors (under `/internal/executors`)
+
+### Dummy
+
+Do not execute any command. Just return empty `ExecutorResult` slice.
+
+### Sandbox
+
+Run the commands in `go-judge` and output the `ExecutorResult` slice.
+
+## Parsers (under `/internal/parsers`)
+
+### Clang Tidy
+
+Parser for `clang-tidy`, check `/examples/clangtidy` on how to call `clang-tidy` with proper parameters.
+
+### Cppcheck
+
+Parser for `cppcheck`, check `/examples/cppcheck` on how to call `cppcheck` with proper parameters.
+
+### Cpplint
+
+Parser for `cpplint`, check `/examples/cpplint` on how to call `cpplint` with proper parameters.
+
+### Diff
+
+Compare the specified output of `ExecutorResult` with the content of the answer file. If they are the same, then score will be given. Just like a normal online judge system.
+
+### Dummy
+
+Does not parse the output of `ExecutorResult`. It just output what is set inside the configuration file as score and comment. Currently it is used to output metadata for `joint-teapot`.
+
+In `joint-teapot`, it will take the content before `-` of the comment of the first stage with name `metadata` as the exercise name and record in the scoreboard. (e.g. If the comment is `p2-s2-0xdeadbeef`, then the exercise name is `p2`.)
+
+### Healthcheck
+
+Parser for the `healthcheck` binary mentioned before.
+
+### Keyword
+
+Match the given keyword from the specified output of `ExecutorResult`. For each match, a deduction of score is given. Can be useful if we do not have a specific parser for a code quality tool. Check `/examples/keyword`.
+
+### Result Status
+
+Only check if all the status of the executor is `StatusAccepted`. Can be used to check whether the command run in the executor exit normally.
+
+### Sample
+
+Parser for the `sample` binary mentioned before. Only used as a sample.
