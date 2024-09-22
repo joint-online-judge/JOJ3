@@ -29,7 +29,7 @@ func severityFromString(severityString string) (Severity, error) {
 	case "information":
 		return INFORMATION, nil
 	default:
-		return UNKNOWN, fmt.Errorf("unkown severity type \"%s\" for cppcheck", severityString)
+		return UNKNOWN, fmt.Errorf("unknown severity type \"%s\" for cppcheck", severityString)
 	}
 }
 

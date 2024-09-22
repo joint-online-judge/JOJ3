@@ -25,7 +25,7 @@ func getMetas(rootDir string, fileList []string) ([]string, string, error) {
 	matched := false
 	umatchedRes := ""
 
-	// TODO: it seems that there is no good find subsitution now
+	// TODO: it seems that there is no good find substitution now
 	// modify current code if exist a better solution
 	for i, regex := range regexList {
 		for _, file := range files {
