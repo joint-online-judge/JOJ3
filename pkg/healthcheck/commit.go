@@ -14,12 +14,12 @@ import (
 // Otherwise, it iterates over each character in the message and checks if it is a non-ASCII character.
 // If a non-ASCII character is found, it returns an error indicating not to use non-ASCII characters in commit messages.
 // Otherwise, it returns nil indicating that the commit message is valid.
+// It skips the non-ASCII characters check for lines starting with specific keywords like "Co-authored-by", "Reviewed-by", and "Co-committed-by".
 func NonAsciiMsg(root string) error {
-	// cmd := exec.Command("git", "log", "--encoding=UTF-8", "--format=%B")
 	repo, err := git.PlainOpen(root)
 	if err != nil {
-		slog.Error("openning git repo", "err", err)
-		return fmt.Errorf("error openning git repo: %v", err)
+		slog.Error("opening git repo", "err", err)
+		return fmt.Errorf("error opening git repo: %v", err)
 	}
 
 	ref, err := repo.Head()
