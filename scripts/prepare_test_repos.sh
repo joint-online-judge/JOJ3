@@ -18,14 +18,14 @@ for submodule in $submodules; do
         else
             cd $repo_dir
             git fetch --all
-            cd -
+            cd - > /dev/null
         fi
     fi
     repo_names[$repo_name]=1
     cd $repo_dir
     git checkout -q $branch
     git reset -q --hard origin/$branch
-    cd -
+    cd - > /dev/null
     submodule_dir="$submodules_dir/$repo_name/$submodule"
     mkdir -p $submodule_dir
     cp -rT $repo_dir $submodule_dir

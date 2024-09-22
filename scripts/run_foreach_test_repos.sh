@@ -17,5 +17,5 @@ for submodule in $submodules; do
             mv -f "joj3_result.json" "expected.json"
         fi
     fi
-    cd -
+    cd - > /dev/null
 done
