@@ -46,7 +46,7 @@ type Cmd struct {
 
 	CopyIn       map[string]CmdFile `json:"copyIn"`
 	CopyInCached map[string]string  `json:"copyInCached"`
-	CopyInCwd    bool               `json:"copyInCwd"`
+	CopyInDir    string             `json:"copyInDir"`
 
 	CopyOut       []string `json:"copyOut"`
 	CopyOutCached []string `json:"copyOutCached"`

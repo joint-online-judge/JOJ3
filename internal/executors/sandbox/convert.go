@@ -28,7 +28,7 @@ func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 			CpuSetLimit:       c.CPUSetLimit,
 			DataSegmentLimit:  c.DataSegmentLimit,
 			AddressSpaceLimit: c.AddressSpaceLimit,
-			CopyIn:            convertPBCopyIn(c.CopyIn, c.CopyInCwd),
+			CopyIn:            convertPBCopyIn(c.CopyIn, c.CopyInDir),
 			CopyOut:           convertPBCopyOut(c.CopyOut),
 			CopyOutCached:     convertPBCopyOut(c.CopyOutCached),
 			CopyOutMax:        c.CopyOutMax,
@@ -39,9 +39,11 @@ func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 	return ret
 }
 
-func convertPBCopyIn(copyIn map[string]stage.CmdFile, copyInCwd bool) map[string]*pb.Request_File {
-	if copyInCwd {
-		_ = filepath.Walk(".",
+func convertPBCopyIn(
+	copyIn map[string]stage.CmdFile, copyInDir string,
+) map[string]*pb.Request_File {
+	if copyInDir != "" {
+		_ = filepath.Walk(copyInDir,
 			func(path string, info os.FileInfo, err error) error {
 				if err != nil {
 					return nil

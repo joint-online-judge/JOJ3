@@ -75,7 +75,7 @@ Check `Cmd` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 Some difference:
 
--   `CopyInCwd bool`: set to `true` to add everything in the current working directory to `CopyIn`.
+-   `CopyInDir string`: set to non-empty string to add everything in that directory to `CopyIn`.
 -   `CopyInCached map[string]string`: key: file name in the sandbox, value: file name used in `CopyOutCached`.
 -   `LocalFile`: now supports the relative path
 
