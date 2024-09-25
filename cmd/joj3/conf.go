@@ -1,7 +1,11 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"log/slog"
+	"os"
+	"regexp"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/go-git/go-git/v5"
@@ -60,6 +64,46 @@ type OptionalCmd struct {
 	AddressSpaceLimit *bool
 }
 
+// TODO: add other fields to match? not only limit to latest commit message
+type MetaConf struct {
+	Patterns []struct {
+		Filename string
+		Regex    string
+	}
+}
+
+func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
+	// FIXME: remove this default meta config, it is only for demonstration
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return MetaConf{
+			Patterns: []struct {
+				Filename string
+				Regex    string
+			}{
+				{
+					Filename: "conf.json",
+					Regex:    ".*",
+				},
+			},
+		}, nil
+	}
+	d := &multiconfig.DefaultLoader{}
+	d.Loader = multiconfig.MultiLoader(
+		&multiconfig.TagLoader{},
+		&multiconfig.JSONLoader{Path: path},
+	)
+	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
+	if err = d.Load(&metaConf); err != nil {
+		slog.Error("parse meta conf", "error", err)
+		return
+	}
+	if err = d.Validate(&metaConf); err != nil {
+		slog.Error("validate meta conf", "error", err)
+		return
+	}
+	return
+}
+
 func parseConfFile(path string) (conf Conf, err error) {
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
@@ -79,6 +123,10 @@ func parseConfFile(path string) (conf Conf, err error) {
 }
 
 func commitMsgToConf() (conf Conf, err error) {
+	metaConf, err := parseMetaConfFile("meta-conf.json")
+	if err != nil {
+		return
+	}
 	r, err := git.PlainOpen(".")
 	if err != nil {
 		return
@@ -93,7 +141,12 @@ func commitMsgToConf() (conf Conf, err error) {
 	}
 	msg := commit.Message
 	slog.Debug("commit msg to conf", "msg", msg)
-	// TODO: parse msg to conf name
-	conf, err = parseConfFile("conf.json")
+	for _, pattern := range metaConf.Patterns {
+		if matched, _ := regexp.MatchString(pattern.Regex, msg); matched {
+			slog.Debug("pattern matched", "pattern", pattern)
+			return parseConfFile(pattern.Filename)
+		}
+	}
+	err = fmt.Errorf("no pattern matched")
 	return
 }
