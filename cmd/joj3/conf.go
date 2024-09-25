@@ -51,7 +51,7 @@ type OptionalCmd struct {
 
 	CopyIn       *map[string]stage.CmdFile
 	CopyInCached *map[string]string
-	CopyInCwd    *bool
+	CopyInDir    *string
 
 	CopyOut       *[]string
 	CopyOutCached *[]string
