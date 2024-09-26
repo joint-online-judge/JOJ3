@@ -92,7 +92,12 @@ Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 ### JOJ3
 
-JOJ3 itself. Currently support CLI argument `-meta-conf` to specify the meta configuration file path. JOJ3 will try to match the commit message by the `regex`, once matched, the configuration file in the `filename` will be load and run the whole process.
+JOJ3 itself.
+
+#### CLI arguments
+
+1. `-meta-conf` to specify the meta configuration file path. JOJ3 will try to match the commit message by the `regex`, once matched, the configuration file in the `filename` will be load and run the whole process.
+2. `-msg` to specify message to trigger the running. If empty, JOJ3 will use git commit message on HEAD.
 
 ### Sample
 
