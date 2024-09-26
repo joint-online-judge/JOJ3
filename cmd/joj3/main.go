@@ -13,9 +13,9 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func setupSlog(conf Conf) {
+func setupSlog(logLevel int) {
 	lvl := new(slog.LevelVar)
-	lvl.Set(slog.Level(conf.LogLevel))
+	lvl.Set(slog.Level(logLevel))
 	opts := &slog.HandlerOptions{Level: lvl}
 	handler := slog.NewTextHandler(os.Stderr, opts)
 	logger := slog.New(handler)
@@ -62,12 +62,12 @@ func generateStages(conf Conf) ([]stage.Stage, error) {
 	return stages, nil
 }
 
-func outputResult(conf Conf, results []stage.StageResult) error {
+func outputResult(outputPath string, results []stage.StageResult) error {
 	content, err := json.Marshal(results)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(conf.OutputPath,
+	return os.WriteFile(outputPath,
 		append(content, []byte("\n")...), 0o600)
 }
 
@@ -84,7 +84,7 @@ func mainImpl() error {
 		slog.Error("no conf found", "error", err)
 		return err
 	}
-	setupSlog(conf)
+	setupSlog(conf.LogLevel)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf)
 	if err != nil {
@@ -97,7 +97,7 @@ func mainImpl() error {
 		slog.Error("run stages", "error", err)
 		return err
 	}
-	if err := outputResult(conf, results); err != nil {
+	if err := outputResult(conf.OutputPath, results); err != nil {
 		slog.Error("output result", "error", err)
 		return err
 	}
