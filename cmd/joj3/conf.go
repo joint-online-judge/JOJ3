@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
-	"github.com/go-git/go-git/v5"
 	"github.com/koding/multiconfig"
 )
 
@@ -122,25 +121,11 @@ func parseConfFile(path string) (conf Conf, err error) {
 	return
 }
 
-func commitMsgToConf(metaConfPath string) (conf Conf, err error) {
+func msgToConf(metaConfPath string, msg string) (conf Conf, err error) {
 	metaConf, err := parseMetaConfFile(metaConfPath)
 	if err != nil {
 		return
 	}
-	r, err := git.PlainOpen(".")
-	if err != nil {
-		return
-	}
-	ref, err := r.Head()
-	if err != nil {
-		return
-	}
-	commit, err := r.CommitObject(ref.Hash())
-	if err != nil {
-		return
-	}
-	msg := commit.Message
-	slog.Debug("commit msg to conf", "msg", msg)
 	for _, pattern := range metaConf.Patterns {
 		if matched, _ := regexp.MatchString(pattern.Regex, msg); matched {
 			slog.Debug("pattern matched", "pattern", pattern)

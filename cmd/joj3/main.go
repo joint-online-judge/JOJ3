@@ -10,6 +10,7 @@ import (
 	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/jinzhu/copier"
 )
 
@@ -20,6 +21,23 @@ func setupSlog(logLevel int) {
 	handler := slog.NewTextHandler(os.Stderr, opts)
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
+}
+
+func getCommitMsg() (msg string, err error) {
+	r, err := git.PlainOpen(".")
+	if err != nil {
+		return
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return
+	}
+	commit, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		return
+	}
+	msg = commit.Message
+	return
 }
 
 func generateStages(conf Conf) ([]stage.Stage, error) {
@@ -71,20 +89,33 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 		append(content, []byte("\n")...), 0o600)
 }
 
-var metaConfPath string
+var (
+	metaConfPath string
+	msg          string
+)
 
 func init() {
 	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.json", "meta config file path")
+	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
 }
 
 func mainImpl() error {
+	setupSlog(int(slog.LevelInfo)) // before conf is loaded
 	flag.Parse()
-	conf, err := commitMsgToConf(metaConfPath)
+	if msg == "" {
+		var err error
+		msg, err = getCommitMsg()
+		if err != nil {
+			slog.Error("get commit msg", "error", err)
+			return err
+		}
+	}
+	conf, err := msgToConf(metaConfPath, msg)
 	if err != nil {
 		slog.Error("no conf found", "error", err)
 		return err
 	}
-	setupSlog(conf.LogLevel)
+	setupSlog(conf.LogLevel) // after conf is loaded
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf)
 	if err != nil {
