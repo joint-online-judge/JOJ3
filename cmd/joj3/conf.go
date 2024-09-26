@@ -122,8 +122,8 @@ func parseConfFile(path string) (conf Conf, err error) {
 	return
 }
 
-func commitMsgToConf() (conf Conf, err error) {
-	metaConf, err := parseMetaConfFile("meta-conf.json")
+func commitMsgToConf(metaConfPath string) (conf Conf, err error) {
+	metaConf, err := parseMetaConfFile(metaConfPath)
 	if err != nil {
 		return
 	}

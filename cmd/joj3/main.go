@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log/slog"
 	"os"
 
@@ -70,8 +71,15 @@ func outputResult(conf Conf, results []stage.StageResult) error {
 		append(content, []byte("\n")...), 0o600)
 }
 
+var metaConfPath string
+
+func init() {
+	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.json", "meta config file path")
+}
+
 func mainImpl() error {
-	conf, err := commitMsgToConf()
+	flag.Parse()
+	conf, err := commitMsgToConf(metaConfPath)
 	if err != nil {
 		slog.Error("no conf found", "error", err)
 		return err
