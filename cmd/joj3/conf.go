@@ -122,13 +122,16 @@ func parseConfFile(path string) (conf Conf, err error) {
 }
 
 func msgToConf(metaConfPath string, msg string) (conf Conf, err error) {
+	slog.Info("msg to conf", "msg", msg)
 	metaConf, err := parseMetaConfFile(metaConfPath)
 	if err != nil {
 		return
 	}
 	for _, pattern := range metaConf.Patterns {
 		if matched, _ := regexp.MatchString(pattern.Regex, msg); matched {
-			slog.Debug("pattern matched", "pattern", pattern)
+			slog.Debug("pattern matched",
+				"pattern", pattern, "filename", pattern.Filename)
+			slog.Info("pattern matched", "filename", pattern.Filename)
 			return parseConfFile(pattern.Filename)
 		}
 	}

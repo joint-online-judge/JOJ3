@@ -10,7 +10,8 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 	var parserResults []ParserResult
 	var forceQuit bool
 	for _, stage := range stages {
-		slog.Debug("stage start", "name", stage.Name)
+		slog.Info("stage start", "name", stage.Name)
+		slog.Info("executor run start")
 		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)
 		executor, ok := executorMap[stage.ExecutorName]
 		if !ok {
@@ -24,6 +25,7 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 			return
 		}
 		slog.Debug("executor run done", "results", executorResults)
+		slog.Info("parser run start")
 		slog.Debug("parser run start", "conf", stage.ParserConf)
 		parser, ok := parserMap[stage.ParserName]
 		if !ok {
