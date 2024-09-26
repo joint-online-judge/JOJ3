@@ -136,6 +136,8 @@ Does not parse the output of `ExecutorResult`. It just output what is set inside
 
 In `joint-teapot`, it will take the content before `-` of the comment of the first stage with name `metadata` as the exercise name and record in the scoreboard. (e.g. If the comment is `p2-s2-0xdeadbeef`, then the exercise name is `p2`.)
 
+The comment in `metadata` can also be used to skip teapot commands. With `skip-teapot` in the comment, teapot will not run. And with `skip-scoreboard`, `skip-failed-table`, and `skip-result-issue`, only the corresponding step will be skipped, while the others will be executed. (e.g. If the comment is `p2-s2-0xdeadbeef-skip-scoreboard-skip-result-issue`, then only failed table step in teapot will run.)
+
 ### Healthcheck
 
 Parser for the `healthcheck` binary mentioned before.
