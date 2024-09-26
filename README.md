@@ -90,6 +90,10 @@ Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
 ## Binaries (under `/cmd` and `/pkg`)
 
+### JOJ3
+
+JOJ3 itself. Currently support CLI argument `-meta-conf` to specify the meta configuration file path. JOJ3 will try to match the commit message by the `regex`, once matched, the configuration file in the `filename` will be load and run the whole process.
+
 ### Sample
 
 Just a sample on how to write an executable that can be called by the executor.
