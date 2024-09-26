@@ -1,0 +1,29 @@
+---
+name: build-image
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    create-empty-commit:
+        container:
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            volumes:
+                - /home/actions/.ssh:/root/.ssh
+        steps:
+            - name: Check out repository code
+              uses: https://gitea.com/BoYanZh/checkout@focs
+            - name: Set up Git
+              run: |
+                  git config --global user.name "gitea-actions[bot]"
+                  git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+                  chown -R root:root /root/.ssh
+            - name: Clone target repository
+              run: |
+                  git clone ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/runner-images.git runner-images
+                  cd runner-images
+            - name: Commit and Push
+              run: |
+                  git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+                  git push
