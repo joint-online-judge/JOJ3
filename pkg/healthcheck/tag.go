@@ -56,7 +56,7 @@ func CheckTags(repoPath string, category string, n int) error {
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", target, strings.Join(tags, "', '"))
+		return fmt.Errorf("wrong release tag '%s' or missing release tags. Please use one of '%s'.", target, strings.Join(tags, "', '"))
 	}
 	return nil
 }

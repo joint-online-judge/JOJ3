@@ -29,7 +29,7 @@ func getRegex(fileList []string) ([]*regexp.Regexp, error) {
 	for _, pattern := range fileList {
 		regex, err := regexp.Compile("(?i)" + pattern)
 		if err != nil {
-			return nil, fmt.Errorf("Error compiling regex:%w", err)
+			return nil, fmt.Errorf("error compiling regex: %w", err)
 		}
 		regexList = append(regexList, regex)
 	}

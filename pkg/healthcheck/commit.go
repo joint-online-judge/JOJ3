@@ -72,7 +72,7 @@ func NonAsciiMsg(root string) error {
 	}
 
 	if !isCommitLegal {
-		return fmt.Errorf("Non-ASCII characters in commit messages:\n%s", msg)
+		return fmt.Errorf("non-ASCII characters in commit messages:\n%s", msg)
 	}
 	return nil
 }
