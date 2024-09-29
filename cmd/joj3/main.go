@@ -95,7 +95,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.json", "meta config file path")
+	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.toml", "meta config file path")
 	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
 }
 

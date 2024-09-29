@@ -87,10 +87,7 @@ func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
 		}, nil
 	}
 	d := &multiconfig.DefaultLoader{}
-	d.Loader = multiconfig.MultiLoader(
-		&multiconfig.TagLoader{},
-		&multiconfig.JSONLoader{Path: path},
-	)
+	d.Loader = multiconfig.NewWithPath(path)
 	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
 	if err = d.Load(&metaConf); err != nil {
 		slog.Error("parse meta conf", "error", err)
