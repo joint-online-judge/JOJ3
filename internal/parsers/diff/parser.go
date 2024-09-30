@@ -2,6 +2,7 @@ package diff
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 	"unicode"
@@ -52,7 +53,10 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			if err != nil {
 				return nil, true, err
 			}
-
+			slog.Debug("compare", "filename", output.FileName,
+				"answer path", output.AnswerPath,
+				"actual", result.Files[output.FileName],
+				"answer", string(answer))
 			// If no difference, assign score
 			if compareChars(string(answer), result.Files[output.FileName], output.IgnoreWhitespace) {
 				score += output.Score
