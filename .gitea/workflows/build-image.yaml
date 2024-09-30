@@ -19,7 +19,7 @@ jobs:
                   chown -R root:root /root/.ssh
             - name: Clone, Commit and Push
               run: |
-                  git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ3/runner-images.git runner-images
+                  git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
                   git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
                   git push
