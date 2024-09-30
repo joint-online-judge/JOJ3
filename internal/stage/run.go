@@ -25,6 +25,9 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 			return
 		}
 		slog.Debug("executor run done", "results", executorResults)
+		for _, executorResult := range executorResults {
+			slog.Debug("executor run done", "result.Files", executorResult.Files)
+		}
 		slog.Info("parser run start")
 		slog.Debug("parser run start", "conf", stage.ParserConf)
 		parser, ok := parserMap[stage.ParserName]
