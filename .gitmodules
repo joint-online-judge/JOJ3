@@ -1,72 +1,72 @@
 [submodule "examples/diff/basic"]
 	path = examples/diff/basic
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = diff/basic
 [submodule "examples/diff/complex"]
 	path = examples/diff/complex
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = diff/complex
 [submodule "examples/cpplint/sillycode"]
 	path = examples/cpplint/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = cpplint/sillycode
 [submodule "examples/compile/success"]
 	path = examples/compile/success
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = compile/success
 [submodule "examples/compile/error"]
 	path = examples/compile/error
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = compile/error
 [submodule "examples/sample/success"]
 	path = examples/sample/success
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = sample/success
 [submodule "examples/sample/error"]
 	path = examples/sample/error
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = sample/error
 [submodule "examples/keyword/cpplint/sillycode"]
 	path = examples/keyword/cpplint/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = keyword/cpplint/sillycode
 [submodule "examples/clangtidy/sillycode"]
 	path = examples/clangtidy/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = clangtidy/sillycode
 [submodule "examples/keyword/clangtidy/sillycode"]
 	path = examples/keyword/clangtidy/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = keyword/clangtidy/sillycode
 [submodule "examples/healthcheck/asciifile"]
 	path = examples/healthcheck/asciifile
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/asciifile
 [submodule "examples/healthcheck/asciimsg"]
 	path = examples/healthcheck/asciimsg
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/asciimsg
 [submodule "examples/healthcheck/forbiddenfile"]
 	path = examples/healthcheck/forbiddenfile
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/forbiddenfile
 [submodule "examples/healthcheck/meta"]
 	path = examples/healthcheck/meta
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/meta
 [submodule "examples/healthcheck/release"]
 	path = examples/healthcheck/release
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/release
 [submodule "examples/healthcheck/reposize"]
 	path = examples/healthcheck/reposize
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/reposize
 [submodule "examples/healthcheck/repoverify"]
 	path = examples/healthcheck/repoverify
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/repoverify
 [submodule "examples/cppcheck/sillycode"]
 	path = examples/cppcheck/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/FOCS-dev/JOJ3-examples.git
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = cppcheck/sillycode

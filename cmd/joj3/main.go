@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"os"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/executors"
-	_ "focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/parsers"
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/executors"
+	_ "focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/parsers"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/jinzhu/copier"

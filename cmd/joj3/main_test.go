@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 )
 
 func compareStageResults(t *testing.T, actual, expected []stage.StageResult, regex bool) {

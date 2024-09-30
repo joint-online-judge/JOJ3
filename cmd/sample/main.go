@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/pkg/sample"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/pkg/sample"
 )
 
 func main() {

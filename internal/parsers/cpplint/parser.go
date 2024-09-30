@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 )
 
 type Conf struct {

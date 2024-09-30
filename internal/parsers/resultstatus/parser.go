@@ -3,7 +3,7 @@ package resultstatus
 import (
 	"fmt"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
+	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/envexec"
 )
 

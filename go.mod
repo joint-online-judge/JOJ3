@@ -1,4 +1,4 @@
-module focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3
+module focs.ji.sjtu.edu.cn/git/JOJ/JOJ3
 
 go 1.22.1
 
