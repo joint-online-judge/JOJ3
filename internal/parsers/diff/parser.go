@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
+	"github.com/criyle/go-judge/envexec"
 )
 
 // operation represents the type of edit operation.
@@ -21,7 +22,8 @@ const (
 
 type Conf struct {
 	Cases []struct {
-		Outputs []struct {
+		IgnoreResultStatus bool
+		Outputs            []struct {
 			Score            int
 			FileName         string
 			AnswerPath       string
@@ -44,10 +46,18 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 	}
 
 	var res []stage.ParserResult
+	forceQuit := false
 	for i, caseConf := range conf.Cases {
 		result := results[i]
 		score := 0
 		comment := ""
+		if !caseConf.IgnoreResultStatus &&
+			result.Status != stage.Status(envexec.StatusAccepted) {
+			forceQuit = true
+			comment += fmt.Sprintf(
+				"Unexpected executor status: %s.", result.Status,
+			)
+		}
 		for _, output := range caseConf.Outputs {
 			answer, err := os.ReadFile(output.AnswerPath)
 			if err != nil {
@@ -83,7 +93,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		})
 	}
 
-	return res, false, nil
+	return res, forceQuit, nil
 }
 
 // compareChars compares two strings character by character, optionally ignoring whitespace.
