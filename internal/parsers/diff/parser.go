@@ -57,6 +57,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			comment += fmt.Sprintf(
 				"Unexpected executor status: %s.", result.Status,
 			)
+			continue
 		}
 		for _, output := range caseConf.Outputs {
 			answer, err := os.ReadFile(output.AnswerPath)
