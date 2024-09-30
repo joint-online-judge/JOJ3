@@ -1,5 +1,7 @@
 # JOJ3
 
+[![Gitea Actions Test Status](https://focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/actions/workflows/test.yaml/badge.svg)](https://focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/actions?workflow=test.yaml)
+
 ## Quick Start
 
 1. Make sure you are in a Unix-like OS (Linux, MacOS). For Windows, use [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install).
