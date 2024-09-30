@@ -20,7 +20,7 @@ func getNonAscii(root string, localList string) ([]string, error) {
 	if localList != "" {
 		file, err := os.Open(localList)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open file %s: %v\n", localList, err)
+			return nil, fmt.Errorf("Failed to open file %s: %v\n", localList, err)
 		}
 		defer file.Close()
 
@@ -29,7 +29,7 @@ func getNonAscii(root string, localList string) ([]string, error) {
 			dirs = append(dirs, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("error reading file %s: %v\n", localList, err)
+			return nil, fmt.Errorf("Error reading file %s: %v\n", localList, err)
 		}
 	}
 
@@ -86,7 +86,7 @@ func NonAsciiFiles(root string, localList string) error {
 		return fmt.Errorf("error getting non-ascii: %w", err)
 	}
 	if len(nonAscii) > 0 {
-		return fmt.Errorf("non-ASCII characters found in the following files:\n%s",
+		return fmt.Errorf("Non-ASCII characters found in the following files:\n%s",
 			strings.Join(nonAscii, "\n"))
 	}
 	return nil

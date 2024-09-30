@@ -26,7 +26,7 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 	if localList != "" {
 		file, err := os.Open(localList)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open file %s: %v\n", localList, err)
+			return nil, fmt.Errorf("Failed to open file %s: %v\n", localList, err)
 		}
 		defer file.Close()
 
@@ -35,7 +35,7 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 			dirs = append(dirs, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("error reading file %s: %v\n", localList, err)
+			return nil, fmt.Errorf("Error reading file %s: %v\n", localList, err)
 		}
 	}
 
@@ -78,7 +78,7 @@ func ForbiddenCheck(rootDir string, regexList []string, localList string, repo s
 	}
 
 	if len(forbids) > 0 {
-		return fmt.Errorf("the following forbidden files were found: %s\n\nTo fix it, first make a backup of your repository and then run the following commands:\nfor i in %s%s",
+		return fmt.Errorf("The following forbidden files were found: %s\n\nTo fix it, first make a backup of your repository and then run the following commands:\nfor i in %s%s",
 			strings.Join(forbids, ", "),
 			strings.Join(forbids, " "),
 			fmt.Sprint(

@@ -33,10 +33,10 @@ func checkFileChecksum(rootDir, fileName, expectedChecksum string) error {
 	filePath := filepath.Join(rootDir, strings.TrimSpace(fileName))
 	actualChecksum, err := getChecksum(filePath)
 	if err != nil {
-		return fmt.Errorf("error reading file %s: %v", filePath, err)
+		return fmt.Errorf("Error reading file %s: %v", filePath, err)
 	}
 	if actualChecksum != expectedChecksum {
-		return fmt.Errorf("checksum for %s failed. Expected %s, but got %s. Please revert your changes or contact the teaching team if you have a valid reason for adjusting them.", filePath, expectedChecksum, actualChecksum)
+		return fmt.Errorf("Checksum for %s failed. Expected %s, but got %s. Please revert your changes or contact the teaching team if you have a valid reason for adjusting them.", filePath, expectedChecksum, actualChecksum)
 	}
 	return nil
 }
@@ -49,7 +49,7 @@ func VerifyFiles(rootDir string, checkFileNameList string, checkFileSumList stri
 	checkSums := strings.Split(checkFileSumList, ",")
 	// Check if the number of files matches the number of checksums
 	if len(fileNames) != len(checkSums) {
-		return fmt.Errorf("the number of files and checksums do not match")
+		return fmt.Errorf("Error: The number of files and checksums do not match.")
 	}
 	// Check each file's checksum
 	for i, fileName := range fileNames {

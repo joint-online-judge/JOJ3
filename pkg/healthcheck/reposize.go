@@ -34,7 +34,7 @@ func RepoSize() error {
 		}
 	}
 	if sum > 2048 {
-		return fmt.Errorf("repository larger than 2MB. Please clean up or contact the teaching team.")
+		return fmt.Errorf("Repository larger than 2MB. Please clean up or contact the teaching team.")
 	}
 	return nil
 }
