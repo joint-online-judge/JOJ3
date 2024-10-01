@@ -110,6 +110,7 @@ func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
 		slog.Error("validate meta conf", "error", err)
 		return
 	}
+	slog.Debug("meta conf loaded", "metaConf", metaConf)
 	return
 }
 
