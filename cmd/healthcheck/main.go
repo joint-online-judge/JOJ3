@@ -39,7 +39,7 @@ var Version string
 
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
-	var gitWhitelist, metaFile, releaseTags []string
+	var gitWhitelist, metaFile []string
 	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
@@ -51,7 +51,6 @@ func main() {
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
 	parseMultiValueFlag(&metaFile, "meta", "")
-	parseMultiValueFlag(&releaseTags, "releaseTags", "")
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -83,7 +82,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("## Release Tag Check Failed:\n%s\n", err.Error())
 	}
-	// FIXME: for drone usage
 	err = healthcheck.VerifyFiles(*rootDir, *checkFileNameList, *checkFileSumList)
 	if err != nil {
 		fmt.Printf("## Repo File Check Failed:\n%s\n", err.Error())

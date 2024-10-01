@@ -32,6 +32,10 @@ func getTagsFromRepo(repoPath string) ([]string, error) {
 }
 
 func CheckTags(repoPath string, category string, n int) error {
+	// INFO: if category not specified, skipping this check by default
+	if category == "" {
+		return nil
+	}
 	tags, err := getTagsFromRepo(repoPath)
 	if err != nil {
 		return fmt.Errorf("error getting tags: %v", err)
@@ -56,7 +60,7 @@ func CheckTags(repoPath string, category string, n int) error {
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", target, strings.Join(tags, "', '"))
+		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", strings.Join(tags, "', '"), target)
 	}
 	return nil
 }
