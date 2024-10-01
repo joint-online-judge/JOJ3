@@ -75,6 +75,7 @@ type MetaConf struct {
 func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
 	// FIXME: remove this default meta config, it is only for demonstration
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		slog.Debug("meta conf not found", "path", path)
 		return MetaConf{
 			Patterns: []struct {
 				Filename string
