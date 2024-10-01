@@ -1,6 +1,6 @@
 # JOJ3
 
-[![Gitea Actions Test Status](https://focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/actions/workflows/test.yaml/badge.svg)](https://focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/actions?workflow=test.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/joint-online-judge/JOJ3)](https://goreportcard.com/report/github.com/joint-online-judge/JOJ3)
 
 ## Quick Start
 
