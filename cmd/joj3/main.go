@@ -119,6 +119,7 @@ func mainImpl() error {
 	if err := setupSlog(conf.LogPath); err != nil { // after conf is loaded
 		return err
 	}
+	slog.Info("debug log", "path", conf.LogPath)
 	slog.Debug("conf loaded", "conf", conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf)
