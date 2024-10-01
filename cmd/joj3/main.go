@@ -98,6 +98,7 @@ func mainImpl() error {
 	if err := setupSlog(""); err != nil { // before conf is loaded
 		return err
 	}
+	slog.Info("start joj3", "version", Version)
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -140,6 +141,7 @@ func mainImpl() error {
 
 func main() {
 	if err := mainImpl(); err != nil {
+		slog.Error("main exit", "error", err)
 		os.Exit(1)
 	}
 }
