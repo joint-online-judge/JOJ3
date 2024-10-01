@@ -1,6 +1,7 @@
 package stage
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -162,8 +163,17 @@ type ParserResult struct {
 	Comment string `json:"comment"`
 }
 
+type NonNullSlice[T any] []T
+
+func (s NonNullSlice[T]) MarshalJSON() ([]byte, error) {
+	if len(s) == 0 {
+		return []byte("[]"), nil
+	}
+	return json.Marshal([]T(s))
+}
+
 type StageResult struct {
-	Name      string         `json:"name"`
-	Results   []ParserResult `json:"results"`
-	ForceQuit bool           `json:"force_quit"`
+	Name      string                     `json:"name"`
+	Results   NonNullSlice[ParserResult] `json:"results"`
+	ForceQuit bool                       `json:"force_quit"`
 }
