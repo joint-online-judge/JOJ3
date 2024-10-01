@@ -1,5 +1,5 @@
 ---
-name: checks
+name: build
 on:
     - push
     - pull_request
@@ -42,3 +42,22 @@ jobs:
               run: |
                   make prepare-test
                   make ci-test
+    trigger-build-image:
+        container:
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            volumes:
+                - /home/actions/.ssh:/root/.ssh
+        needs: build
+        if: github.ref == 'refs/heads/master'
+        steps:
+            - name: Set up Git
+              run: |
+                  git config --global user.name "gitea-actions[bot]"
+                  git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+                  chown -R root:root /root/.ssh
+            - name: Clone, Commit and Push
+              run: |
+                  git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
+                  cd runner-images
+                  git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+                  git push
