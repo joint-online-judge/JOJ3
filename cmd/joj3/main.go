@@ -60,7 +60,6 @@ func generateStages(conf Conf) ([]stage.Stage, error) {
 		if len(s.Executor.With.Cases) == 0 {
 			cmds = []stage.Cmd{defaultCmd}
 		}
-		slog.Debug("parse stages conf", "cmds", cmds)
 		stages = append(stages, stage.Stage{
 			Name:         s.Name,
 			ExecutorName: s.Executor.Name,
@@ -120,18 +119,21 @@ func mainImpl() error {
 	if err := setupSlog(conf.LogPath); err != nil { // after conf is loaded
 		return err
 	}
+	slog.Debug("conf loaded", "conf", conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		return err
 	}
+	slog.Debug("stages generated", "stages", stages)
 	defer stage.Cleanup()
 	results, err := stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
 		return err
 	}
+	slog.Debug("stages run done", "results", results)
 	if err := outputResult(conf.OutputPath, results); err != nil {
 		slog.Error("output result", "error", err)
 		return err
