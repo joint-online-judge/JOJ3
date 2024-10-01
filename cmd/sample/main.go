@@ -9,9 +9,16 @@ import (
 	"github.com/joint-online-judge/JOJ3/pkg/sample"
 )
 
+var Version string
+
 func main() {
+	showVersion := flag.Bool("v", false, "print current version")
 	score := flag.Int("score", 0, "score")
 	flag.Parse()
+	if *showVersion {
+		fmt.Println(Version)
+		return
+	}
 	res, err := sample.Run(sample.Conf{Score: *score})
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)

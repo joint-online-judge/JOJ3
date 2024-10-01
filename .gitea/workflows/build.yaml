@@ -38,6 +38,8 @@ jobs:
               run: make lint
             - name: Build
               run: make build
+            - name: Version
+              run: ./build/joj3 -v
             - name: Test
               run: |
                   make prepare-test

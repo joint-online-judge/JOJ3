@@ -35,9 +35,12 @@ func setupSlog() {
 	slog.SetDefault(logger)
 }
 
+var Version string
+
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
 	var gitWhitelist, metaFile, releaseTags []string
+	showVersion := flag.Bool("v", false, "print current version")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
 	localList := flag.String("localList", "", "")
@@ -50,6 +53,10 @@ func main() {
 	parseMultiValueFlag(&metaFile, "meta", "")
 	parseMultiValueFlag(&releaseTags, "releaseTags", "")
 	flag.Parse()
+	if *showVersion {
+		fmt.Println(Version)
+		return
+	}
 	setupSlog()
 	var err error
 	err = healthcheck.RepoSize()

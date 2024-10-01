@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -92,16 +93,23 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 var (
 	metaConfPath string
 	msg          string
+	showVersion  *bool
+	Version      string
 )
 
 func init() {
 	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.toml", "meta config file path")
 	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
+	showVersion = flag.Bool("v", false, "print current version")
 }
 
 func mainImpl() error {
 	setupSlog(int(slog.LevelInfo)) // before conf is loaded
 	flag.Parse()
+	if *showVersion {
+		fmt.Println(Version)
+		return nil
+	}
 	if msg == "" {
 		var err error
 		msg, err = getCommitMsg()
