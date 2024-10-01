@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/pkg/healthcheck"
+	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
 // parseMultiValueFlag parses a multi-value command-line flag and appends its values to the provided slice.

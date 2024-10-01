@@ -1,6 +1,6 @@
 package healthcheck
 
-import "focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
+import "github.com/joint-online-judge/JOJ3/internal/stage"
 
 var name = "healthcheck"
 

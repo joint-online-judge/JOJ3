@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/envexec"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 // operation represents the type of edit operation.

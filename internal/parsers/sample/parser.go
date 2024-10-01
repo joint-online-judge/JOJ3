@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/pkg/sample"
 	"github.com/criyle/go-judge/envexec"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"github.com/joint-online-judge/JOJ3/pkg/sample"
 )
 
 type Conf struct {

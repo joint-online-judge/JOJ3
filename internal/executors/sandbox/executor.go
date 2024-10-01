@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/pb"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 type Sandbox struct {

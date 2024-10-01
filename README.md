@@ -47,7 +47,7 @@ go test -coverprofile cover.out -v ./...
 ...
 PASS
 coverage: 74.0% of statements
-ok      focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/cmd/joj3  2.290s  coverage: 74.0% of statements
+ok      github.com/joint-online-judge/JOJ3/cmd/joj3  2.290s  coverage: 74.0% of statements
 ```
 
 ### For developers

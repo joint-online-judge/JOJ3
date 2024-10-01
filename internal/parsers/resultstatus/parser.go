@@ -3,8 +3,8 @@ package resultstatus
 import (
 	"fmt"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/envexec"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 type Conf struct {

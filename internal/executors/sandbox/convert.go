@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"focs.ji.sjtu.edu.cn/git/JOJ/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/pb"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 // copied from https://github.com/criyle/go-judge/blob/master/cmd/go-judge-shell/grpc.go
