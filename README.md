@@ -52,7 +52,7 @@ ok      github.com/joint-online-judge/JOJ3/cmd/joj3  2.290s  coverage: 74.0% of 
 
 ### For developers
 
-1. Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run), [`goimports`](https://golang.org/x/tools/cmd/goimports), [`gofumpt`](https://github.com/mvdan/gofumpt).
+1. Install [`pre-commit`](https://pre-commit.com/), [`golangci-lint`](https://golangci-lint.run).
 
 2. Install the pre-commit hooks. It will run some checks before you commit.
 

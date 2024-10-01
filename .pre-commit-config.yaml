@@ -14,10 +14,6 @@ repos:
       rev: 0.2.3
       hooks:
           - id: yamlfmt
-    - repo: https://github.com/Bahjat/pre-commit-golang
-      rev: v1.0.3
-      hooks:
-          - id: gofumpt
     - repo: https://github.com/dnephin/pre-commit-golang
       rev: v0.5.1
       hooks:
@@ -31,7 +27,13 @@ repos:
             name: make build
             entry: make build
             language: system
+            always_run: true
+            stages: [commit]
+            pass_filenames: false
           - id: make-test
             name: make test
             entry: make test
             language: system
+            always_run: true
+            stages: [commit]
+            pass_filenames: false

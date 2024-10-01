@@ -3,11 +3,13 @@
 BUILD_DIR = ./build
 TMP_DIR = ./tmp
 APPS := $(notdir $(wildcard ./cmd/*))
-FLAGS := "-s -w"
+VERSION := $(shell git rev-parse --short HEAD)
+FLAGS := "-s -w -X main.Version=$(VERSION)"
 
 all: build
 
 build:
+	echo 'make build'
 	$(foreach APP,$(APPS), go build -ldflags=$(FLAGS) -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
 
 clean:
@@ -22,6 +24,7 @@ prepare-test:
 	git submodule update --init --remote
 
 test:
+	echo 'make test'
 	./scripts/prepare_test_repos.sh $(TMP_DIR)
 	go test -coverprofile cover.out -v ./...
 
