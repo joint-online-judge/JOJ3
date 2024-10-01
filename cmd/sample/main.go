@@ -12,7 +12,7 @@ import (
 var Version string
 
 func main() {
-	showVersion := flag.Bool("v", false, "print current version")
+	showVersion := flag.Bool("version", false, "print current version")
 	score := flag.Int("score", 0, "score")
 	flag.Parse()
 	if *showVersion {

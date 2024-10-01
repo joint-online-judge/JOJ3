@@ -100,7 +100,7 @@ var (
 func init() {
 	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.toml", "meta config file path")
 	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
-	showVersion = flag.Bool("v", false, "print current version")
+	showVersion = flag.Bool("version", false, "print current version")
 }
 
 func mainImpl() error {

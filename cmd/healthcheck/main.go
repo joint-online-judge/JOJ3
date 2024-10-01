@@ -40,7 +40,7 @@ var Version string
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
 	var gitWhitelist, metaFile, releaseTags []string
-	showVersion := flag.Bool("v", false, "print current version")
+	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
 	localList := flag.String("localList", "", "")

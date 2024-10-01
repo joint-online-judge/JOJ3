@@ -39,7 +39,7 @@ jobs:
             - name: Build
               run: make build
             - name: Version
-              run: ./build/joj3 -v
+              run: ./build/joj3 -version
             - name: Test
               run: |
                   make prepare-test
