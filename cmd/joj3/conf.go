@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/koding/multiconfig"
@@ -87,7 +88,18 @@ func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
 		}, nil
 	}
 	d := &multiconfig.DefaultLoader{}
-	d.Loader = multiconfig.NewWithPath(path)
+	loaders := []multiconfig.Loader{}
+	loaders = append(loaders, &multiconfig.TagLoader{})
+	if strings.HasSuffix(path, "toml") {
+		loaders = append(loaders, &multiconfig.TOMLLoader{Path: path})
+	}
+	if strings.HasSuffix(path, "json") {
+		loaders = append(loaders, &multiconfig.JSONLoader{Path: path})
+	}
+	if strings.HasSuffix(path, "yml") || strings.HasSuffix(path, "yaml") {
+		loaders = append(loaders, &multiconfig.YAMLLoader{Path: path})
+	}
+	d.Loader = multiconfig.MultiLoader(loaders...)
 	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
 	if err = d.Load(&metaConf); err != nil {
 		slog.Error("parse meta conf", "error", err)
