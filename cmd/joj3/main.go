@@ -15,15 +15,6 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func setupSlog(logLevel int) {
-	lvl := new(slog.LevelVar)
-	lvl.Set(slog.Level(logLevel))
-	opts := &slog.HandlerOptions{Level: lvl}
-	handler := slog.NewTextHandler(os.Stderr, opts)
-	logger := slog.New(handler)
-	slog.SetDefault(logger)
-}
-
 func getCommitMsg() (msg string, err error) {
 	r, err := git.PlainOpen(".")
 	if err != nil {
@@ -104,7 +95,9 @@ func init() {
 }
 
 func mainImpl() error {
-	setupSlog(int(slog.LevelInfo)) // before conf is loaded
+	if err := setupSlog(""); err != nil { // before conf is loaded
+		return err
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -123,7 +116,9 @@ func mainImpl() error {
 		slog.Error("no conf found", "error", err)
 		return err
 	}
-	setupSlog(conf.LogLevel) // after conf is loaded
+	if err := setupSlog(conf.LogPath); err != nil { // after conf is loaded
+		return err
+	}
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf)
 	if err != nil {
