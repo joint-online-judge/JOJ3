@@ -27,7 +27,7 @@ func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
 	if token != "" {
 		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
 	}
-	return grpc.Dial(addr, opts...)
+	return grpc.NewClient(addr, opts...)
 }
 
 type tokenAuth struct {
