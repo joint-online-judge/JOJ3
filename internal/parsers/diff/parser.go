@@ -57,37 +57,36 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			comment += fmt.Sprintf(
 				"Unexpected executor status: %s.", result.Status,
 			)
-			continue
-		}
-		for _, output := range caseConf.Outputs {
-			answer, err := os.ReadFile(output.AnswerPath)
-			if err != nil {
-				return nil, true, err
+		} else {
+			for _, output := range caseConf.Outputs {
+				answer, err := os.ReadFile(output.AnswerPath)
+				if err != nil {
+					return nil, true, err
+				}
+				slog.Debug("compare", "filename", output.FileName,
+					"answer path", output.AnswerPath,
+					"actual", result.Files[output.FileName],
+					"answer", string(answer))
+				// If no difference, assign score
+				if compareChars(string(answer), result.Files[output.FileName], output.IgnoreWhitespace) {
+					score += output.Score
+				} else {
+					// Convert answer to string and split by lines
+					stdoutLines := strings.Split(string(answer), "\n")
+					resultLines := strings.Split(result.Files[output.FileName], "\n")
+
+					// Generate Myers diff
+					diffOps := myersDiff(stdoutLines, resultLines)
+
+					// Generate diff block with surrounding context
+					diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffOps)
+					comment += fmt.Sprintf(
+						"difference found in %s:\n```diff\n%s```\n",
+						output.FileName, diffOutput,
+					)
+				}
 			}
-			slog.Debug("compare", "filename", output.FileName,
-				"answer path", output.AnswerPath,
-				"actual", result.Files[output.FileName],
-				"answer", string(answer))
-			// If no difference, assign score
-			if compareChars(string(answer), result.Files[output.FileName], output.IgnoreWhitespace) {
-				score += output.Score
-			} else {
-				// Convert answer to string and split by lines
-				stdoutLines := strings.Split(string(answer), "\n")
-				resultLines := strings.Split(result.Files[output.FileName], "\n")
-
-				// Generate Myers diff
-				diffOps := myersDiff(stdoutLines, resultLines)
-
-				// Generate diff block with surrounding context
-				diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffOps)
-				comment += fmt.Sprintf(
-					"difference found in %s:\n```diff\n%s```\n",
-					output.FileName, diffOutput,
-				)
-			}
 		}
-
 		res = append(res, stage.ParserResult{
 			Score:   score,
 			Comment: comment,
