@@ -1,10 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
-	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -19,6 +18,7 @@ type Conf struct {
 	OutputPath        string `default:"joj3_result.json"`
 	Stages            []struct {
 		Name     string
+		Group    string
 		Executor struct {
 			Name string
 			With struct {
@@ -64,54 +64,28 @@ type OptionalCmd struct {
 	AddressSpaceLimit *bool
 }
 
-// TODO: add other fields to match? not only limit to latest commit message
-type MetaConf struct {
-	Patterns []struct {
-		Filename string
-		Regex    string
-	}
+type ConventionalCommit struct {
+	Type        string
+	Scope       string
+	Description string
+	Body        string
+	Footer      string
 }
 
-func parseMetaConfFile(path string) (metaConf MetaConf, err error) {
-	// FIXME: remove this default meta config, it is only for demonstration
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		slog.Debug("meta conf not found", "path", path)
-		return MetaConf{
-			Patterns: []struct {
-				Filename string
-				Regex    string
-			}{
-				{
-					Filename: "conf.json",
-					Regex:    ".*",
-				},
-			},
-		}, nil
+func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
+	re := regexp.MustCompile(`^(\w+)(\(([^)]+)\))?!?: (.+)(\n\n(.+))?(\n\n(.+))?$`)
+	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
+	if matches == nil {
+		return nil, fmt.Errorf("invalid conventional commit format")
 	}
-	d := &multiconfig.DefaultLoader{}
-	loaders := []multiconfig.Loader{}
-	loaders = append(loaders, &multiconfig.TagLoader{})
-	if strings.HasSuffix(path, "toml") {
-		loaders = append(loaders, &multiconfig.TOMLLoader{Path: path})
+	cc := &ConventionalCommit{
+		Type:        matches[1],
+		Scope:       matches[3],
+		Description: strings.TrimSpace(matches[4]),
+		Body:        strings.TrimSpace(matches[6]),
+		Footer:      strings.TrimSpace(matches[8]),
 	}
-	if strings.HasSuffix(path, "json") {
-		loaders = append(loaders, &multiconfig.JSONLoader{Path: path})
-	}
-	if strings.HasSuffix(path, "yml") || strings.HasSuffix(path, "yaml") {
-		loaders = append(loaders, &multiconfig.YAMLLoader{Path: path})
-	}
-	d.Loader = multiconfig.MultiLoader(loaders...)
-	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
-	if err = d.Load(&metaConf); err != nil {
-		slog.Error("parse meta conf", "error", err)
-		return
-	}
-	if err = d.Validate(&metaConf); err != nil {
-		slog.Error("validate meta conf", "error", err)
-		return
-	}
-	slog.Debug("meta conf loaded", "metaConf", metaConf)
-	return
+	return cc, nil
 }
 
 func parseConfFile(path string) (conf Conf, err error) {
@@ -132,20 +106,32 @@ func parseConfFile(path string) (conf Conf, err error) {
 	return
 }
 
-func msgToConf(metaConfPath string, msg string) (conf Conf, err error) {
-	slog.Info("msg to conf", "msg", msg)
-	metaConf, err := parseMetaConfFile(metaConfPath)
+func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err error) {
+	slog.Info("parse msg", "msg", msg)
+	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
 		return
 	}
-	for _, pattern := range metaConf.Patterns {
-		if matched, _ := regexp.MatchString(pattern.Regex, msg); matched {
-			slog.Debug("pattern matched",
-				"pattern", pattern, "filename", pattern.Filename)
-			slog.Info("pattern matched", "filename", pattern.Filename)
-			return parseConfFile(pattern.Filename)
-		}
+	slog.Info("conventional commit", "commit", conventionalCommit)
+	confRoot = filepath.Clean(confRoot)
+	confPath := filepath.Clean(fmt.Sprintf("%s/%s/%s",
+		confRoot, conventionalCommit.Scope, confName))
+	relPath, err := filepath.Rel(confRoot, confPath)
+	if err != nil {
+		return
 	}
-	err = fmt.Errorf("no pattern matched")
+	if strings.HasPrefix(relPath, "..") {
+		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
+		return
+	}
+	slog.Info("try to load conf", "path", confPath)
+	conf, err = parseConfFile(confPath)
+	if err != nil {
+		return
+	}
+	if strings.Contains(
+		strings.ToLower(conventionalCommit.Description), "joj") {
+		group = "joj"
+	}
 	return
 }

@@ -32,9 +32,12 @@ func getCommitMsg() (msg string, err error) {
 	return
 }
 
-func generateStages(conf Conf) ([]stage.Stage, error) {
+func generateStages(conf Conf, group string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	for _, s := range conf.Stages {
+		if s.Group != "" && group != "" && group != s.Group {
+			continue
+		}
 		var cmds []stage.Cmd
 		defaultCmd := s.Executor.With.Default
 		for _, optionalCmd := range s.Executor.With.Cases {
@@ -81,14 +84,16 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 }
 
 var (
-	metaConfPath string
-	msg          string
-	showVersion  *bool
-	Version      string
+	confRoot    string
+	confName    string
+	msg         string
+	showVersion *bool
+	Version     string = "debug"
 )
 
 func init() {
-	flag.StringVar(&metaConfPath, "meta-conf", "meta-conf.toml", "meta config file path")
+	flag.StringVar(&confRoot, "conf-root", ".", "root path for all config files")
+	flag.StringVar(&confName, "conf-name", "conf.json", "filename for config files")
 	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
 	showVersion = flag.Bool("version", false, "print current version")
 }
@@ -97,12 +102,12 @@ func mainImpl() error {
 	if err := setupSlog(""); err != nil { // before conf is loaded
 		return err
 	}
-	slog.Info("start joj3", "version", Version)
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
 		return nil
 	}
+	slog.Info("start joj3", "version", Version)
 	if msg == "" {
 		var err error
 		msg, err = getCommitMsg()
@@ -111,9 +116,9 @@ func mainImpl() error {
 			return err
 		}
 	}
-	conf, err := msgToConf(metaConfPath, msg)
+	conf, group, err := parseMsg(confRoot, confName, msg)
 	if err != nil {
-		slog.Error("no conf found", "error", err)
+		slog.Error("parse msg", "error", err)
 		return err
 	}
 	if err := setupSlog(conf.LogPath); err != nil { // after conf is loaded
@@ -122,7 +127,7 @@ func mainImpl() error {
 	slog.Info("debug log", "path", conf.LogPath)
 	slog.Debug("conf loaded", "conf", conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
-	stages, err := generateStages(conf)
+	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		return err
