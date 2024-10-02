@@ -129,9 +129,13 @@ func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	if err != nil {
 		return
 	}
-	if strings.Contains(
-		strings.ToLower(conventionalCommit.Description), "joj") {
-		group = "joj"
+	groupKeywords := []string{"joj"}
+	for _, groupKeyword := range groupKeywords {
+		if strings.Contains(
+			strings.ToLower(conventionalCommit.Description), groupKeyword) {
+			group = groupKeyword
+			break
+		}
 	}
 	slog.Debug("conf loaded", "conf", conf)
 	return
