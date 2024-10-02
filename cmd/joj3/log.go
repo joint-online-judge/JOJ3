@@ -70,5 +70,8 @@ func setupSlog(logPath string) error {
 	// Set the default logger
 	logger := slog.New(multiHandler)
 	slog.SetDefault(logger)
+	if logPath != "" {
+		slog.Info("debug log", "path", logPath)
+	}
 	return nil
 }

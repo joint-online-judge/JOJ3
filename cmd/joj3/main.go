@@ -71,10 +71,13 @@ func generateStages(conf Conf, group string) ([]stage.Stage, error) {
 			ParserConf:   s.Parser.With,
 		})
 	}
+	slog.Debug("stages generated", "stages", stages)
 	return stages, nil
 }
 
 func outputResult(outputPath string, results []stage.StageResult) error {
+	slog.Info("output result start", "path", outputPath)
+	slog.Debug("output result start", "path", outputPath, "results", results)
 	content, err := json.Marshal(results)
 	if err != nil {
 		return err
@@ -124,22 +127,18 @@ func mainImpl() error {
 	if err := setupSlog(conf.LogPath); err != nil { // after conf is loaded
 		return err
 	}
-	slog.Info("debug log", "path", conf.LogPath)
-	slog.Debug("conf loaded", "conf", conf)
 	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
 	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		return err
 	}
-	slog.Debug("stages generated", "stages", stages)
 	defer stage.Cleanup()
 	results, err := stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
 		return err
 	}
-	slog.Debug("stages run done", "results", results)
 	if err := outputResult(conf.OutputPath, results); err != nil {
 		slog.Error("output result", "error", err)
 		return err

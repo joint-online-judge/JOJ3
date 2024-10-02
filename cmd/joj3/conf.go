@@ -133,5 +133,6 @@ func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 		strings.ToLower(conventionalCommit.Description), "joj") {
 		group = "joj"
 	}
+	slog.Debug("conf loaded", "conf", conf)
 	return
 }

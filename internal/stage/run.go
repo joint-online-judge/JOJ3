@@ -9,10 +9,12 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 	var executorResults []ExecutorResult
 	var parserResults []ParserResult
 	var forceQuit bool
+	slog.Info("stage run start")
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
-		slog.Info("executor run start")
-		slog.Debug("executor run start", "cmds", stage.ExecutorCmds)
+		slog.Info("executor run start", "name", stage.ExecutorName)
+		slog.Debug("executor run start", "name", stage.ExecutorName,
+			"cmds", stage.ExecutorCmds)
 		executor, ok := executorMap[stage.ExecutorName]
 		if !ok {
 			slog.Error("executor not found", "name", stage.ExecutorName)
@@ -28,8 +30,9 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 		for _, executorResult := range executorResults {
 			slog.Debug("executor run done", "result.Files", executorResult.Files)
 		}
-		slog.Info("parser run start")
-		slog.Debug("parser run start", "conf", stage.ParserConf)
+		slog.Info("parser run start", "name", stage.ParserName)
+		slog.Debug("parser run start", "name", stage.ParserName,
+			"conf", stage.ParserConf)
 		parser, ok := parserMap[stage.ParserName]
 		if !ok {
 			slog.Error("parser not found", "name", stage.ParserName)
@@ -56,12 +59,11 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 }
 
 func Cleanup() {
+	slog.Info("stage cleanup start")
 	for name, executor := range executorMap {
-		slog.Debug("executor cleanup start", "name", name)
 		err := executor.Cleanup()
 		if err != nil {
 			slog.Error("executor cleanup error", "name", name, "error", err)
 		}
-		slog.Debug("executor cleanup done", "name", name)
 	}
 }
