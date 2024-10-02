@@ -15,10 +15,10 @@ jobs:
               uses: https://gitea.com/BoYanZh/checkout@focs
             - name: Setup Go 1.23.1
               run: |
-                  wget -q https://studygolang.com/dl/golang/go1.23.1.linux-amd64.tar.gz
+                  wget -q https://studygolang.com/dl/golang/go1.23.2.linux-amd64.tar.gz
                   rm -rf /usr/local/go
-                  tar -C /usr/local -xzf go1.23.1.linux-amd64.tar.gz
-                  rm -rf go1.23.1.linux-amd64.tar.gz
+                  tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz
+                  rm -rf go1.23.2.linux-amd64.tar.gz
                   echo "PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> $GITHUB_ENV
             - name: Display Go version
               run: go version
