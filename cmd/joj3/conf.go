@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -139,4 +140,32 @@ func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	}
 	slog.Debug("conf loaded", "conf", conf)
 	return
+}
+
+func listValidScopes(confRoot, confName, msg string) ([]string, error) {
+	conventionalCommit, err := parseConventionalCommit(msg)
+	if err != nil {
+		return []string{}, err
+	}
+	slog.Info("conventional commit", "commit", conventionalCommit)
+	confRoot = filepath.Clean(confRoot)
+	validScopes := []string{}
+	err = filepath.Walk(confRoot, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			slog.Error("list valid scopes", "error", err)
+			return err
+		}
+		if info.IsDir() {
+			confPath := filepath.Join(path, confName)
+			if _, err := os.Stat(confPath); err == nil {
+				relPath, err := filepath.Rel(confRoot, path)
+				if err != nil {
+					return err
+				}
+				validScopes = append(validScopes, relPath)
+			}
+		}
+		return nil
+	})
+	return validScopes, err
 }
