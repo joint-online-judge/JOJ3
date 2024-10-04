@@ -35,7 +35,7 @@ func getCommitMsg() (msg string, err error) {
 func generateStages(conf Conf, group string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	for _, s := range conf.Stages {
-		if s.Group != "" && group != "" && group != s.Group {
+		if s.Group != "" && group != s.Group {
 			continue
 		}
 		var cmds []stage.Cmd
