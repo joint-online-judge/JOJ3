@@ -2,6 +2,7 @@
 package clangtidy
 
 import (
+	"log/slog"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -78,8 +79,16 @@ func parseMessage(line string) ClangMessage {
 		return *newClangMessage("", 0, 0, UNKNOWN, "", "", nil, nil)
 	} else {
 		filepath := regexRes[1]
-		line, _ := strconv.Atoi(regexRes[2])
-		column, _ := strconv.Atoi(regexRes[3])
+		line, err := strconv.Atoi(regexRes[2])
+		if err != nil {
+			line = 0
+			slog.Error("parse line", "error", err)
+		}
+		column, err := strconv.Atoi(regexRes[3])
+		if err != nil {
+			column = 0
+			slog.Error("parse column", "error", err)
+		}
 		level := levelFromString(regexRes[4])
 		message := regexRes[5]
 		diagnosticName := regexRes[6]

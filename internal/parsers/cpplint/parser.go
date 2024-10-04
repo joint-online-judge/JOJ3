@@ -2,6 +2,7 @@ package cpplint
 
 import (
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strconv"
 
@@ -23,10 +24,24 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	comment := ""
 	for _, match := range matches {
 		fileName := match[1]
-		lineNum, _ := strconv.Atoi(match[2])
+		lineNum, err := strconv.Atoi(match[2])
+		if err != nil {
+			slog.Error("parse lineNum", "error", err)
+			return stage.ParserResult{
+				Score:   0,
+				Comment: fmt.Sprintf("Unexpected parser error: %s.", err),
+			}
+		}
 		message := match[3]
 		category := match[4]
-		confidence, _ := strconv.Atoi(match[5])
+		confidence, err := strconv.Atoi(match[5])
+		if err != nil {
+			slog.Error("parse confidence", "error", err)
+			return stage.ParserResult{
+				Score:   0,
+				Comment: fmt.Sprintf("Unexpected parser error: %s.", err),
+			}
+		}
 		score -= confidence
 		// TODO: add more detailed comment, just re-assemble for now
 		comment += fmt.Sprintf("%s:%d:  %s  [%s] [%d]\n",
