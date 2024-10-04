@@ -50,7 +50,16 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 			continue
 		}
 		var record Record
-		_ = json.Unmarshal([]byte(line), &record)
+		err := json.Unmarshal([]byte(line), &record)
+		if err != nil {
+			return stage.ParserResult{
+				Score: 0,
+				Comment: fmt.Sprintf(
+					"Unexpected parser error: %s.",
+					err,
+				),
+			}
+		}
 		records = append(records, record)
 	}
 	comment, score, err := GetResult(records, conf)
