@@ -9,6 +9,41 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+func checkMsg(msg string) bool {
+	// List of prefixes to ignore in the commit message
+	ignoredPrefixes := []string{
+		"Co-authored-by:",
+		"Reviewed-by:",
+		"Co-committed-by:",
+		"Reviewed-on:",
+	}
+
+	// Split message by lines and ignore specific lines with prefixes
+	lines := strings.Split(msg, "\n")
+	for i, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		ignore := false
+		if i != 0 {
+			for _, prefix := range ignoredPrefixes {
+				if strings.HasPrefix(trimmedLine, prefix) {
+					ignore = true
+					break
+				}
+			}
+		}
+		if ignore {
+			continue
+		}
+		// Check for non-ASCII characters in the rest of the lines
+		for _, c := range line {
+			if c > unicode.MaxASCII {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // nonAsciiMsg checks for non-ASCII characters in the commit message.
 // If the message starts with "Merge pull request", it skips the non-ASCII characters check.
 // Otherwise, it iterates over each character in the message and checks if it is a non-ASCII character.
@@ -35,43 +70,7 @@ func NonAsciiMsg(root string) error {
 	}
 
 	msg := commit.Message
-	if msg == "" {
-		return nil
-	}
-
-	var isCommitLegal bool = true
-	// List of prefixes to ignore in the commit message
-	ignoredPrefixes := []string{
-		"Co-authored-by:",
-		"Reviewed-by:",
-		"Co-committed-by:",
-		"Reviewed-on:",
-	}
-
-	// Split message by lines and ignore specific lines with prefixes
-	lines := strings.Split(msg, "\n")
-	for _, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		ignore := false
-		for _, prefix := range ignoredPrefixes {
-			if strings.HasPrefix(trimmedLine, prefix) {
-				ignore = true
-				break
-			}
-		}
-		if ignore {
-			continue
-		}
-		// Check for non-ASCII characters in the rest of the lines
-		for _, c := range line {
-			if c > unicode.MaxASCII {
-				isCommitLegal = false
-				break
-			}
-		}
-	}
-
-	if !isCommitLegal {
+	if !checkMsg(msg) {
 		return fmt.Errorf("Non-ASCII characters in commit messages:\n%s", msg)
 	}
 	return nil
