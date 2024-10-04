@@ -45,8 +45,7 @@ func checkMsg(msg string) bool {
 }
 
 // nonAsciiMsg checks for non-ASCII characters in the commit message.
-// If the message starts with "Merge pull request", it skips the non-ASCII characters check.
-// Otherwise, it iterates over each character in the message and checks if it is a non-ASCII character.
+// It iterates over each character in the message and checks if it is a non-ASCII character.
 // If a non-ASCII character is found, it returns an error indicating not to use non-ASCII characters in commit messages.
 // Otherwise, it returns nil indicating that the commit message is valid.
 // It skips the non-ASCII characters check for lines starting with specific keywords like "Co-authored-by", "Reviewed-by", and "Co-committed-by".
