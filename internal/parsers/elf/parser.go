@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"focs.ji.sjtu.edu.cn/git/FOCS-dev/JOJ3/internal/stage"
 	"github.com/criyle/go-judge/envexec"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/mitchellh/mapstructure"
 )
 
