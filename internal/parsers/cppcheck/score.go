@@ -7,10 +7,11 @@ type Severity int
 const (
 	ERROR Severity = iota
 	WARNING
-	PROBABILITY
+	PORTABILITY
 	PERFORMANCE
 	STYLE
 	INFORMATION
+	DEBUG
 	UNKNOWN
 )
 
@@ -20,14 +21,16 @@ func severityFromString(severityString string) (Severity, error) {
 		return ERROR, nil
 	case "warning":
 		return WARNING, nil
-	case "probability":
-		return PROBABILITY, nil
+	case "portability":
+		return PORTABILITY, nil
 	case "performance":
 		return PERFORMANCE, nil
 	case "style":
 		return STYLE, nil
 	case "information":
 		return INFORMATION, nil
+	case "debug":
+		return DEBUG, nil
 	default:
 		return UNKNOWN, fmt.Errorf("unknown severity type \"%s\" for cppcheck", severityString)
 	}
@@ -35,8 +38,8 @@ func severityFromString(severityString string) (Severity, error) {
 
 func GetResult(records []Record, conf Conf) (string, int, error) {
 	result := "### Test results summary\n\n"
-	var severityCounts [6]int
-	var severityScore [6]int
+	var severityCounts [UNKNOWN]int
+	var severityScore [UNKNOWN]int
 	score := conf.Score
 
 	for _, match := range conf.Matches {
@@ -58,9 +61,10 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 	}
 	result += fmt.Sprintf("1. error: %d\n", severityCounts[0])
 	result += fmt.Sprintf("2. warning: %d\n", severityCounts[1])
-	result += fmt.Sprintf("3. probability: %d\n", severityCounts[2])
+	result += fmt.Sprintf("3. portability: %d\n", severityCounts[2])
 	result += fmt.Sprintf("4. performance: %d\n", severityCounts[3])
 	result += fmt.Sprintf("5. style: %d\n", severityCounts[4])
-	result += fmt.Sprintf("6. information: %d", severityCounts[5])
+	result += fmt.Sprintf("6. information: %d\n", severityCounts[5])
+	result += fmt.Sprintf("7. debug: %d\n", severityCounts[6])
 	return result, score, nil
 }
