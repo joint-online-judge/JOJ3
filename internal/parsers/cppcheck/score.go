@@ -1,6 +1,9 @@
 package cppcheck
 
-import "fmt"
+import (
+	"fmt"
+	"log/slog"
+)
 
 type Severity int
 
@@ -38,8 +41,8 @@ func severityFromString(severityString string) (Severity, error) {
 
 func GetResult(records []Record, conf Conf) (string, int, error) {
 	result := "### Test results summary\n\n"
-	var severityCounts [UNKNOWN]int
-	var severityScore [UNKNOWN]int
+	var severityCounts [UNKNOWN + 1]int
+	var severityScore [UNKNOWN + 1]int
 	score := conf.Score
 
 	for _, match := range conf.Matches {
@@ -55,7 +58,10 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 	}
 
 	for _, record := range records {
-		severity, _ := severityFromString(record.Severity)
+		severity, err := severityFromString(record.Severity)
+		if err != nil {
+			slog.Error("parse severity", "error", err)
+		}
 		severityCounts[int(severity)] += 1
 		score -= severityScore[int(severity)]
 	}
