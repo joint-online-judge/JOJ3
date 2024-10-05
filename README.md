@@ -148,7 +148,7 @@ Do not execute any command. Just return empty `ExecutorResult` slice.
 
 ### Sandbox
 
-Run the commands in `go-judge` and output the `ExecutorResult` slice.
+Run the commands in `go-judge` and output the `ExecutorResult` slice. Note: we communicate with `go-judge` using gRPC, which means `go-judge` can run anywhere as the gRPC connection can be established. In deployment, `go-judge` runs in the host machine of the Gitea runner.
 
 ## Parsers (under `/internal/parsers`)
 
