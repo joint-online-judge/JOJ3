@@ -34,10 +34,16 @@ func getCommitMsg() (msg string, err error) {
 
 func generateStages(conf Conf, group string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
+	existNames := map[string]bool{}
 	for _, s := range conf.Stages {
 		if s.Group != "" && group != s.Group {
 			continue
 		}
+		_, ok := existNames[s.Name] // check for existence
+		if ok {
+			continue
+		}
+		existNames[s.Name] = true
 		var cmds []stage.Cmd
 		defaultCmd := s.Executor.With.Default
 		for _, optionalCmd := range s.Executor.With.Cases {
