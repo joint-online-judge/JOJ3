@@ -74,7 +74,7 @@ type ConventionalCommit struct {
 }
 
 func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
-	re := regexp.MustCompile(`^(\w+)(\(([^)]+)\))?!?: (.+)(\n\n(.+))?(\n\n(.+))?$`)
+	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?)(\n\n(.+?))?(\n\n(.+))?$`)
 	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
 	if matches == nil {
 		return nil, fmt.Errorf("invalid conventional commit format")
