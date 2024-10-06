@@ -9,8 +9,8 @@ import (
 )
 
 type Match struct {
-	Keyword []string
-	Score   int
+	Keywords []string
+	Score    int
 }
 
 type Conf struct {
@@ -41,9 +41,10 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 			}
 		}
 	}
+	score, comment := GetResult(formattedMessages, conf)
 	return stage.ParserResult{
-		Score:   GetScore(formattedMessages, conf),
-		Comment: GetComment(formattedMessages),
+		Score:   score,
+		Comment: comment,
 	}
 }
 

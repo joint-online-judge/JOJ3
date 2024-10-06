@@ -5,32 +5,9 @@ import (
 	"strings"
 )
 
-func contains(arr []string, element string) bool {
-	for i := range arr {
-		// TODO: The keyword in json report might also be an array, need to split it
-		if strings.Contains(arr[i], element) {
-			return true
-		}
-	}
-	return false
-}
-
-func GetScore(jsonMessages []JsonMessage, conf Conf) int {
-	fullmark := conf.Score
-	for _, jsonMessage := range jsonMessages {
-		keyword := jsonMessage.CheckName
-		for _, match := range conf.Matches {
-			if contains(match.Keyword, keyword) {
-				fullmark -= match.Score
-				break
-			}
-		}
-	}
-	return fullmark
-}
-
-func GetComment(jsonMessages []JsonMessage) string {
-	res := "### Test results summary\n\n"
+func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
+	score := conf.Score
+	comment := "### Test results summary\n\n"
 	keys := [...]string{
 		"codequality-unchecked-malloc-result",
 		"codequality-no-global-variables",
@@ -56,22 +33,29 @@ func GetComment(jsonMessages []JsonMessage) string {
 		mapping[key] = 0
 	}
 	for _, jsonMessage := range jsonMessages {
-		keyword := jsonMessage.CheckName
-		flag := true
-		for key := range mapping {
-			if strings.Contains(keyword, key) {
-				mapping[key] += 1
-				flag = false
-				break
+		checkName := jsonMessage.CheckName
+		for _, match := range conf.Matches {
+			for _, keyword := range match.Keywords {
+				// TODO: The keyword in json report might also be an array, need to split it
+				if strings.Contains(checkName, keyword) {
+					score -= match.Score
+				}
 			}
 		}
-		if flag {
+		listed := false
+		for key := range mapping {
+			if strings.Contains(checkName, key) {
+				mapping[key] += 1
+				listed = true
+			}
+		}
+		if !listed {
 			mapping["others"] += 1
 		}
 	}
 
 	for i, key := range keys {
-		res = fmt.Sprintf("%s%d. %s: %d\n", res, i+1, key, mapping[key])
+		comment = fmt.Sprintf("%s%d. %s: %d\n", comment, i+1, key, mapping[key])
 	}
-	return res
+	return score, comment
 }
