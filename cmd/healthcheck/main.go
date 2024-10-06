@@ -60,30 +60,30 @@ func main() {
 	var err error
 	err = healthcheck.RepoSize()
 	if err != nil {
-		fmt.Printf("## Repo Size Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.ForbiddenCheck(*rootDir, gitWhitelist, *localList, *repo, *droneBranch)
 	if err != nil {
-		fmt.Printf("## Forbidden File Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.MetaCheck(*rootDir, metaFile)
 	if err != nil {
-		fmt.Printf("## Forbidden File Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.NonAsciiFiles(*rootDir, *localList)
 	if err != nil {
-		fmt.Printf("## Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.NonAsciiMsg(*rootDir)
 	if err != nil {
-		fmt.Printf("## Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.CheckTags(*rootDir, *releaseCategories, *releaseNumber)
 	if err != nil {
-		fmt.Printf("## Release Tag Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.VerifyFiles(*rootDir, *checkFileNameList, *checkFileSumList)
 	if err != nil {
-		fmt.Printf("## Repo File Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Repo File Check Failed:\n%s\n", err.Error())
 	}
 }
