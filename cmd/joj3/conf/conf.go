@@ -1,4 +1,4 @@
-package main
+package conf
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/koding/multiconfig"
 )
@@ -17,6 +18,8 @@ type Conf struct {
 	SandboxToken      string `default:""`
 	LogPath           string `default:""`
 	OutputPath        string `default:"joj3_result.json"`
+	GradingRepoName   string `default:""`
+	SkipTeapot        bool   `default:"true"`
 	Stages            []struct {
 		Name     string
 		Group    string
@@ -73,6 +76,23 @@ type ConventionalCommit struct {
 	Footer      string
 }
 
+func GetCommitMsg() (msg string, err error) {
+	r, err := git.PlainOpen(".")
+	if err != nil {
+		return
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return
+	}
+	commit, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		return
+	}
+	msg = commit.Message
+	return
+}
+
 func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?)(\n\n(.+?))?(\n\n(.+))?$`)
 	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
@@ -107,7 +127,7 @@ func parseConfFile(path string) (conf Conf, err error) {
 	return
 }
 
-func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err error) {
+func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err error) {
 	slog.Info("parse msg", "msg", msg)
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
@@ -142,7 +162,7 @@ func parseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	return
 }
 
-func listValidScopes(confRoot, confName, msg string) ([]string, error) {
+func ListValidScopes(confRoot, confName, msg string) ([]string, error) {
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
 		return []string{}, err

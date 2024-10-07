@@ -34,6 +34,9 @@ jobs:
                   rm -rf golangci-lint-1.61.0-linux-amd64.tar.gz
                   mkdir -p /root/go/bin
                   mv /tmp/golangci-lint-1.61.0-linux-amd64/golangci-lint /root/go/bin
+            - name: Setup Joint-Teapot
+              run: |
+                  pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
             - name: Lint
               run: make lint
             - name: Build

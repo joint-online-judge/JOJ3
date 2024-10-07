@@ -10,6 +10,7 @@ all: build
 
 build:
 	$(foreach APP,$(APPS), go build -ldflags=$(FLAGS) -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
+	cp ./build/repo-health-checker ./build/healthcheck
 
 clean:
 	rm -rf $(BUILD_DIR)/*

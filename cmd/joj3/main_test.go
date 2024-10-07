@@ -61,7 +61,7 @@ func readStageResults(t *testing.T, path string) []stage.StageResult {
 	return results
 }
 
-func TestMain(t *testing.T) {
+func TestRun(t *testing.T) {
 	var tests []string
 	root := "../../tmp/submodules/JOJ3-examples/examples/"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
