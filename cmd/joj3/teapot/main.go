@@ -14,6 +14,10 @@ func Run(conf conf.Conf) error {
 	if conf.SkipTeapot {
 		return nil
 	}
+	for _, env := range os.Environ() {
+		pair := strings.SplitN(env, "=", 2)
+		slog.Info("env", "key", pair[0], "value", pair[1])
+	}
 	os.Setenv("LOG_FILE_PATH", "/home/tt/.cache/joint-teapot-debug.log")
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	envFilePath := "/home/tt/.config/teapot/teapot.env"
