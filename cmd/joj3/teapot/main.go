@@ -35,27 +35,27 @@ func Run(conf conf.Conf) error {
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
 		runNumber) // #nosec G204
 	output, err := cmd.CombinedOutput()
+	slog.Info("joint-teapot joj3-scoreboard", "output", string(output))
 	if err != nil {
-		slog.Error("running git command:", "err", err)
+		slog.Error("joint-teapot joj3-scoreboard", "err", err)
 		return err
 	}
-	slog.Info("joint-teapot joj3-scoreboard", "output", string(output))
 	cmd = exec.Command("joint-teapot", "joj3-failed-table",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
 		runNumber) // #nosec G204
 	output, err = cmd.CombinedOutput()
+	slog.Info("joint-teapot joj3-failed-table", "output", string(output))
 	if err != nil {
-		slog.Error("running git command:", "err", err)
+		slog.Error("joint-teapot joj3-failed-table", "err", err)
 		return err
 	}
-	slog.Info("joint-teapot joj3-failed-table", "output", string(output))
 	cmd = exec.Command("joint-teapot", "joj3-create-result-issue",
 		envFilePath, conf.OutputPath, repoName, runNumber) // #nosec G204
 	output, err = cmd.CombinedOutput()
+	slog.Info("joint-teapot joj3-create-result-issue", "output", string(output))
 	if err != nil {
-		slog.Error("running git command:", "err", err)
+		slog.Error("joint-teapot joj3-create-result-issue", "err", err)
 		return err
 	}
-	slog.Info("joint-teapot joj3-create-result-issue", "output", string(output))
 	return nil
 }
