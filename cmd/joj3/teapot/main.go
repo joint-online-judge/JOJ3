@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
@@ -27,11 +28,13 @@ func Run(conf conf.Conf) error {
 	}
 	repoParts := strings.Split(repository, "/")
 	repoName := repoParts[1]
+	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 	cmd := exec.Command("joint-teapot", "joj3-scoreboard",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
 		runNumber, conf.ScoreboardPath) // #nosec G204
-	output, err := cmd.CombinedOutput()
-	slog.Info("joint-teapot joj3-scoreboard", "output", string(output))
+	outputBytes, err := cmd.CombinedOutput()
+	output := re.ReplaceAllString(string(outputBytes), "")
+	slog.Info("joint-teapot joj3-scoreboard", "output", output)
 	if err != nil {
 		slog.Error("joint-teapot joj3-scoreboard", "err", err)
 		return err
@@ -39,16 +42,18 @@ func Run(conf conf.Conf) error {
 	cmd = exec.Command("joint-teapot", "joj3-failed-table",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
 		runNumber, conf.FailedTablePath) // #nosec G204
-	output, err = cmd.CombinedOutput()
-	slog.Info("joint-teapot joj3-failed-table", "output", string(output))
+	outputBytes, err = cmd.CombinedOutput()
+	output = re.ReplaceAllString(string(outputBytes), "")
+	slog.Info("joint-teapot joj3-failed-table", "output", output)
 	if err != nil {
 		slog.Error("joint-teapot joj3-failed-table", "err", err)
 		return err
 	}
 	cmd = exec.Command("joint-teapot", "joj3-create-result-issue",
 		envFilePath, conf.OutputPath, repoName, runNumber) // #nosec G204
-	output, err = cmd.CombinedOutput()
-	slog.Info("joint-teapot joj3-create-result-issue", "output", string(output))
+	outputBytes, err = cmd.CombinedOutput()
+	output = re.ReplaceAllString(string(outputBytes), "")
+	slog.Info("joint-teapot joj3-create-result-issue", "output", output)
 	if err != nil {
 		slog.Error("joint-teapot joj3-create-result-issue", "err", err)
 		return err
