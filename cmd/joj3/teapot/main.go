@@ -35,6 +35,9 @@ func Run(conf conf.Conf) error {
 	outputBytes, err := cmd.CombinedOutput()
 	output := re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
+		if line == "" {
+			continue
+		}
 		slog.Info("joint-teapot joj3-scoreboard", "output", line)
 	}
 	if err != nil {
@@ -47,6 +50,9 @@ func Run(conf conf.Conf) error {
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
+		if line == "" {
+			continue
+		}
 		slog.Info("joint-teapot joj3-scoreboard", "output", line)
 	}
 	if err != nil {
@@ -58,6 +64,9 @@ func Run(conf conf.Conf) error {
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
+		if line == "" {
+			continue
+		}
 		slog.Info("joint-teapot joj3-scoreboard", "output", line)
 	}
 	if err != nil {
