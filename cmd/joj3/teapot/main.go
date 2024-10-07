@@ -34,7 +34,9 @@ func Run(conf conf.Conf) error {
 		runNumber, conf.ScoreboardPath) // #nosec G204
 	outputBytes, err := cmd.CombinedOutput()
 	output := re.ReplaceAllString(string(outputBytes), "")
-	slog.Info("joint-teapot joj3-scoreboard", "output", output)
+	for _, line := range strings.Split(output, "\n") {
+		slog.Info("joint-teapot joj3-scoreboard", "output", line)
+	}
 	if err != nil {
 		slog.Error("joint-teapot joj3-scoreboard", "err", err)
 		return err
@@ -44,7 +46,9 @@ func Run(conf conf.Conf) error {
 		runNumber, conf.FailedTablePath) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
-	slog.Info("joint-teapot joj3-failed-table", "output", output)
+	for _, line := range strings.Split(output, "\n") {
+		slog.Info("joint-teapot joj3-scoreboard", "output", line)
+	}
 	if err != nil {
 		slog.Error("joint-teapot joj3-failed-table", "err", err)
 		return err
@@ -53,7 +57,9 @@ func Run(conf conf.Conf) error {
 		envFilePath, conf.OutputPath, repoName, runNumber) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
-	slog.Info("joint-teapot joj3-create-result-issue", "output", output)
+	for _, line := range strings.Split(output, "\n") {
+		slog.Info("joint-teapot joj3-scoreboard", "output", line)
+	}
 	if err != nil {
 		slog.Error("joint-teapot joj3-create-result-issue", "err", err)
 		return err
