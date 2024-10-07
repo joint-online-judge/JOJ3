@@ -29,7 +29,7 @@ func Run(conf conf.Conf) error {
 	repoName := repoParts[1]
 	cmd := exec.Command("joint-teapot", "joj3-scoreboard",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber) // #nosec G204
+		runNumber, conf.ScoreboardPath) // #nosec G204
 	output, err := cmd.CombinedOutput()
 	slog.Info("joint-teapot joj3-scoreboard", "output", string(output))
 	if err != nil {
@@ -38,7 +38,7 @@ func Run(conf conf.Conf) error {
 	}
 	cmd = exec.Command("joint-teapot", "joj3-failed-table",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber) // #nosec G204
+		runNumber, conf.FailedTablePath) // #nosec G204
 	output, err = cmd.CombinedOutput()
 	slog.Info("joint-teapot joj3-failed-table", "output", string(output))
 	if err != nil {

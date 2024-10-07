@@ -20,6 +20,8 @@ type Conf struct {
 	OutputPath        string `default:"joj3_result.json"`
 	GradingRepoName   string `default:""`
 	SkipTeapot        bool   `default:"true"`
+	ScoreboardPath    string `default:"scoreboard.csv"`
+	FailedTablePath   string `default:"failed-table.md"`
 	Stages            []struct {
 		Name     string
 		Group    string
