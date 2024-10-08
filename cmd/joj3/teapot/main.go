@@ -53,7 +53,7 @@ func Run(conf conf.Conf) error {
 		if line == "" {
 			continue
 		}
-		slog.Info("joint-teapot joj3-scoreboard", "output", line)
+		slog.Info("joint-teapot joj3-failed-table", "output", line)
 	}
 	if err != nil {
 		slog.Error("joint-teapot joj3-failed-table", "err", err)
@@ -67,7 +67,7 @@ func Run(conf conf.Conf) error {
 		if line == "" {
 			continue
 		}
-		slog.Info("joint-teapot joj3-scoreboard", "output", line)
+		slog.Info("joint-teapot joj3-create-result-issue", "output", line)
 	}
 	if err != nil {
 		slog.Error("joint-teapot joj3-create-result-issue", "err", err)
