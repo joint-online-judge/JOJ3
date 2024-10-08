@@ -14,16 +14,21 @@ import (
 )
 
 type Conf struct {
-	SandboxExecServer string `default:"localhost:5051"`
-	SandboxToken      string `default:""`
-	LogPath           string `default:""`
-	OutputPath        string `default:"joj3_result.json"`
-	GradingRepoName   string `default:""`
-	SkipTeapot        bool   `default:"true"`
-	ScoreboardPath    string `default:"scoreboard.csv"`
-	FailedTablePath   string `default:"failed-table.md"`
-	Name              string `default:"unknown"`
-	Stages            []struct {
+	Name    string `default:"unknown"`
+	LogPath string `default:""`
+	Stage   struct {
+		SandboxExecServer string `default:"localhost:5051"`
+		SandboxToken      string `default:""`
+		OutputPath        string `default:"stages_result.json"`
+	}
+	Teapot struct {
+		Skip            bool   `default:"true"`
+		LogPath         string `default:"/home/tt/.cache/joint-teapot-debug.log"`
+		ScoreboardPath  string `default:"scoreboard.csv"`
+		FailedTablePath string `default:"failed-table.md"`
+		GradingRepoName string `default:""`
+	}
+	Stages []struct {
 		Name     string
 		Group    string
 		Executor struct {

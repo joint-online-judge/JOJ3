@@ -74,7 +74,10 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 }
 
 func Run(conf conf.Conf, group string) error {
-	executors.InitWithConf(conf.SandboxExecServer, conf.SandboxToken)
+	executors.InitWithConf(
+		conf.Stage.SandboxExecServer,
+		conf.Stage.SandboxToken,
+	)
 	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
@@ -86,7 +89,7 @@ func Run(conf conf.Conf, group string) error {
 		slog.Error("run stages", "error", err)
 		return err
 	}
-	if err := outputResult(conf.OutputPath, results); err != nil {
+	if err := outputResult(conf.Stage.OutputPath, results); err != nil {
 		slog.Error("output result", "error", err)
 		return err
 	}

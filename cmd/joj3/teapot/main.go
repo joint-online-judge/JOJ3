@@ -12,10 +12,10 @@ import (
 )
 
 func Run(conf conf.Conf) error {
-	if conf.SkipTeapot {
+	if conf.Teapot.Skip {
 		return nil
 	}
-	os.Setenv("LOG_FILE_PATH", "/home/tt/.cache/joint-teapot-debug.log")
+	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	envFilePath := "/home/tt/.config/teapot/teapot.env"
 	actor := os.Getenv("GITHUB_ACTOR")
@@ -30,8 +30,8 @@ func Run(conf conf.Conf) error {
 	repoName := repoParts[1]
 	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 	cmd := exec.Command("joint-teapot", "joj3-scoreboard",
-		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber, conf.ScoreboardPath, conf.Name) // #nosec G204
+		envFilePath, conf.Stage.OutputPath, actor, conf.Teapot.GradingRepoName,
+		repoName, runNumber, conf.Teapot.ScoreboardPath, conf.Name) // #nosec G204
 	outputBytes, err := cmd.CombinedOutput()
 	output := re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
@@ -45,8 +45,8 @@ func Run(conf conf.Conf) error {
 		return err
 	}
 	cmd = exec.Command("joint-teapot", "joj3-failed-table",
-		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber, conf.FailedTablePath, conf.Name) // #nosec G204
+		envFilePath, conf.Stage.OutputPath, actor, conf.Teapot.GradingRepoName,
+		repoName, runNumber, conf.Teapot.FailedTablePath, conf.Name) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
@@ -60,7 +60,7 @@ func Run(conf conf.Conf) error {
 		return err
 	}
 	cmd = exec.Command("joint-teapot", "joj3-create-result-issue",
-		envFilePath, conf.OutputPath, repoName, runNumber, conf.Name) // #nosec G204
+		envFilePath, conf.Stage.OutputPath, repoName, runNumber, conf.Name) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
