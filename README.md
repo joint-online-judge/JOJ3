@@ -7,6 +7,7 @@
 1. Make sure you are in a Unix-like OS (Linux, MacOS). For Windows, use [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
 2. Install [Go](https://go.dev/doc/install). Also, make sure `make` and `git` are installed and all 3 programs are presented in `$PATH`.
+   - If you have problem on connecting to the Go website and Go packages, download Go from [studygolang](https://studygolang.com/dl) and run `go env -w GOPROXY=https://goproxy.io,direct` to set the Go modules mirror proxy after installing Go.
 
 3. Enable cgroup v2 for your OS. Check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
 
