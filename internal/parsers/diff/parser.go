@@ -28,6 +28,7 @@ type Conf struct {
 			FileName         string
 			AnswerPath       string
 			IgnoreWhitespace bool
+			AlwaysHide       bool
 		}
 	}
 }
@@ -68,22 +69,29 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					"actual", result.Files[output.FileName],
 					"answer", string(answer))
 				// If no difference, assign score
-				if compareChars(string(answer), result.Files[output.FileName], output.IgnoreWhitespace) {
+				if compareChars(string(answer), result.Files[output.FileName],
+					output.IgnoreWhitespace) {
 					score += output.Score
 				} else {
-					// Convert answer to string and split by lines
-					stdoutLines := strings.Split(string(answer), "\n")
-					resultLines := strings.Split(result.Files[output.FileName], "\n")
+					comment += fmt.Sprintf("Difference found in `%s`.\n",
+						output.FileName)
+					if !output.AlwaysHide {
+						// Convert answer to string and split by lines
+						stdoutLines := strings.Split(string(answer), "\n")
+						resultLines := strings.Split(
+							result.Files[output.FileName], "\n")
 
-					// Generate Myers diff
-					diffOps := myersDiff(stdoutLines, resultLines)
+						// Generate Myers diff
+						diffOps := myersDiff(stdoutLines, resultLines)
 
-					// Generate diff block with surrounding context
-					diffOutput := generateDiffWithContext(stdoutLines, resultLines, diffOps)
-					comment += fmt.Sprintf(
-						"difference found in %s:\n```diff\n%s```\n",
-						output.FileName, diffOutput,
-					)
+						// Generate diff block with surrounding context
+						diffOutput := generateDiffWithContext(
+							stdoutLines, resultLines, diffOps)
+						comment += fmt.Sprintf(
+							"```diff\n%s```\n",
+							diffOutput,
+						)
+					}
 				}
 			}
 		}
