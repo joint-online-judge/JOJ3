@@ -1,0 +1,28 @@
+---
+name: Submodules Sync
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    sync:
+        container:
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            volumes:
+                - /home/actions/.ssh:/root/.ssh
+        steps:
+            - name: Check out repository code
+              uses: https://gitea.com/BoYanZh/checkout@focs
+            - name: Git Submodule Update
+              run: |
+                  git pull --recurse-submodules
+                  git submodule update --remote --recursive
+            - name: Set up Git
+              run: |
+                  git config --global user.name "gitea-actions[bot]"
+                  git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+                  chown -R root:root /root/.ssh
+            - name: Commit update
+              run: |
+                  git commit -am "chore: update submodule references" && git push || echo "No changes to commit"
