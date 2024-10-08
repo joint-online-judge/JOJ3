@@ -164,15 +164,10 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	return
 }
 
-func ListValidScopes(confRoot, confName, msg string) ([]string, error) {
-	conventionalCommit, err := parseConventionalCommit(msg)
-	if err != nil {
-		return []string{}, err
-	}
-	slog.Info("conventional commit", "commit", conventionalCommit)
+func ListValidScopes(confRoot, confName string) ([]string, error) {
 	confRoot = filepath.Clean(confRoot)
 	validScopes := []string{}
-	err = filepath.Walk(confRoot, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(confRoot, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			slog.Error("list valid scopes", "error", err)
 			return err

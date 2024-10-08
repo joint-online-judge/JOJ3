@@ -49,12 +49,13 @@ func mainImpl() error {
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		validScopes, scopeErr := conf.ListValidScopes(
-			confRoot, confName, msg)
+			confRoot, confName)
 		if scopeErr != nil {
 			slog.Error("list valid scopes", "error", scopeErr)
 			return err
 		}
-		slog.Info("hint: valid scopes in commit message", "scopes", validScopes)
+		slog.Info("HINT: use valid scopes in commit message",
+			"valid scopes", validScopes)
 		return err
 	}
 	if err := setupSlog(confObj.LogPath); err != nil { // after conf is loaded
