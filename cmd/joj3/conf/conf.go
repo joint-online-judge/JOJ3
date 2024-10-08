@@ -20,6 +20,21 @@ type Conf struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
 		OutputPath        string `default:"stages_result.json"`
+		Stages            []struct {
+			Name     string
+			Group    string
+			Executor struct {
+				Name string
+				With struct {
+					Default stage.Cmd
+					Cases   []OptionalCmd
+				}
+			}
+			Parser struct {
+				Name string
+				With interface{}
+			}
+		}
 	}
 	Teapot struct {
 		Skip            bool   `default:"true"`
@@ -27,21 +42,6 @@ type Conf struct {
 		ScoreboardPath  string `default:"scoreboard.csv"`
 		FailedTablePath string `default:"failed-table.md"`
 		GradingRepoName string `default:""`
-	}
-	Stages []struct {
-		Name     string
-		Group    string
-		Executor struct {
-			Name string
-			With struct {
-				Default stage.Cmd
-				Cases   []OptionalCmd
-			}
-		}
-		Parser struct {
-			Name string
-			With interface{}
-		}
 	}
 }
 
