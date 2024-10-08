@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
@@ -25,15 +26,15 @@ func init() {
 	showVersion = flag.Bool("version", false, "print current version")
 }
 
-func main() {
+func mainImpl() error {
 	if err := setupSlog(""); err != nil { // before conf is loaded
 		slog.Error("setup slog", "error", err)
-		return
+		return err
 	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
-		return
+		return nil
 	}
 	slog.Info("start joj3", "version", Version)
 	if msg == "" {
@@ -41,7 +42,7 @@ func main() {
 		msg, err = conf.GetCommitMsg()
 		if err != nil {
 			slog.Error("get commit msg", "error", err)
-			return
+			return err
 		}
 	}
 	confObj, group, err := conf.ParseMsg(confRoot, confName, msg)
@@ -51,21 +52,29 @@ func main() {
 			confRoot, confName, msg)
 		if scopeErr != nil {
 			slog.Error("list valid scopes", "error", scopeErr)
-			return
+			return err
 		}
 		slog.Info("hint: valid scopes in commit message", "scopes", validScopes)
-		return
+		return err
 	}
 	if err := setupSlog(confObj.LogPath); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)
-		return
+		return err
 	}
 	if err := stage.Run(confObj, group); err != nil {
 		slog.Error("stage run", "error", err)
-		return
+		return err
 	}
 	if err := teapot.Run(confObj); err != nil {
 		slog.Error("teapot run", "error", err)
-		return
+		return err
+	}
+	return nil
+}
+
+func main() {
+	if err := mainImpl(); err != nil {
+		slog.Error("main exit", "error", err)
+		os.Exit(1)
 	}
 }
