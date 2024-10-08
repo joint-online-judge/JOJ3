@@ -2,11 +2,41 @@ package healthcheck
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 )
+
+func parseConventionalCommit(commit string) (*conf.ConventionalCommit, error) {
+	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?)(\n\n(.+?))?(\n\n(.+))?$`)
+	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
+	if matches == nil {
+		return nil, fmt.Errorf("invalid conventional commit format")
+	}
+	cc := &conf.ConventionalCommit{
+		Type:        matches[1],
+		Scope:       matches[3],
+		Description: strings.TrimSpace(matches[4]),
+		Body:        strings.TrimSpace(matches[6]),
+		Footer:      strings.TrimSpace(matches[8]),
+	}
+	return cc, nil
+}
+
+func getTagFromMsg() (tag string, err error) {
+	msg, err := conf.GetCommitMsg()
+	if err != nil {
+		return "", err
+	}
+	conventionalCommit, err := parseConventionalCommit(msg)
+	if err != nil {
+		return "", err
+	}
+	return conventionalCommit.Scope, err
+}
 
 func getTagsFromRepo(repoPath string) ([]string, error) {
 	repo, err := git.PlainOpen(repoPath)
@@ -31,29 +61,18 @@ func getTagsFromRepo(repoPath string) ([]string, error) {
 	return tags, nil
 }
 
-func CheckTags(repoPath string, category string, n int, m int) error {
-	// INFO: if category not specified, skipping this check by default
-	if category == "" {
+func CheckTags(repoPath string, skip bool) error {
+	if skip {
 		return nil
 	}
 	tags, err := getTagsFromRepo(repoPath)
 	if err != nil {
-		return fmt.Errorf("error getting tags: %v", err)
+		return fmt.Errorf("error getting tags from repo: %v", err)
 	}
-	var prefix string
-	switch category {
-	case "exam":
-		prefix = "e"
-	case "project":
-		prefix = "p"
-	case "homework":
-		prefix = "h"
-	default:
-		prefix = "a"
-	}
-	target := prefix + fmt.Sprintf("%d", n)
-	if category == "project" {
-		target += fmt.Sprintf("m%d", m)
+
+	target, err := getTagFromMsg()
+	if err != nil {
+		return fmt.Errorf("error getting tag from msg scope: %v", err)
 	}
 	found := false
 	for _, tag := range tags {
@@ -63,7 +82,7 @@ func CheckTags(repoPath string, category string, n int, m int) error {
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", strings.Join(tags, "', '"), target)
+		return fmt.Errorf("Wrong release tag in '%s' or missing release tags. Please use '%s'.", strings.Join(tags, "', '"), target)
 	}
 	return nil
 }
