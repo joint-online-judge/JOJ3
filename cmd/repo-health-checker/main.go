@@ -47,6 +47,7 @@ func main() {
 	droneBranch := flag.String("droneBranch", "", "")
 	releaseCategories := flag.String("releaseCategories", "", "")
 	releaseNumber := flag.Int("releaseNumber", 0, "")
+	mileStoneNumber := flag.Int("mileStoneNumber", 0, "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
@@ -78,7 +79,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.CheckTags(*rootDir, *releaseCategories, *releaseNumber)
+	err = healthcheck.CheckTags(*rootDir, *releaseCategories, *releaseNumber, *mileStoneNumber)
 	if err != nil {
 		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}

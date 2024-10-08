@@ -31,7 +31,7 @@ func getTagsFromRepo(repoPath string) ([]string, error) {
 	return tags, nil
 }
 
-func CheckTags(repoPath string, category string, n int) error {
+func CheckTags(repoPath string, category string, n int, m int) error {
 	// INFO: if category not specified, skipping this check by default
 	if category == "" {
 		return nil
@@ -52,6 +52,9 @@ func CheckTags(repoPath string, category string, n int) error {
 		prefix = "a"
 	}
 	target := prefix + fmt.Sprintf("%d", n)
+	if category == "project" {
+		target += fmt.Sprintf("m%d", m)
+	}
 	found := false
 	for _, tag := range tags {
 		if tag == target {
