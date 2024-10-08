@@ -185,7 +185,7 @@ func ListValidScopes(confRoot, confName string) ([]string, error) {
 					relPath = ""
 				}
 				validScopes = append(validScopes,
-					fmt.Sprintf("\"%s\"", relPath))
+					fmt.Sprintf("'%s'", relPath))
 			}
 		}
 		return nil
