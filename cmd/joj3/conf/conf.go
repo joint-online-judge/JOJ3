@@ -22,6 +22,7 @@ type Conf struct {
 	SkipTeapot        bool   `default:"true"`
 	ScoreboardPath    string `default:"scoreboard.csv"`
 	FailedTablePath   string `default:"failed-table.md"`
+	Name              string `default:"unknown"`
 	Stages            []struct {
 		Name     string
 		Group    string

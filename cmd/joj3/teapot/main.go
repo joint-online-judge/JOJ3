@@ -31,7 +31,7 @@ func Run(conf conf.Conf) error {
 	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 	cmd := exec.Command("joint-teapot", "joj3-scoreboard",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber, conf.ScoreboardPath) // #nosec G204
+		runNumber, conf.ScoreboardPath, conf.Name) // #nosec G204
 	outputBytes, err := cmd.CombinedOutput()
 	output := re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
@@ -46,7 +46,7 @@ func Run(conf conf.Conf) error {
 	}
 	cmd = exec.Command("joint-teapot", "joj3-failed-table",
 		envFilePath, conf.OutputPath, actor, conf.GradingRepoName, repoName,
-		runNumber, conf.FailedTablePath) // #nosec G204
+		runNumber, conf.FailedTablePath, conf.Name) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
@@ -60,7 +60,7 @@ func Run(conf conf.Conf) error {
 		return err
 	}
 	cmd = exec.Command("joint-teapot", "joj3-create-result-issue",
-		envFilePath, conf.OutputPath, repoName, runNumber) // #nosec G204
+		envFilePath, conf.OutputPath, repoName, runNumber, conf.Name) // #nosec G204
 	outputBytes, err = cmd.CombinedOutput()
 	output = re.ReplaceAllString(string(outputBytes), "")
 	for _, line := range strings.Split(output, "\n") {
