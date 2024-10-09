@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
-	"github.com/joint-online-judge/JOJ3/internal/executors"
-	_ "github.com/joint-online-judge/JOJ3/internal/parsers"
+	executors "github.com/joint-online-judge/JOJ3/internal/executor"
+	_ "github.com/joint-online-judge/JOJ3/internal/parser"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 
 	"github.com/jinzhu/copier"
