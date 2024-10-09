@@ -36,6 +36,7 @@ type Conf struct {
 			}
 		}
 	}
+	// TODO: allow skip scoreboard/failed table/issue
 	Teapot struct {
 		Skip            bool   `default:"true"`
 		LogPath         string `default:"/home/tt/.cache/joint-teapot-debug.log"`
