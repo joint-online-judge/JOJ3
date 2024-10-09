@@ -65,6 +65,8 @@ jobs:
               run: |
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
+                  git submodule update --init --remote --force
+                  git add -A
                   if echo "${{ github.event.head_commit.message }}" | grep -q "force build"; then
                     git commit --allow-empty -m "chore: trigger force build gitea actions by JOJ3"
                   else
