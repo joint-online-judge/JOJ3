@@ -87,8 +87,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						// Generate diff block with surrounding context
 						diffOutput := generateDiffWithContext(
 							stdoutLines, resultLines, diffOps)
+						diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
 						comment += fmt.Sprintf(
-							"```diff\n%s```\n",
+							"```diff\n%s\n```\n",
 							diffOutput,
 						)
 					}
