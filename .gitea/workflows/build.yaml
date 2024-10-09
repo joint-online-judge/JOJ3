@@ -63,7 +63,7 @@ jobs:
             - name: Clone, Commit and Push
               shell: bash
               run: |
-                  COMMIT_MSG=$(git log -1 --pretty=%B)
+                  COMMIT_MSG=${{ github.event.head_commit.message }}
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
                   if echo "$COMMIT_MSG" | grep -qi "force build"; then
