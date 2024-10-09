@@ -61,8 +61,14 @@ jobs:
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
                   chown -R root:root /root/.ssh
             - name: Clone, Commit and Push
+              shell: bash
               run: |
+                  COMMIT_MSG=$(git log -1 --pretty=%B)
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
-                  git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+                  if echo "$COMMIT_MSG" | grep -qi "force build"; then
+                      git commit --allow-empty -m "chore: trigger force build gitea actions by JOJ3"
+                  else
+                      git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+                  fi
                   git push
