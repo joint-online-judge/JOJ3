@@ -8,6 +8,7 @@ import (
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/dummy"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/healthcheck"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/keyword"
+	_ "github.com/joint-online-judge/JOJ3/internal/parser/resultdetail"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/resultstatus"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/sample"
 )
