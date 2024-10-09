@@ -30,7 +30,7 @@ type Conf struct {
 					Cases   []OptionalCmd
 				}
 			}
-			Parser struct {
+			Parsers []struct {
 				Name string
 				With interface{}
 			}

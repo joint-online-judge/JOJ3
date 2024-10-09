@@ -16,7 +16,7 @@ import (
 func generateStages(conf conf.Conf, group string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
-	for _, s := range conf.Stages {
+	for _, s := range conf.Stage.Stages {
 		if s.Group != "" && group != s.Group {
 			continue
 		}
@@ -50,12 +50,20 @@ func generateStages(conf conf.Conf, group string) ([]stage.Stage, error) {
 		if len(s.Executor.With.Cases) == 0 {
 			cmds = []stage.Cmd{defaultCmd}
 		}
+		parsers := []stage.StageParser{}
+		for _, p := range s.Parsers {
+			parsers = append(parsers, stage.StageParser{
+				Name: p.Name,
+				Conf: p.With,
+			})
+		}
 		stages = append(stages, stage.Stage{
-			Name:         s.Name,
-			ExecutorName: s.Executor.Name,
-			ExecutorCmds: cmds,
-			ParserName:   s.Parser.Name,
-			ParserConf:   s.Parser.With,
+			Name: s.Name,
+			Executor: stage.StageExecutor{
+				Name: s.Executor.Name,
+				Cmds: cmds,
+			},
+			Parsers: parsers,
 		})
 	}
 	slog.Debug("stages generated", "stages", stages)
