@@ -37,11 +37,8 @@ jobs:
                     if [ "$local_hash" != "$remote_hash" ]; then
                       echo "Hashes are different, updating Joint-Teapot..."
                       pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
-
-                      echo "hashes_match=false" >> $GITHUB_ENV
                     else
                       echo "Hashes are the same, no update required."
-                      echo "hashes_match=true" >> $GITHUB_ENV
                     fi
             # - name: Lint
             #   run: make lint
@@ -81,12 +78,31 @@ jobs:
                   git push
     triger-update-ci:
         container:
-            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ci-test
             volumes:
                 - /home/actions/.ssh:/root/.ssh
         needs: build
-        if: github.env.hashes_match == 'false'
         steps:
+            - name: Check update
+              run: |
+                    if [ -f /master_hash.txt ]; then
+                      local_hash=$(cat /master_hash.txt)
+                    else
+                      local_hash=""
+                    fi
+
+                    remote_hash=$(git ls-remote https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
+
+                    echo "Local hash: $local_hash"
+                    echo "Remote hash: $remote_hash"
+
+                    if [ "$local_hash" != "$remote_hash" ]; then
+                      echo "Hashes are different, updating Joint-Teapot..."
+                      pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
+                    else
+                      echo "Hashes are the same, no update required."
+                      exit 0
+                    fi
             - name: Set up Git
               run: |
                   git config --global user.name "gitea-actions[bot]"
