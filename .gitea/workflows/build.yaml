@@ -104,14 +104,14 @@ jobs:
                       echo "HASH_MATCH=false" >> $GITHUB_ENV
                     fi
             - name: Set up Git
-              if: HASH_MATCH==true
+              if: env.HASH_MATCH==true
               run: |
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
-                  # chown -R root:root /root/.ssh
+                  chown -R root:root /root/.ssh
             - name: Clone, Commit and Push
               shell: bash
-              if: HASH_MATCH==false
+              if: env.HASH_MATCH==false
               run: |
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
