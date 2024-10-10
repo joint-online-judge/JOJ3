@@ -98,7 +98,6 @@ jobs:
 
                     if [ "$local_hash" != "$remote_hash" ]; then
                       echo "Hashes are different, updating Joint-Teapot..."
-                      pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
                     else
                       echo "Hashes are the same, no update required."
                       exit 0
@@ -114,5 +113,5 @@ jobs:
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
                   git checkout ci-test
-                  make image
+                  make build
                   make push
