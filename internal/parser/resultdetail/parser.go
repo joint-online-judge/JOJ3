@@ -13,6 +13,7 @@ type Conf struct {
 	ShowTime       bool `default:"true"`
 	ShowMemory     bool `default:"true"`
 	ShowRunTime    bool `default:"false"`
+	ShowFiles      []string
 }
 
 type ResultDetail struct{}
@@ -43,6 +44,15 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 		}
 		if conf.ShowRunTime {
 			comment += fmt.Sprintf("RunTime: %d\n", result.RunTime)
+		}
+		for _, file := range conf.ShowFiles {
+			content, ok := result.Files[file]
+			comment += fmt.Sprintf("File: `%s`.\n", file)
+			if ok {
+				comment += fmt.Sprintf("```%s```\n", content)
+			} else {
+				comment += "Not found.\n"
+			}
 		}
 		res = append(res, stage.ParserResult{
 			Score:   conf.Score,
