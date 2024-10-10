@@ -103,9 +103,8 @@ jobs:
                       echo "Hashes are the same, no update required."
                       echo "HASH_MATCH=false" >> $GITHUB_ENV
                     fi
-                    echo ${env.HASH_MATCH}
             - name: Set up Git
-              if: env.HASH_MATCH==false
+              if: env.HASH_MATCH==true
               run: |
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
