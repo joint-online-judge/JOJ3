@@ -29,7 +29,7 @@ jobs:
                       local_hash=""
                     fi
 
-                    remote_hash=$(git ls-remote https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
+                    remote_hash=$(git ls-remote https://mirror.ghproxy.com/https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
 
                     echo "Local hash: $local_hash"
                     echo "Remote hash: $remote_hash"
