@@ -11,13 +11,13 @@ jobs:
             volumes:
                 - /home/actions/.ssh:/root/.ssh
         steps:
-            # - name: Check out repository code
-            #   uses: https://gitea.com/BoYanZh/checkout@focs
-            # - name: Setup Go 1.23.1
-            #   run: |
-            #       echo "PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> $GITHUB_ENV
-            # - name: Display Go version
-            #   run: go version
+            - name: Check out repository code
+              uses: https://gitea.com/BoYanZh/checkout@focs
+            - name: Setup Go 1.23.1
+              run: |
+                  echo "PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> $GITHUB_ENV
+            - name: Display Go version
+              run: go version
             - name: Prepare
               run: |
                   chown -R root:root /root/.ssh
@@ -40,16 +40,16 @@ jobs:
                     else
                       echo "Hashes are the same, no update required."
                     fi
-            # - name: Lint
-            #   run: make lint
-            # - name: Build
-            #   run: make build
-            # - name: Version
-            #   run: ./build/joj3 -version
-            # - name: Test
-            #   run: |
-            #       make prepare-test
-            #       make ci-test
+            - name: Lint
+              run: make lint
+            - name: Build
+              run: make build
+            - name: Version
+              run: ./build/joj3 -version
+            - name: Test
+              run: |
+                  make prepare-test
+                  make ci-test
     trigger-build-image:
         container:
             image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
