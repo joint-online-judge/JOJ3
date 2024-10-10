@@ -108,7 +108,7 @@ jobs:
               run: |
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
-                  chown -R root:root /root/.ssh
+                  # chown -R root:root /root/.ssh
             - name: Clone, Commit and Push
               shell: bash
               if: HASH_MATCH==false
