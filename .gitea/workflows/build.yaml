@@ -23,8 +23,8 @@ jobs:
                   chown -R root:root /root/.ssh
             - name: Setup Joint-Teapot
               run: |
-                    if [ -f master_hash.txt ]; then
-                      local_hash=$(cat master_hash.txt)
+                    if [ -f /master_hash.txt ]; then
+                      local_hash=$(cat /master_hash.txt)
                     else
                       local_hash=""
                     fi
