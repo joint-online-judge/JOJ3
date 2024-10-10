@@ -81,7 +81,7 @@ jobs:
             image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ci-test
             volumes:
                 - /home/actions/.ssh:/root/.ssh
-        # needs: build
+        needs: build
         steps:
             - name: Check update
               run: |
