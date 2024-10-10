@@ -98,17 +98,21 @@ jobs:
 
                     if [ "$local_hash" != "$remote_hash" ]; then
                       echo "Hashes are different, updating Joint-Teapot..."
+                      echo "HASH_MATCH=true" >> $GITHUB_ENV
                     else
                       echo "Hashes are the same, no update required."
-                      exit 0
+                      echo "HASH_MATCH=false" >> $GITHUB_ENV
                     fi
             - name: Set up Git
+              if: env.HASH_MATCH==false
               run: |
+                  echo env.HASH_MATCH
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
                   chown -R root:root /root/.ssh
             - name: Clone, Commit and Push
               shell: bash
+              if: env.HASH_MATCH==false
               run: |
                   git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
                   cd runner-images
