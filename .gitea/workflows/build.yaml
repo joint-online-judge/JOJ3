@@ -7,7 +7,7 @@ on:
 jobs:
     build:
         container:
-            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ci-test
             volumes:
                 - /home/actions/.ssh:/root/.ssh
         steps:
@@ -15,28 +15,33 @@ jobs:
               uses: https://gitea.com/BoYanZh/checkout@focs
             - name: Setup Go 1.23.1
               run: |
-                  wget -q https://studygolang.com/dl/golang/go1.23.2.linux-amd64.tar.gz
-                  rm -rf /usr/local/go
-                  tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz
-                  rm -rf go1.23.2.linux-amd64.tar.gz
                   echo "PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> $GITHUB_ENV
             - name: Display Go version
               run: go version
             - name: Prepare
               run: |
-                  go env -w GO111MODULE=on
-                  go env -w GOPROXY=https://goproxy.io,direct
                   chown -R root:root /root/.ssh
-            - name: Setup golangci-lint
-              run: |
-                  wget -q https://ghp.ci/https://github.com/golangci/golangci-lint/releases/download/v1.61.0/golangci-lint-1.61.0-linux-amd64.tar.gz
-                  tar -C /tmp -xzf golangci-lint-1.61.0-linux-amd64.tar.gz
-                  rm -rf golangci-lint-1.61.0-linux-amd64.tar.gz
-                  mkdir -p /root/go/bin
-                  mv /tmp/golangci-lint-1.61.0-linux-amd64/golangci-lint /root/go/bin
             - name: Setup Joint-Teapot
               run: |
-                  pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
+                    if [ -f master_hash.txt ]; then
+                      local_hash=$(cat master_hash.txt)
+                    else
+                      local_hash=""
+                    fi
+
+                    remote_hash=$(git ls-remote https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
+
+                    echo "Local hash: $local_hash"
+                    echo "Remote hash: $remote_hash"
+
+                    if [ "$local_hash" != "$remote_hash" ]; then
+                      echo "Hashes are different, updating Joint-Teapot..."
+                      pip install git+https://mirror.ghproxy.com/https://github.com/BoYanZh/Joint-Teapot
+
+                      echo "$remote_hash" > master_hash.txt
+                    else
+                      echo "Hashes are the same, no update required."
+                    fi
             - name: Lint
               run: make lint
             - name: Build
