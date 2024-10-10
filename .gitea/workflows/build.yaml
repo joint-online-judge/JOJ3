@@ -85,7 +85,7 @@ jobs:
             volumes:
                 - /home/actions/.ssh:/root/.ssh
         needs: build
-        if: env.hashes_match == 'true'
+        if: env.hashes_match == 'false'
         steps:
             - name: Set up Git
               run: |
