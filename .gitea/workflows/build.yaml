@@ -29,14 +29,14 @@ jobs:
                       local_hash=""
                     fi
 
-                    remote_hash=$(git ls-remote https://mirror.ghproxy.com/https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
+                    remote_hash=$(git ls-remote https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot | grep master | awk '{print $1}')
 
                     echo "Local hash: $local_hash"
                     echo "Remote hash: $remote_hash"
 
                     if [ "$local_hash" != "$remote_hash" ]; then
                       echo "Hashes are different, updating Joint-Teapot..."
-                      pip install git+https://mirror.ghproxy.com/https://github.com/BoYanZh/Joint-Teapot
+                      pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
 
                       echo "$remote_hash" > master_hash.txt
                     else
