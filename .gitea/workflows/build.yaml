@@ -98,13 +98,13 @@ jobs:
 
                     if [ "$local_hash" != "$remote_hash" ]; then
                       echo "Hashes are different, updating Joint-Teapot..."
-                      echo "HASH_MATCH=true" >> $GITHUB_ENV
+                      echo "HASH_MATCH=false" >> $GITHUB_ENV
                     else
                       echo "Hashes are the same, no update required."
-                      echo "HASH_MATCH=false" >> $GITHUB_ENV
+                      echo "HASH_MATCH=true" >> $GITHUB_ENV
                     fi
             - name: Set up Git
-              if: env.HASH_MATCH == 'true'
+              if: env.HASH_MATCH == 'false'
               run: |
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
