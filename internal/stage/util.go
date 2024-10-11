@@ -2,6 +2,7 @@ package stage
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/mcuadros/go-defaults"
 	"github.com/mitchellh/mapstructure"
@@ -14,5 +15,6 @@ func DecodeConf[T any](confAny any) (*T, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode conf: %w", err)
 	}
+	slog.Debug("conf decode", "conf", conf)
 	return conf, nil
 }
