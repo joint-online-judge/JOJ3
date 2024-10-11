@@ -18,7 +18,7 @@ clean:
 	rm -rf *.out
 
 lint:
-	golangci-lint run
+	golangci-lint run -v
 
 prepare-test:
 	git submodule update --init --remote
