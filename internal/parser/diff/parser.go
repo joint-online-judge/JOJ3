@@ -27,7 +27,7 @@ type Conf struct {
 			Score            int
 			FileName         string
 			AnswerPath       string
-			IgnoreWhitespace bool
+			IgnoreWhitespace bool `default:"true"`
 			AlwaysHide       bool
 		}
 	}
