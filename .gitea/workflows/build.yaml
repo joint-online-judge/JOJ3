@@ -20,9 +20,9 @@ jobs:
                   go env -w GO111MODULE=on
                   go env -w GOPROXY=https://goproxy.io,direct
                   chown -R root:root /root/.ssh
-            - name: Setup Joint-Teapot
-              run: |
-                  pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
+            # - name: Setup Joint-Teapot
+            #   run: |
+            #       pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
             - name: Lint
               run: make lint
             - name: Build
