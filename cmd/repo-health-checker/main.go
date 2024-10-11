@@ -46,6 +46,8 @@ func main() {
 	repo := flag.String("repo", "", "")
 	localList := flag.String("localList", "", "")
 	droneBranch := flag.String("droneBranch", "", "")
+	releaseCategories := flag.String("releaseCategories", "", "")
+	releaseNumber := flag.Int("releaseNumber", 0, "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
@@ -77,7 +79,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.CheckTags(*rootDir, *checkRelease)
+	err = healthcheck.CheckTags(*rootDir, *checkRelease, *releaseCategories, *releaseNumber)
 	if err != nil {
 		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}
