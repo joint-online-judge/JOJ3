@@ -61,7 +61,49 @@ func getTagsFromRepo(repoPath string) ([]string, error) {
 	return tags, nil
 }
 
-func CheckTags(repoPath string, skip bool) error {
+// INFO: check whether release tag consistent with last commit msg scope
+func checkConsist(tags []string, target string) (err error) {
+	found := false
+	for _, tag := range tags {
+		if tag == target {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("Wrong release tag in '%s' or missing release tags. Please use '%s'.", strings.Join(tags, "', '"), target)
+	}
+	return nil
+}
+
+// INFO: check whether release tag follow the tag list we give
+func checkStyle(tags []string, category string, n int) (err error) {
+	var prefix string
+	switch category {
+	case "exam":
+		prefix = "e"
+	case "project":
+		prefix = "p"
+	case "homework":
+		prefix = "h"
+	default:
+		prefix = "a"
+	}
+	target := prefix + fmt.Sprintf("%d", n)
+	found := false
+	for _, tag := range tags {
+		if tag == target {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", strings.Join(tags, "', '"), target)
+	}
+	return nil
+}
+
+func CheckTags(repoPath string, skip bool, category string, n int) error {
 	if skip {
 		return nil
 	}
@@ -74,15 +116,13 @@ func CheckTags(repoPath string, skip bool) error {
 	if err != nil {
 		return fmt.Errorf("error getting tag from msg scope: %v", err)
 	}
-	found := false
-	for _, tag := range tags {
-		if tag == target {
-			found = true
-			break
-		}
+	err = checkConsist(tags, target)
+	if err != nil {
+		return err
 	}
-	if !found {
-		return fmt.Errorf("Wrong release tag in '%s' or missing release tags. Please use '%s'.", strings.Join(tags, "', '"), target)
+	err = checkStyle(tags, category, n)
+	if err != nil {
+		return err
 	}
 	return nil
 }
