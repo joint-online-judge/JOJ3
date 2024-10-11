@@ -72,7 +72,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				if compareChars(string(answer), result.Files[output.FileName],
 					output.CompareSpace) {
 					score += output.Score
+					comment += "Pass!\n"
 				} else {
+					comment += "Fail!\n"
 					comment += fmt.Sprintf("Difference found in `%s`.\n",
 						output.FileName)
 					if !output.AlwaysHide {
@@ -92,6 +94,8 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 							"```diff\n%s\n```\n",
 							diffOutput,
 						)
+					} else {
+						comment += "(Content hidden.)\n"
 					}
 				}
 			}
