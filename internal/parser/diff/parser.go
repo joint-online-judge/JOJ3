@@ -24,11 +24,11 @@ type Conf struct {
 	Cases []struct {
 		IgnoreResultStatus bool
 		Outputs            []struct {
-			Score            int
-			FileName         string
-			AnswerPath       string
-			IgnoreWhitespace bool `default:"true"`
-			AlwaysHide       bool
+			Score        int
+			FileName     string
+			AnswerPath   string
+			CompareSpace bool
+			AlwaysHide   bool
 		}
 	}
 }
@@ -70,7 +70,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					"answer", string(answer))
 				// If no difference, assign score
 				if compareChars(string(answer), result.Files[output.FileName],
-					output.IgnoreWhitespace) {
+					output.CompareSpace) {
 					score += output.Score
 				} else {
 					comment += fmt.Sprintf("Difference found in `%s`.\n",
@@ -106,16 +106,16 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 }
 
 // compareChars compares two strings character by character, optionally ignoring whitespace.
-func compareChars(stdout, result string, ignoreWhitespace bool) bool {
-	if ignoreWhitespace {
-		stdout = removeWhitespace(stdout)
-		result = removeWhitespace(result)
+func compareChars(stdout, result string, compareSpace bool) bool {
+	if !compareSpace {
+		stdout = removeSpace(stdout)
+		result = removeSpace(result)
 	}
 	return stdout == result
 }
 
-// removeWhitespace removes all whitespace characters from the string.
-func removeWhitespace(s string) string {
+// removeSpace removes all whitespace characters from the string.
+func removeSpace(s string) string {
 	var b strings.Builder
 	for _, r := range s {
 		if !unicode.IsSpace(r) {
