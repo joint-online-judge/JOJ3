@@ -45,7 +45,7 @@ func mainImpl() error {
 			return err
 		}
 	}
-	confObj, group, err := conf.ParseMsg(confRoot, confName, msg)
+	confPath, group, err := conf.ParseMsg(confRoot, confName, msg)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		validScopes, scopeErr := conf.ListValidScopes(
@@ -58,6 +58,13 @@ func mainImpl() error {
 			"valid scopes", validScopes)
 		return err
 	}
+	slog.Info("try to load conf", "path", confPath)
+	confObj, err := conf.ParseConfFile(confPath)
+	if err != nil {
+		slog.Error("parse conf", "error", err)
+		return err
+	}
+	slog.Debug("conf loaded", "conf", confObj)
 	if err := setupSlog(confObj.LogPath); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)
 		return err

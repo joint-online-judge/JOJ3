@@ -144,7 +144,7 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	return cc, nil
 }
 
-func parseConfFile(path string) (conf Conf, err error) {
+func ParseConfFile(path string) (conf Conf, err error) {
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
 		&multiconfig.TagLoader{},
@@ -191,7 +191,7 @@ func parseConfFile(path string) (conf Conf, err error) {
 	return
 }
 
-func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err error) {
+func ParseMsg(confRoot, confName, msg string) (confPath, group string, err error) {
 	slog.Info("parse msg", "msg", msg)
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
@@ -199,7 +199,7 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	}
 	slog.Info("conventional commit", "commit", conventionalCommit)
 	confRoot = filepath.Clean(confRoot)
-	confPath := filepath.Clean(fmt.Sprintf("%s/%s/%s",
+	confPath = filepath.Clean(fmt.Sprintf("%s/%s/%s",
 		confRoot, conventionalCommit.Scope, confName))
 	relPath, err := filepath.Rel(confRoot, confPath)
 	if err != nil {
@@ -207,11 +207,6 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	}
 	if strings.HasPrefix(relPath, "..") {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
-		return
-	}
-	slog.Info("try to load conf", "path", confPath)
-	conf, err = parseConfFile(confPath)
-	if err != nil {
 		return
 	}
 	groupKeywords := []string{"joj"}
@@ -222,7 +217,6 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 			break
 		}
 	}
-	slog.Debug("conf loaded", "conf", conf)
 	return
 }
 
