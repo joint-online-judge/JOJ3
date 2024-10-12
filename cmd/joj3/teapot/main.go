@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 )
@@ -33,55 +34,61 @@ func Run(conf *conf.Conf) error {
 	repoParts := strings.Split(repository, "/")
 	repoName := repoParts[1]
 	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
-	if !conf.Teapot.SkipScoreboard {
-		cmd := exec.Command("joint-teapot", "joj3-scoreboard",
-			envFilePath, conf.Stage.OutputPath, actor, conf.Teapot.GradingRepoName,
-			repoName, runNumber, conf.Teapot.ScoreboardPath, conf.Name) // #nosec G204
+	execCommand := func(name string, cmdArgs []string) error {
+		cmd := exec.Command(name, cmdArgs...) // #nosec G204
 		outputBytes, err := cmd.CombinedOutput()
 		output := re.ReplaceAllString(string(outputBytes), "")
 		for _, line := range strings.Split(output, "\n") {
 			if line == "" {
 				continue
 			}
-			slog.Info("joint-teapot joj3-scoreboard", "output", line)
+			slog.Info(fmt.Sprintf("%s %s", name, cmdArgs[0]), "output", line)
 		}
-		if err != nil {
-			slog.Error("joint-teapot joj3-scoreboard", "err", err)
-			return err
-		}
+		return err
 	}
-	if !conf.Teapot.SkipFailedTable {
-		cmd := exec.Command("joint-teapot", "joj3-failed-table",
-			envFilePath, conf.Stage.OutputPath, actor, conf.Teapot.GradingRepoName,
-			repoName, runNumber, conf.Teapot.FailedTablePath, conf.Name) // #nosec G204
-		outputBytes, err := cmd.CombinedOutput()
-		output := re.ReplaceAllString(string(outputBytes), "")
-		for _, line := range strings.Split(output, "\n") {
-			if line == "" {
-				continue
+	var wg sync.WaitGroup
+	var scoreboardErr, failedTableErr, issueErr error
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		if !conf.Teapot.SkipScoreboard {
+			err := execCommand("joint-teapot", []string{
+				"joj3-scoreboard", envFilePath, conf.Stage.OutputPath, actor,
+				conf.Teapot.GradingRepoName, repoName, runNumber,
+				conf.Teapot.ScoreboardPath, conf.Name,
+			})
+			if err != nil {
+				scoreboardErr = err
 			}
-			slog.Info("joint-teapot joj3-failed-table", "output", line)
 		}
-		if err != nil {
-			slog.Error("joint-teapot joj3-failed-table", "err", err)
-			return err
-		}
-	}
-	if !conf.Teapot.SkipIssue {
-		cmd := exec.Command("joint-teapot", "joj3-create-result-issue",
-			envFilePath, conf.Stage.OutputPath, repoName, runNumber, conf.Name) // #nosec G204
-		outputBytes, err := cmd.CombinedOutput()
-		output := re.ReplaceAllString(string(outputBytes), "")
-		for _, line := range strings.Split(output, "\n") {
-			if line == "" {
-				continue
+		if !conf.Teapot.SkipFailedTable {
+			err := execCommand("joint-teapot", []string{
+				"joj3-failed-table", envFilePath, conf.Stage.OutputPath, actor,
+				conf.Teapot.GradingRepoName, repoName, runNumber,
+				conf.Teapot.FailedTablePath, conf.Name,
+			})
+			if err != nil {
+				failedTableErr = err
 			}
-			slog.Info("joint-teapot joj3-create-result-issue", "output", line)
 		}
-		if err != nil {
-			slog.Error("joint-teapot joj3-create-result-issue", "err", err)
-			return err
+	}()
+	go func() {
+		defer wg.Done()
+		if !conf.Teapot.SkipIssue {
+			err := execCommand("joint-teapot", []string{
+				"joj3-create-result-issue", envFilePath, conf.Stage.OutputPath,
+				repoName, runNumber, conf.Name,
+			})
+			if err != nil {
+				issueErr = err
+			}
 		}
+	}()
+	wg.Wait()
+	if scoreboardErr != nil || failedTableErr != nil || issueErr != nil {
+		slog.Error("teapot exit", "scoreboardErr", scoreboardErr,
+			"failedTableErr", failedTableErr, "issueErr", issueErr)
+		return fmt.Errorf("teapot exit")
 	}
 	return nil
 }
