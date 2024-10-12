@@ -144,18 +144,19 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	return cc, nil
 }
 
-func ParseConfFile(path string) (conf Conf, err error) {
+func ParseConfFile(path string) (conf *Conf, err error) {
+	conf = new(Conf)
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
 		&multiconfig.TagLoader{},
 		&multiconfig.JSONLoader{Path: path},
 	)
 	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
-	if err = d.Load(&conf); err != nil {
+	if err = d.Load(conf); err != nil {
 		slog.Error("parse stages conf", "error", err)
 		return
 	}
-	if err = d.Validate(&conf); err != nil {
+	if err = d.Validate(conf); err != nil {
 		slog.Error("validate stages conf", "error", err)
 		return
 	}

@@ -13,7 +13,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func generateStages(conf conf.Conf, group string) ([]stage.Stage, error) {
+func generateStages(conf *conf.Conf, group string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
 	for _, s := range conf.Stage.Stages {
@@ -81,7 +81,7 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 		append(content, []byte("\n")...), 0o600)
 }
 
-func Run(conf conf.Conf, group string) error {
+func Run(conf *conf.Conf, group string) error {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,

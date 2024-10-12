@@ -11,7 +11,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 )
 
-func Run(conf conf.Conf) error {
+func Run(conf *conf.Conf) error {
 	actions := os.Getenv("GITHUB_ACTIONS")
 	if actions != "true" {
 		slog.Info("teapot exit", "GITHUB_ACTIONS", actions)
