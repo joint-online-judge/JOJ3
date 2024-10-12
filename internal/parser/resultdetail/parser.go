@@ -47,7 +47,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 		}
 		for _, file := range conf.ShowFiles {
 			content, ok := result.Files[file]
-			comment += fmt.Sprintf("File: `%s`:\n", file)
+			comment += fmt.Sprintf("File `%s`:\n", file)
 			if ok {
 				comment += fmt.Sprintf("```\n%s\n```\n", content)
 			} else {
