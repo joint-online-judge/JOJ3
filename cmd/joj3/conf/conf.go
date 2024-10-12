@@ -13,16 +13,48 @@ import (
 	"github.com/koding/multiconfig"
 )
 
+type ConfStage struct {
+	Name     string
+	Group    string
+	Executor struct {
+		Name string
+		With struct {
+			Default stage.Cmd
+			Cases   []OptionalCmd
+		}
+	}
+	Parsers []struct {
+		Name string
+		With interface{}
+	}
+}
+
 type Conf struct {
+	Name    string `default:"unknown"`
+	LogPath string `default:""`
+	Stage   struct {
+		SandboxExecServer string `default:"localhost:5051"`
+		SandboxToken      string `default:""`
+		OutputPath        string `default:"joj3_result.json"`
+		Stages            []ConfStage
+	}
+	Teapot struct {
+		LogPath         string `default:"/home/tt/.cache/joint-teapot-debug.log"`
+		ScoreboardPath  string `default:"scoreboard.csv"`
+		FailedTablePath string `default:"failed-table.md"`
+		GradingRepoName string `default:""`
+		SkipIssue       bool   `default:"false"`
+		SkipScoreboard  bool   `default:"false"`
+		SkipFailedTable bool   `default:"false"`
+	}
+	// TODO: remove the following backward compatibility fields
 	SandboxExecServer string `default:"localhost:5051"`
 	SandboxToken      string `default:""`
-	LogPath           string `default:""`
 	OutputPath        string `default:"joj3_result.json"`
 	GradingRepoName   string `default:""`
 	SkipTeapot        bool   `default:"true"`
 	ScoreboardPath    string `default:"scoreboard.csv"`
 	FailedTablePath   string `default:"failed-table.md"`
-	Name              string `default:"unknown"`
 	Stages            []struct {
 		Name     string
 		Group    string
@@ -126,6 +158,27 @@ func parseConfFile(path string) (conf Conf, err error) {
 	if err = d.Validate(&conf); err != nil {
 		slog.Error("validate stages conf", "error", err)
 		return
+	}
+	// TODO: remove the following backward compatibility codes
+	if len(conf.Stage.Stages) == 0 {
+		conf.Stage.SandboxExecServer = conf.SandboxExecServer
+		conf.Stage.SandboxToken = conf.SandboxToken
+		conf.Stage.OutputPath = conf.OutputPath
+		conf.Stage.Stages = make([]ConfStage, len(conf.Stages))
+		for i, stage := range conf.Stages {
+			conf.Stage.Stages[i].Name = stage.Name
+			conf.Stage.Stages[i].Group = stage.Group
+			conf.Stage.Stages[i].Executor = stage.Executor
+			conf.Stage.Stages[i].Parsers = []struct {
+				Name string
+				With interface{}
+			}{
+				{
+					Name: stage.Parser.Name,
+					With: stage.Parser.With,
+				},
+			}
+		}
 	}
 	return
 }
