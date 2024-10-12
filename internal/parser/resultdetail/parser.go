@@ -29,21 +29,21 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	for _, result := range results {
 		comment := ""
-		// TODO: more human readable units
 		if conf.ShowExitStatus {
-			comment += fmt.Sprintf("Exit Status: %d\n", result.ExitStatus)
+			comment += fmt.Sprintf("Exit Status: `%d`\n", result.ExitStatus)
 		}
 		if conf.ShowError {
-			comment += fmt.Sprintf("Error: %s\n", result.Error)
+			comment += fmt.Sprintf("Error: `%s`\n", result.Error)
 		}
 		if conf.ShowTime {
-			comment += fmt.Sprintf("Time: %d\n", result.Time)
+			comment += fmt.Sprintf("Time: `%d ms`\n", result.Time/1e9)
 		}
 		if conf.ShowMemory {
-			comment += fmt.Sprintf("Memory: %d\n", result.Memory)
+			comment += fmt.Sprintf("Memory: `%.2f MiB`\n",
+				float64(result.Memory)/(1024*1024))
 		}
 		if conf.ShowRunTime {
-			comment += fmt.Sprintf("RunTime: %d\n", result.RunTime)
+			comment += fmt.Sprintf("RunTime: `%d ms`\n", result.RunTime/1e9)
 		}
 		for _, file := range conf.ShowFiles {
 			content, ok := result.Files[file]
