@@ -49,7 +49,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 			content, ok := result.Files[file]
 			comment += fmt.Sprintf("File: `%s`.\n", file)
 			if ok {
-				comment += fmt.Sprintf("```%s```\n", content)
+				comment += fmt.Sprintf("```%s\n```\n", content)
 			} else {
 				comment += "Not found.\n"
 			}
