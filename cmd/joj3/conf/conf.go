@@ -179,6 +179,14 @@ func parseConfFile(path string) (conf Conf, err error) {
 				},
 			}
 		}
+		conf.Teapot.GradingRepoName = conf.GradingRepoName
+		conf.Teapot.ScoreboardPath = conf.ScoreboardPath
+		conf.Teapot.FailedTablePath = conf.FailedTablePath
+		if conf.SkipTeapot {
+			conf.Teapot.SkipScoreboard = true
+			conf.Teapot.SkipFailedTable = true
+			conf.Teapot.SkipIssue = true
+		}
 	}
 	return
 }
