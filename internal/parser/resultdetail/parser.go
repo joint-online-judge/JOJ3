@@ -36,14 +36,14 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 			comment += fmt.Sprintf("Error: `%s`\n", result.Error)
 		}
 		if conf.ShowTime {
-			comment += fmt.Sprintf("Time: `%d ms`\n", result.Time/1e9)
+			comment += fmt.Sprintf("Time: `%d ms`\n", result.Time/1e6)
 		}
 		if conf.ShowMemory {
 			comment += fmt.Sprintf("Memory: `%.2f MiB`\n",
 				float64(result.Memory)/(1024*1024))
 		}
 		if conf.ShowRunTime {
-			comment += fmt.Sprintf("RunTime: `%d ms`\n", result.RunTime/1e9)
+			comment += fmt.Sprintf("RunTime: `%d ms`\n", result.RunTime/1e6)
 		}
 		for _, file := range conf.ShowFiles {
 			content, ok := result.Files[file]
