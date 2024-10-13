@@ -15,6 +15,7 @@ var (
 	confRoot    string
 	confName    string
 	msg         string
+	tag         string
 	showVersion *bool
 	Version     string = "debug"
 )
@@ -23,6 +24,7 @@ func init() {
 	flag.StringVar(&confRoot, "conf-root", ".", "root path for all config files")
 	flag.StringVar(&confName, "conf-name", "conf.json", "filename for config files")
 	flag.StringVar(&msg, "msg", "", "message to trigger the running, leave empty to use git commit message on HEAD")
+	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
 	showVersion = flag.Bool("version", false, "print current version")
 }
 
@@ -45,7 +47,7 @@ func mainImpl() error {
 			return err
 		}
 	}
-	confPath, group, err := conf.ParseMsg(confRoot, confName, msg)
+	confPath, group, err := conf.ParseMsg(confRoot, confName, msg, tag)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		validScopes, scopeErr := conf.ListValidScopes(
