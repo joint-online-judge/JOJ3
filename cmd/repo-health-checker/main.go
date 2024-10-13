@@ -39,7 +39,7 @@ var Version string
 
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
-	var gitWhitelist, metaFile []string
+	var gitWhitelist, metaFile, releaseTag []string
 	showVersion := flag.Bool("version", false, "print current version")
 	checkRelease := flag.Bool("checkRelease", true, "trigger release check")
 	rootDir := flag.String("root", "", "")
@@ -47,12 +47,11 @@ func main() {
 	size := flag.Float64("reposize", 2, "size of the repo")
 	localList := flag.String("localList", "", "")
 	droneBranch := flag.String("droneBranch", "", "")
-	releaseCategories := flag.String("releaseCategories", "", "")
-	releaseNumber := flag.Int("releaseNumber", 0, "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
 	parseMultiValueFlag(&metaFile, "meta", "")
+	parseMultiValueFlag(&releaseTag, "releaseTag", "Recommended tags")
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -80,7 +79,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.CheckTags(*rootDir, *checkRelease, *releaseCategories, *releaseNumber)
+	err = healthcheck.CheckTags(*rootDir, *checkRelease, *releaseTag)
 	if err != nil {
 		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}

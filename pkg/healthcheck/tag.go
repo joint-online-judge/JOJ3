@@ -77,33 +77,21 @@ func checkConsist(tags []string, target string) (err error) {
 }
 
 // INFO: check whether release tag follow the tag list we give
-func checkStyle(tags []string, category string, n int) (err error) {
-	var prefix string
-	switch category {
-	case "exam":
-		prefix = "e"
-	case "project":
-		prefix = "p"
-	case "homework":
-		prefix = "h"
-	default:
-		prefix = "a"
-	}
-	target := prefix + fmt.Sprintf("%d", n)
+func checkStyle(target string, recommendTag []string) (err error) {
 	found := false
-	for _, tag := range tags {
+	for _, tag := range recommendTag {
 		if tag == target {
 			found = true
 			break
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", strings.Join(tags, "', '"), target)
+		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", target, strings.Join(recommendTag, "', '"))
 	}
 	return nil
 }
 
-func CheckTags(repoPath string, skip bool, category string, n int) error {
+func CheckTags(repoPath string, skip bool, recommendTag []string) error {
 	if skip {
 		return nil
 	}
@@ -120,7 +108,7 @@ func CheckTags(repoPath string, skip bool, category string, n int) error {
 	if err != nil {
 		return err
 	}
-	err = checkStyle(tags, category, n)
+	err = checkStyle(target, recommendTag)
 	if err != nil {
 		return err
 	}
