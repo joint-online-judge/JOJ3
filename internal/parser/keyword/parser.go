@@ -13,11 +13,11 @@ type Match struct {
 }
 
 type Conf struct {
-	FullScore  int
-	MinScore   int
-	Files      []string
-	EndOnMatch bool
-	Matches    []Match
+	FullScore        int
+	MinScore         int
+	Files            []string
+	ForceQuitOnMatch bool
+	Matches          []Match
 }
 
 type Keyword struct{}
@@ -58,7 +58,7 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	forceQuit := false
 	for _, result := range results {
 		tmp, matched := Parse(result, *conf)
-		if matched && conf.EndOnMatch {
+		if matched && conf.ForceQuitOnMatch {
 			forceQuit = true
 		}
 		res = append(res, tmp)
