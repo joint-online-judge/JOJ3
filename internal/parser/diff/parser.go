@@ -21,7 +21,9 @@ const (
 )
 
 type Conf struct {
-	Cases []struct {
+	PassComment string `default:"🥳Passed!\n"`
+	FailComment string `default:"🧐Failed...\n"`
+	Cases       []struct {
 		IgnoreResultStatus bool
 		Outputs            []struct {
 			Score        int
@@ -72,9 +74,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				if compareChars(string(answer), result.Files[output.FileName],
 					output.CompareSpace) {
 					score += output.Score
-					comment += "Pass!\n"
+					comment += conf.PassComment
 				} else {
-					comment += "Fail!\n"
+					comment += conf.FailComment
 					comment += fmt.Sprintf("Difference found in `%s`.\n",
 						output.FileName)
 					if !output.AlwaysHide {

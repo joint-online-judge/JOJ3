@@ -13,16 +13,48 @@ import (
 	"github.com/koding/multiconfig"
 )
 
+type ConfStage struct {
+	Name     string
+	Group    string
+	Executor struct {
+		Name string
+		With struct {
+			Default stage.Cmd
+			Cases   []OptionalCmd
+		}
+	}
+	Parsers []struct {
+		Name string
+		With interface{}
+	}
+}
+
 type Conf struct {
+	Name    string `default:"unknown"`
+	LogPath string `default:""`
+	Stage   struct {
+		SandboxExecServer string `default:"localhost:5051"`
+		SandboxToken      string `default:""`
+		OutputPath        string `default:"joj3_result.json"`
+		Stages            []ConfStage
+	}
+	Teapot struct {
+		LogPath         string `default:"/home/tt/.cache/joint-teapot-debug.log"`
+		ScoreboardPath  string `default:"scoreboard.csv"`
+		FailedTablePath string `default:"failed-table.md"`
+		GradingRepoName string `default:""`
+		SkipIssue       bool   `default:"false"`
+		SkipScoreboard  bool   `default:"false"`
+		SkipFailedTable bool   `default:"false"`
+	}
+	// TODO: remove the following backward compatibility fields
 	SandboxExecServer string `default:"localhost:5051"`
 	SandboxToken      string `default:""`
-	LogPath           string `default:""`
 	OutputPath        string `default:"joj3_result.json"`
 	GradingRepoName   string `default:""`
 	SkipTeapot        bool   `default:"true"`
 	ScoreboardPath    string `default:"scoreboard.csv"`
 	FailedTablePath   string `default:"failed-table.md"`
-	Name              string `default:"unknown"`
 	Stages            []struct {
 		Name     string
 		Group    string
@@ -112,25 +144,55 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	return cc, nil
 }
 
-func parseConfFile(path string) (conf Conf, err error) {
+func ParseConfFile(path string) (conf *Conf, err error) {
+	conf = new(Conf)
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
 		&multiconfig.TagLoader{},
 		&multiconfig.JSONLoader{Path: path},
 	)
 	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
-	if err = d.Load(&conf); err != nil {
+	if err = d.Load(conf); err != nil {
 		slog.Error("parse stages conf", "error", err)
 		return
 	}
-	if err = d.Validate(&conf); err != nil {
+	if err = d.Validate(conf); err != nil {
 		slog.Error("validate stages conf", "error", err)
 		return
+	}
+	// TODO: remove the following backward compatibility codes
+	if len(conf.Stage.Stages) == 0 {
+		conf.Stage.SandboxExecServer = conf.SandboxExecServer
+		conf.Stage.SandboxToken = conf.SandboxToken
+		conf.Stage.OutputPath = conf.OutputPath
+		conf.Stage.Stages = make([]ConfStage, len(conf.Stages))
+		for i, stage := range conf.Stages {
+			conf.Stage.Stages[i].Name = stage.Name
+			conf.Stage.Stages[i].Group = stage.Group
+			conf.Stage.Stages[i].Executor = stage.Executor
+			conf.Stage.Stages[i].Parsers = []struct {
+				Name string
+				With interface{}
+			}{
+				{
+					Name: stage.Parser.Name,
+					With: stage.Parser.With,
+				},
+			}
+		}
+		conf.Teapot.GradingRepoName = conf.GradingRepoName
+		conf.Teapot.ScoreboardPath = conf.ScoreboardPath
+		conf.Teapot.FailedTablePath = conf.FailedTablePath
+		if conf.SkipTeapot {
+			conf.Teapot.SkipScoreboard = true
+			conf.Teapot.SkipFailedTable = true
+			conf.Teapot.SkipIssue = true
+		}
 	}
 	return
 }
 
-func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err error) {
+func ParseMsg(confRoot, confName, msg string) (confPath, group string, err error) {
 	slog.Info("parse msg", "msg", msg)
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
@@ -138,7 +200,7 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	}
 	slog.Info("conventional commit", "commit", conventionalCommit)
 	confRoot = filepath.Clean(confRoot)
-	confPath := filepath.Clean(fmt.Sprintf("%s/%s/%s",
+	confPath = filepath.Clean(fmt.Sprintf("%s/%s/%s",
 		confRoot, conventionalCommit.Scope, confName))
 	relPath, err := filepath.Rel(confRoot, confPath)
 	if err != nil {
@@ -146,11 +208,6 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 	}
 	if strings.HasPrefix(relPath, "..") {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
-		return
-	}
-	slog.Info("try to load conf", "path", confPath)
-	conf, err = parseConfFile(confPath)
-	if err != nil {
 		return
 	}
 	groupKeywords := []string{"joj"}
@@ -161,7 +218,6 @@ func ParseMsg(confRoot, confName, msg string) (conf Conf, group string, err erro
 			break
 		}
 	}
-	slog.Debug("conf loaded", "conf", conf)
 	return
 }
 

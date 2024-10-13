@@ -150,12 +150,19 @@ func (r ExecutorResult) String() string {
 	return fmt.Sprintf("%+v", d)
 }
 
+type StageExecutor struct {
+	Name string
+	Cmds []Cmd
+}
+type StageParser struct {
+	Name string
+	Conf any
+}
+
 type Stage struct {
-	Name         string
-	ExecutorName string
-	ExecutorCmds []Cmd
-	ParserName   string
-	ParserConf   any
+	Name     string
+	Executor StageExecutor
+	Parsers  []StageParser
 }
 
 type ParserResult struct {

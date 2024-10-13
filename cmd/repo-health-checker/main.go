@@ -44,6 +44,7 @@ func main() {
 	checkRelease := flag.Bool("checkRelease", true, "trigger release check")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
+	size := flag.Float64("reposize", 2, "size of the repo")
 	localList := flag.String("localList", "", "")
 	droneBranch := flag.String("droneBranch", "", "")
 	releaseCategories := flag.String("releaseCategories", "", "")
@@ -59,7 +60,7 @@ func main() {
 	}
 	setupSlog()
 	var err error
-	err = healthcheck.RepoSize()
+	err = healthcheck.RepoSize(*size)
 	if err != nil {
 		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
