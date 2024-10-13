@@ -71,7 +71,7 @@ func checkConsist(tags []string, target string) (err error) {
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag in '%s' or missing release tags. Please use '%s'.", strings.Join(tags, "', '"), target)
+		return fmt.Errorf("Inconsistent release tag with scope in '%s' or missing release tags. Please use '%s'.", strings.Join(tags, "', '"), target)
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func checkStyle(target string, recommendTag []string) (err error) {
 		}
 	}
 	if !found {
-		return fmt.Errorf("Wrong release tag '%s' or missing release tags. Please use one of '%s'.", target, strings.Join(recommendTag, "', '"))
+		return fmt.Errorf("Release tag '%s' doesn't match recommended tag list. Please use one of '%s'.", target, strings.Join(recommendTag, "', '"))
 	}
 	return nil
 }
