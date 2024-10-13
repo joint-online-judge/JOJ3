@@ -192,7 +192,7 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 	return
 }
 
-func ParseMsg(confRoot, confName, msg string) (confPath, group string, err error) {
+func ParseMsg(confRoot, confName, msg, tag string) (confPath, group string, err error) {
 	slog.Info("parse msg", "msg", msg)
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
@@ -208,6 +208,11 @@ func ParseMsg(confRoot, confName, msg string) (confPath, group string, err error
 	}
 	if strings.HasPrefix(relPath, "..") {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
+		return
+	}
+	if tag != "" && conventionalCommit.Scope != tag {
+		err = fmt.Errorf("tag does not match scope: %s != %s", tag,
+			conventionalCommit.Scope)
 		return
 	}
 	groupKeywords := []string{"joj"}
