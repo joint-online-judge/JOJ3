@@ -42,10 +42,8 @@ func main() {
 	var gitWhitelist, metaFile []string
 	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", "", "")
-	repo := flag.String("repo", "", "")
 	size := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
 	localList := flag.String("localList", "", "")
-	droneBranch := flag.String("droneBranch", "", "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
@@ -61,7 +59,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.ForbiddenCheck(*rootDir, gitWhitelist, *localList, *repo, *droneBranch)
+	err = healthcheck.ForbiddenCheck(*rootDir, gitWhitelist, *localList)
 	if err != nil {
 		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
