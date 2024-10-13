@@ -79,7 +79,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.CheckTags(*rootDir, *checkRelease, *releaseTag)
+	err = healthcheck.CheckTags(*rootDir, *checkRelease, releaseTag)
 	if err != nil {
 		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}
