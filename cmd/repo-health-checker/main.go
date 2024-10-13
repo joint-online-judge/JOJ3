@@ -43,7 +43,7 @@ func main() {
 	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
-	size := flag.Float64("reposize", 2, "size of the repo")
+	size := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
 	localList := flag.String("localList", "", "")
 	droneBranch := flag.String("droneBranch", "", "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
