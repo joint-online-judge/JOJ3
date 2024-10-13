@@ -41,7 +41,6 @@ var Version string
 func main() {
 	var gitWhitelist, metaFile []string
 	showVersion := flag.Bool("version", false, "print current version")
-	checkRelease := flag.Bool("checkRelease", true, "trigger release check")
 	rootDir := flag.String("root", "", "")
 	repo := flag.String("repo", "", "")
 	size := flag.Float64("reposize", 2, "size of the repo")
@@ -77,10 +76,6 @@ func main() {
 	err = healthcheck.NonAsciiMsg(*rootDir)
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
-	}
-	err = healthcheck.CheckTags(*rootDir, *checkRelease)
-	if err != nil {
-		fmt.Printf("### Release Tag Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.VerifyFiles(*rootDir, *checkFileNameList, *checkFileSumList)
 	if err != nil {
