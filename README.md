@@ -74,7 +74,8 @@ These steps are executed in runner-images. We use `sudo -u tt` to elevate the pe
 
 1. Run JOJ3
    1. Parse the message.
-       - If not specified by `-msg`, it will use the git commit message from `HEAD`. The message should meet the [Conventional Commits specification](https://www.conventionalcommits.org/). We use `scope` and `description` here.
+       - It will use the git commit message from `HEAD`. The message should meet the [Conventional Commits specification](https://www.conventionalcommits.org/). We use `scope` and `description` here.
+       - If `-tag` is specified, then it should equal to the scope of the message, or JOJ3 will not run.
    2. Find the configuration file.
        - We have `conf-root` and `conf-name` specified in the CLI argument. Then the full path of configuration file is `<conf-root>/<scope>/<conf-name>`.
    3. Generate stages.
