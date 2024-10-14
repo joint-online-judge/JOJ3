@@ -78,8 +78,17 @@ func ForbiddenCheck(rootDir string, regexList []string, localList string) error 
 	}
 
 	if len(forbids) > 0 {
-		return fmt.Errorf("The following forbidden files were found: `%s`\n",
-			strings.Join(forbids, "`, `"))
+		return fmt.Errorf("The following forbidden files were found: `%s`\n\n"+
+			"To fix it, first make a backup of your repository and then run the following commands:\n"+
+			"```bash\n"+
+			"export GIT_BRANCH=$(git branch --show-current)\n"+
+			"export GIT_REMOTE_URL=$(git config --get remote.origin.url)\n"+
+			"for i in %s; do git filter-repo --force --invert-paths --path \"$i\"; done\n"+
+			"git remote add origin $GIT_REMOTE_URL\n"+
+			"git push --set-upstream origin $GIT_BRANCH --force\n"+
+			"```\n",
+			strings.Join(forbids, "`, `"),
+			strings.Join(forbids, " "))
 	}
 	return nil
 }
