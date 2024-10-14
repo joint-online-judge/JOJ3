@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
@@ -30,9 +31,10 @@ type ConfStage struct {
 }
 
 type Conf struct {
-	Name    string `default:"unknown"`
-	LogPath string `default:""`
-	Stage   struct {
+	Name                string `default:"unknown"`
+	LogPath             string `default:""`
+	ExpireUnixTimestamp int64  `default:"-1"`
+	Stage               struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
 		OutputPath        string `default:"joj3_result.json"`
@@ -253,4 +255,12 @@ func ListValidScopes(confRoot, confName string) ([]string, error) {
 		return nil
 	})
 	return validScopes, err
+}
+
+func CheckExpire(conf *Conf) error {
+	if conf.ExpireUnixTimestamp > 0 &&
+		conf.ExpireUnixTimestamp < time.Now().Unix() {
+		return fmt.Errorf("config file expired: %d", conf.ExpireUnixTimestamp)
+	}
+	return nil
 }
