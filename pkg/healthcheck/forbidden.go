@@ -70,7 +70,7 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 
 // forbiddenCheck checks for forbidden files in the specified root directory.
 // It prints the list of forbidden files found, along with instructions on how to fix them.
-func ForbiddenCheck(rootDir string, regexList []string, localList string, repo string, droneBranch string) error {
+func ForbiddenCheck(rootDir string, regexList []string, localList string) error {
 	forbids, err := getForbiddens(rootDir, regexList, localList)
 	if err != nil {
 		slog.Error("getting forbiddens", "error", err)
@@ -78,13 +78,17 @@ func ForbiddenCheck(rootDir string, regexList []string, localList string, repo s
 	}
 
 	if len(forbids) > 0 {
-		return fmt.Errorf("The following forbidden files were found: %s\n\nTo fix it, first make a backup of your repository and then run the following commands:\nfor i in %s%s",
-			strings.Join(forbids, ", "),
-			strings.Join(forbids, " "),
-			fmt.Sprint(
-				"; do git filter-repo --force --invert-paths --path \"$i\"; done\ngit remote add origin ",
-				repo, "\ngit push --set-upstream origin ",
-				droneBranch, " --force"))
+		return fmt.Errorf("The following forbidden files were found: `%s`\n\n"+
+			"To fix it, first make a backup of your repository and then run the following commands:\n"+
+			"```bash\n"+
+			"export GIT_BRANCH=$(git branch --show-current)\n"+
+			"export GIT_REMOTE_URL=$(git config --get remote.origin.url)\n"+
+			"for i in %s; do git filter-repo --force --invert-paths --path \"$i\"; done\n"+
+			"git remote add origin $GIT_REMOTE_URL\n"+
+			"git push --set-upstream origin $GIT_BRANCH --force\n"+
+			"```\n",
+			strings.Join(forbids, "`, `"),
+			strings.Join(forbids, " "))
 	}
 	return nil
 }
