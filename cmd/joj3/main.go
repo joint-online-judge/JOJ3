@@ -15,6 +15,7 @@ var (
 	confRoot    string
 	confName    string
 	tag         string
+	msg         string
 	showVersion *bool
 	Version     string = "debug"
 )
@@ -23,6 +24,8 @@ func init() {
 	flag.StringVar(&confRoot, "conf-root", ".", "root path for all config files")
 	flag.StringVar(&confName, "conf-name", "conf.json", "filename for config files")
 	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
+	// TODO: remove this flag
+	flag.StringVar(&msg, "msg", "", "[DEPRECATED] will be ignored")
 	showVersion = flag.Bool("version", false, "print current version")
 }
 
