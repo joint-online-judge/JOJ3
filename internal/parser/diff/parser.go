@@ -7,7 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -24,8 +23,7 @@ type Conf struct {
 	PassComment string `default:"🥳Passed!\n"`
 	FailComment string `default:"🧐Failed...\n"`
 	Cases       []struct {
-		IgnoreResultStatus bool
-		Outputs            []struct {
+		Outputs []struct {
 			Score        int
 			FileName     string
 			AnswerPath   string
@@ -54,51 +52,43 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		result := results[i]
 		score := 0
 		comment := ""
-		if !caseConf.IgnoreResultStatus &&
-			result.Status != stage.Status(envexec.StatusAccepted) {
-			forceQuit = true
-			comment += fmt.Sprintf(
-				"Unexpected executor status: %s.", result.Status,
-			)
-		} else {
-			for _, output := range caseConf.Outputs {
-				answer, err := os.ReadFile(output.AnswerPath)
-				if err != nil {
-					return nil, true, err
-				}
-				slog.Debug("compare", "filename", output.FileName,
-					"answer path", output.AnswerPath,
-					"actual", result.Files[output.FileName],
-					"answer", string(answer))
-				// If no difference, assign score
-				if compareChars(string(answer), result.Files[output.FileName],
-					output.CompareSpace) {
-					score += output.Score
-					comment += conf.PassComment
+		for _, output := range caseConf.Outputs {
+			answer, err := os.ReadFile(output.AnswerPath)
+			if err != nil {
+				return nil, true, err
+			}
+			slog.Debug("compare", "filename", output.FileName,
+				"answer path", output.AnswerPath,
+				"actual", result.Files[output.FileName],
+				"answer", string(answer))
+			// If no difference, assign score
+			if compareChars(string(answer), result.Files[output.FileName],
+				output.CompareSpace) {
+				score += output.Score
+				comment += conf.PassComment
+			} else {
+				comment += conf.FailComment
+				comment += fmt.Sprintf("Difference found in `%s`.\n",
+					output.FileName)
+				if !output.AlwaysHide {
+					// Convert answer to string and split by lines
+					stdoutLines := strings.Split(string(answer), "\n")
+					resultLines := strings.Split(
+						result.Files[output.FileName], "\n")
+
+					// Generate Myers diff
+					diffOps := myersDiff(stdoutLines, resultLines)
+
+					// Generate diff block with surrounding context
+					diffOutput := generateDiffWithContext(
+						stdoutLines, resultLines, diffOps)
+					diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
+					comment += fmt.Sprintf(
+						"```diff\n%s\n```\n",
+						diffOutput,
+					)
 				} else {
-					comment += conf.FailComment
-					comment += fmt.Sprintf("Difference found in `%s`.\n",
-						output.FileName)
-					if !output.AlwaysHide {
-						// Convert answer to string and split by lines
-						stdoutLines := strings.Split(string(answer), "\n")
-						resultLines := strings.Split(
-							result.Files[output.FileName], "\n")
-
-						// Generate Myers diff
-						diffOps := myersDiff(stdoutLines, resultLines)
-
-						// Generate diff block with surrounding context
-						diffOutput := generateDiffWithContext(
-							stdoutLines, resultLines, diffOps)
-						diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
-						comment += fmt.Sprintf(
-							"```diff\n%s\n```\n",
-							diffOutput,
-						)
-					} else {
-						comment += "(Content hidden.)\n"
-					}
+					comment += "(Content hidden.)\n"
 				}
 			}
 		}
