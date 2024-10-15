@@ -45,7 +45,7 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 		}
 
 		if info.IsDir() {
-			if info.Name() == ".git" || info.Name() == ".gitea" || info.Name() == "ci" || (localList != "" && inString(info.Name(), dirs)) {
+			if info.Name() == ".git" || (localList != "" && inString(info.Name(), dirs)) {
 				return filepath.SkipDir
 			}
 		} else {
