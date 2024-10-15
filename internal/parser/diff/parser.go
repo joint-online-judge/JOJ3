@@ -24,11 +24,12 @@ type Conf struct {
 	FailComment string `default:"🧐Failed...\n"`
 	Cases       []struct {
 		Outputs []struct {
-			Score        int
-			FileName     string
-			AnswerPath   string
-			CompareSpace bool
-			AlwaysHide   bool
+			Score           int
+			FileName        string
+			AnswerPath      string
+			CompareSpace    bool
+			AlwaysHide      bool
+			ForceQuitOnDiff bool
 		}
 	}
 }
@@ -67,6 +68,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				score += output.Score
 				comment += conf.PassComment
 			} else {
+				if output.ForceQuitOnDiff {
+					forceQuit = true
+				}
 				comment += conf.FailComment
 				comment += fmt.Sprintf("Difference found in `%s`.\n",
 					output.FileName)
