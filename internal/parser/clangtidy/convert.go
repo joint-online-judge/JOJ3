@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Level int
@@ -68,6 +69,9 @@ func levelFromString(levelString string) Level {
 }
 
 func isIgnored(line string) bool {
+	if strings.TrimSpace(line) == "" {
+		return true
+	}
 	ignoreRegex := regexp.MustCompile("^error:.*$")
 	return ignoreRegex.MatchString(line)
 }

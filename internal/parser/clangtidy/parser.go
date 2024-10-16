@@ -24,11 +24,6 @@ type ClangTidy struct{}
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files["stdout"]
 	stderr := executorResult.Files["stderr"]
-
-	lines := strings.SplitAfter(stdout, "\n")
-	messages := ParseLines(lines, conf)
-	formattedMessages := Format(messages)
-
 	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
 		if !((executorResult.Status == stage.Status(envexec.StatusNonzeroExitStatus)) &&
 			(executorResult.ExitStatus == 1)) {
@@ -41,6 +36,9 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 			}
 		}
 	}
+	lines := strings.SplitAfter(stdout, "\n")
+	messages := ParseLines(lines, conf)
+	formattedMessages := Format(messages)
 	score, comment := GetResult(formattedMessages, conf)
 	return stage.ParserResult{
 		Score:   score,
