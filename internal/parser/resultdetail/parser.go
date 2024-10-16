@@ -33,6 +33,9 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 			comment += fmt.Sprintf("Exit Status: `%d`\n", result.ExitStatus)
 		}
 		if conf.ShowError {
+			if result.Error == "" {
+				result.Error = "nil"
+			}
 			comment += fmt.Sprintf("Error: `%s`\n", result.Error)
 		}
 		if conf.ShowTime {
