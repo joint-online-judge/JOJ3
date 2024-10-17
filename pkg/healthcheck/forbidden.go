@@ -25,7 +25,10 @@ func getForbiddens(root string, fileList []string) ([]string, error) {
 			return err
 		}
 
-		if info.IsDir() && info.Name() == ".git" {
+		if info.IsDir() && (info.Name() == ".") {
+			return nil
+		}
+		if info.IsDir() && (info.Name() == ".git") {
 			return filepath.SkipDir
 		} else {
 			match := ignore.Relative(info.Name(), true)
