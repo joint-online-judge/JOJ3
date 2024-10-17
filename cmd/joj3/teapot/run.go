@@ -21,8 +21,7 @@ func Run(conf *conf.Conf) error {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	envFilePath := "/home/tt/.config/teapot/teapot.env"
-	// TODO: pass sha to joint-teapot
-	// sha := os.Getenv("GITHUB_SHA")
+	sha := os.Getenv("GITHUB_SHA")
 	actor := os.Getenv("GITHUB_ACTOR")
 	repository := os.Getenv("GITHUB_REPOSITORY")
 	runNumber := os.Getenv("GITHUB_RUN_NUMBER")
@@ -55,7 +54,7 @@ func Run(conf *conf.Conf) error {
 			err := execCommand("joint-teapot", []string{
 				"joj3-scoreboard", envFilePath, conf.Stage.OutputPath, actor,
 				conf.Teapot.GradingRepoName, repoName, runNumber,
-				conf.Teapot.ScoreboardPath, conf.Name,
+				conf.Teapot.ScoreboardPath, conf.Name, sha,
 			})
 			if err != nil {
 				scoreboardErr = err
@@ -65,7 +64,7 @@ func Run(conf *conf.Conf) error {
 			err := execCommand("joint-teapot", []string{
 				"joj3-failed-table", envFilePath, conf.Stage.OutputPath, actor,
 				conf.Teapot.GradingRepoName, repoName, runNumber,
-				conf.Teapot.FailedTablePath, conf.Name,
+				conf.Teapot.FailedTablePath, conf.Name, sha,
 			})
 			if err != nil {
 				failedTableErr = err
@@ -77,7 +76,7 @@ func Run(conf *conf.Conf) error {
 		if !conf.Teapot.SkipIssue {
 			err := execCommand("joint-teapot", []string{
 				"joj3-create-result-issue", envFilePath, conf.Stage.OutputPath,
-				repoName, runNumber, conf.Name, actor,
+				actor, repoName, runNumber, conf.Name, sha,
 			})
 			if err != nil {
 				issueErr = err
