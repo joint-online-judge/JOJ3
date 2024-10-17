@@ -1,42 +1,23 @@
 package healthcheck
 
 import (
-	"bufio"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
+
+	"github.com/denormal/go-gitignore"
 )
 
 // getForbiddens retrieves a list of forbidden files in the specified root directory.
 // It searches for files that do not match the specified regex patterns in the given file list.
-func getForbiddens(root string, fileList []string, localList string) ([]string, error) {
+func getForbiddens(root string, fileList []string) ([]string, error) {
 	var matches []string
 
-	var regexList []*regexp.Regexp
-	regexList, err := getRegex(fileList)
+	ignore, err := gitignore.NewFromFile("./.gitignore")
 	if err != nil {
 		return nil, err
-	}
-
-	var dirs []string
-
-	if localList != "" {
-		file, err := os.Open(localList)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to open file %s: %v\n", localList, err)
-		}
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			dirs = append(dirs, scanner.Text())
-		}
-		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("Error reading file %s: %v\n", localList, err)
-		}
 	}
 
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -44,24 +25,16 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 			return err
 		}
 
-		if info.IsDir() {
-			if info.Name() == ".git" || (localList != "" && inString(info.Name(), dirs)) {
-				return filepath.SkipDir
-			}
+		if info.IsDir() && info.Name() == ".git" {
+			return filepath.SkipDir
 		} else {
-			match := false
-			for _, regex := range regexList {
-				if regex.MatchString(info.Name()) {
-					match = true
-					break
+			match := ignore.Relative(info.Name(), true)
+			if match != nil {
+				if match.Ignore() {
+					matches = append(matches, path)
 				}
 			}
-
-			if !match {
-				matches = append(matches, path)
-			}
 		}
-
 		return nil
 	})
 
@@ -70,8 +43,8 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 
 // forbiddenCheck checks for forbidden files in the specified root directory.
 // It prints the list of forbidden files found, along with instructions on how to fix them.
-func ForbiddenCheck(rootDir string, regexList []string, localList string) error {
-	forbids, err := getForbiddens(rootDir, regexList, localList)
+func ForbiddenCheck(rootDir string, regexList []string) error {
+	forbids, err := getForbiddens(rootDir, regexList)
 	if err != nil {
 		slog.Error("getting forbiddens", "error", err)
 		return fmt.Errorf("error getting forbiddens: %w", err)

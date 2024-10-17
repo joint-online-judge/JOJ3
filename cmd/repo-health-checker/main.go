@@ -59,7 +59,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.ForbiddenCheck(*rootDir, gitWhitelist, *localList)
+	err = healthcheck.ForbiddenCheck(*rootDir, gitWhitelist)
 	if err != nil {
 		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
