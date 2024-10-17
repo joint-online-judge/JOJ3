@@ -76,7 +76,7 @@ func Run(conf *conf.Conf) error {
 		if !conf.Teapot.SkipIssue {
 			err := execCommand("joint-teapot", []string{
 				"joj3-create-result-issue", envFilePath, conf.Stage.OutputPath,
-				actor, repoName, runNumber, conf.Name, sha,
+				repoName, runNumber, conf.Name, actor, sha,
 			})
 			if err != nil {
 				issueErr = err
