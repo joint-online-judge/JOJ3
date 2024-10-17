@@ -11,11 +11,12 @@ import (
 )
 
 // getForbiddens retrieves a list of forbidden files in the specified root directory.
-// It searches for files that do not match the specified regex patterns in the given file list.
-func getForbiddens(root string, fileList []string) ([]string, error) {
+// It searches for files that match the specified ignore patterns in the .gitignore file.
+func getForbiddens(root string) ([]string, error) {
 	var matches []string
 
-	ignore, err := gitignore.NewFromFile("./.gitignore")
+	// Create a gitignore instance from the .gitignore file
+	ignore, err := gitignore.NewFromFile(filepath.Join(root, ".gitignore"))
 	if err != nil {
 		return nil, err
 	}
@@ -25,29 +26,36 @@ func getForbiddens(root string, fileList []string) ([]string, error) {
 			return err
 		}
 
-		if info.IsDir() && (info.Name() == ".") {
-			return nil
-		}
-		if info.IsDir() && (info.Name() == ".git") {
-			return filepath.SkipDir
-		} else {
-			match := ignore.Relative(info.Name(), true)
-			if match != nil {
-				if match.Ignore() {
-					matches = append(matches, path)
-				}
+		if info.IsDir() {
+			if info.Name() == ".git" {
+				return filepath.SkipDir
+			} else if info.Name() == root {
+				return nil
 			}
 		}
+
+		// Get the relative path to the git repo root
+		relPath, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		match := ignore.Relative(relPath, true)
+
+		// Check if the relative file path should be ignored based on the .gitignore rules
+		if match != nil && match.Ignore() {
+			matches = append(matches, path)
+		}
+
 		return nil
 	})
 
 	return matches, err
 }
 
-// forbiddenCheck checks for forbidden files in the specified root directory.
+// ForbiddenCheck checks for forbidden files in the specified root directory.
 // It prints the list of forbidden files found, along with instructions on how to fix them.
-func ForbiddenCheck(rootDir string, regexList []string) error {
-	forbids, err := getForbiddens(rootDir, regexList)
+func ForbiddenCheck(rootDir string) error {
+	forbids, err := getForbiddens(rootDir)
 	if err != nil {
 		slog.Error("getting forbiddens", "error", err)
 		return fmt.Errorf("error getting forbiddens: %w", err)
