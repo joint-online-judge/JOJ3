@@ -55,6 +55,14 @@ func main() {
 		return
 	}
 	setupSlog()
+	slog.Info("start repo-health-checker", "version", Version)
+	slog.Debug("cli args",
+		"repoSize", size,
+		"localList", localList,
+		"checkFileNameList", checkFileNameList,
+		"checkFileSumList", checkFileSumList,
+		"meta", metaFile,
+	)
 	var err error
 	err = healthcheck.RepoSize(*size)
 	if err != nil {
