@@ -41,10 +41,6 @@ func Run(conf *conf.Conf) error {
 			slog.Error("stderr pipe", "error", err)
 			return err
 		}
-		if err := cmd.Start(); err != nil {
-			slog.Error("cmd start", "error", err)
-			return err
-		}
 		var wg sync.WaitGroup
 		wg.Add(1)
 		scanner := bufio.NewScanner(stderr)
@@ -62,6 +58,7 @@ func Run(conf *conf.Conf) error {
 			}
 		}()
 		if err = cmd.Start(); err != nil {
+			slog.Error("cmd start", "error", err)
 			return err
 		}
 		wg.Wait()
