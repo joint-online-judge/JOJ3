@@ -81,7 +81,7 @@ func outputResult(outputPath string, results []stage.StageResult) error {
 		append(content, []byte("\n")...), 0o600)
 }
 
-func Run(conf *conf.Conf, group string) error {
+func Run(conf *conf.Conf, group string) (forceQuit bool, err error) {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
@@ -89,17 +89,17 @@ func Run(conf *conf.Conf, group string) error {
 	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
-		return err
+		return
 	}
 	defer stage.Cleanup()
-	results, err := stage.Run(stages)
+	results, forceQuit, err := stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
-		return err
+		return
 	}
-	if err := outputResult(conf.Stage.OutputPath, results); err != nil {
+	if err = outputResult(conf.Stage.OutputPath, results); err != nil {
 		slog.Error("output result", "error", err)
-		return err
+		return
 	}
-	return nil
+	return
 }
