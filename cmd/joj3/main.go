@@ -48,20 +48,16 @@ func mainImpl() error {
 	confPath, group, err := conf.ParseMsg(confRoot, confName, msg, tag)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
-		validScopes, scopeErr := conf.ListValidScopes(
-			confRoot, confName)
-		if scopeErr != nil {
-			slog.Error("list valid scopes", "error", scopeErr)
-			return err
-		}
-		slog.Info("HINT: use valid scopes in commit message",
-			"valid scopes", validScopes)
+		conf.HintValidScopes(confRoot, confName)
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
 	confObj, err := conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
+		if _, statErr := os.Stat(confPath); os.IsNotExist(statErr) {
+			conf.HintValidScopes(confRoot, confName)
+		}
 		return err
 	}
 	slog.Debug("conf loaded", "conf", confObj)

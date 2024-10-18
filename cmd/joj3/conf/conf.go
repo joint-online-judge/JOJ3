@@ -228,10 +228,10 @@ func ParseMsg(confRoot, confName, msg, tag string) (confPath, group string, err 
 	return
 }
 
-func ListValidScopes(confRoot, confName string) ([]string, error) {
+func HintValidScopes(confRoot, confName string) {
 	confRoot = filepath.Clean(confRoot)
 	validScopes := []string{}
-	err := filepath.Walk(confRoot, func(
+	_ = filepath.Walk(confRoot, func(
 		path string, info os.FileInfo, err error,
 	) error {
 		if err != nil {
@@ -254,7 +254,8 @@ func ListValidScopes(confRoot, confName string) ([]string, error) {
 		}
 		return nil
 	})
-	return validScopes, err
+	slog.Info("HINT: use valid scopes in commit message",
+		"valid scopes", validScopes)
 }
 
 func CheckExpire(conf *Conf) error {
