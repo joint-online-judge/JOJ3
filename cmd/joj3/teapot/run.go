@@ -47,10 +47,10 @@ func Run(conf *conf.Conf) error {
 	}
 	var wg sync.WaitGroup
 	var scoreboardErr, failedTableErr, issueErr error
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		if !conf.Teapot.SkipScoreboard {
+	if !conf.Teapot.SkipScoreboard {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			err := execCommand("joint-teapot", []string{
 				"joj3-scoreboard", envFilePath, conf.Stage.OutputPath, actor,
 				conf.Teapot.GradingRepoName, repoName, runNumber,
@@ -59,8 +59,12 @@ func Run(conf *conf.Conf) error {
 			if err != nil {
 				scoreboardErr = err
 			}
-		}
-		if !conf.Teapot.SkipFailedTable {
+		}()
+	}
+	if !conf.Teapot.SkipFailedTable {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			err := execCommand("joint-teapot", []string{
 				"joj3-failed-table", envFilePath, conf.Stage.OutputPath, actor,
 				conf.Teapot.GradingRepoName, repoName, runNumber,
@@ -69,11 +73,12 @@ func Run(conf *conf.Conf) error {
 			if err != nil {
 				failedTableErr = err
 			}
-		}
-	}()
-	go func() {
-		defer wg.Done()
-		if !conf.Teapot.SkipIssue {
+		}()
+	}
+	if !conf.Teapot.SkipIssue {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			err := execCommand("joint-teapot", []string{
 				"joj3-create-result-issue", envFilePath, conf.Stage.OutputPath,
 				repoName, runNumber, conf.Name, actor, sha,
@@ -81,8 +86,8 @@ func Run(conf *conf.Conf) error {
 			if err != nil {
 				issueErr = err
 			}
-		}
-	}()
+		}()
+	}
 	wg.Wait()
 	if scoreboardErr != nil || failedTableErr != nil || issueErr != nil {
 		slog.Error("teapot exit", "scoreboardErr", scoreboardErr,
