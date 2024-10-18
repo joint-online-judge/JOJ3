@@ -1,42 +1,29 @@
 package healthcheck
 
 import (
-	"bufio"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
+
+	"github.com/denormal/go-gitignore"
 )
 
 // getForbiddens retrieves a list of forbidden files in the specified root directory.
-// It searches for files that do not match the specified regex patterns in the given file list.
-func getForbiddens(root string, fileList []string, localList string) ([]string, error) {
+// It searches for files that match the specified ignore patterns in the .gitignore file.
+func getForbiddens(root string) ([]string, error) {
 	var matches []string
 
-	var regexList []*regexp.Regexp
-	regexList, err := getRegex(fileList)
+	// Create a gitignore instance from the .gitignore file
+	ignore := gitignore.NewRepositoryWithCache(root, ".gitignore", gitignore.NewCache(), func(e gitignore.Error) bool {
+		return false
+	})
+
+	var err error
+
 	if err != nil {
 		return nil, err
-	}
-
-	var dirs []string
-
-	if localList != "" {
-		file, err := os.Open(localList)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to open file %s: %v\n", localList, err)
-		}
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			dirs = append(dirs, scanner.Text())
-		}
-		if err := scanner.Err(); err != nil {
-			return nil, fmt.Errorf("Error reading file %s: %v\n", localList, err)
-		}
 	}
 
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -45,21 +32,23 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 		}
 
 		if info.IsDir() {
-			if info.Name() == ".git" || info.Name() == ".gitea" || info.Name() == "ci" || (localList != "" && inString(info.Name(), dirs)) {
+			if info.Name() == ".git" {
 				return filepath.SkipDir
+			} else if info.Name() == root {
+				return nil
 			}
-		} else {
-			match := false
-			for _, regex := range regexList {
-				if regex.MatchString(info.Name()) {
-					match = true
-					break
-				}
-			}
+		}
 
-			if !match {
-				matches = append(matches, path)
-			}
+		// Get the relative path to the git repo root
+		relPath, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		match := ignore.Relative(relPath, true)
+
+		// Check if the relative file path should be ignored based on the .gitignore rules
+		if match != nil && match.Ignore() {
+			matches = append(matches, path)
 		}
 
 		return nil
@@ -68,10 +57,10 @@ func getForbiddens(root string, fileList []string, localList string) ([]string, 
 	return matches, err
 }
 
-// forbiddenCheck checks for forbidden files in the specified root directory.
+// ForbiddenCheck checks for forbidden files in the specified root directory.
 // It prints the list of forbidden files found, along with instructions on how to fix them.
-func ForbiddenCheck(rootDir string, regexList []string, localList string) error {
-	forbids, err := getForbiddens(rootDir, regexList, localList)
+func ForbiddenCheck(rootDir string) error {
+	forbids, err := getForbiddens(rootDir)
 	if err != nil {
 		slog.Error("getting forbiddens", "error", err)
 		return fmt.Errorf("error getting forbiddens: %w", err)
