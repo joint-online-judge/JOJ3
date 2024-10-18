@@ -32,14 +32,14 @@ func getForbiddens(root string) ([]string, error) {
 				return nil
 			}
 		}
-		// TODO: remove this temporary fix for stdout and stderr
-		if path == root && (info.Name() == "stdout" || info.Name() == "stderr") {
-			return nil
-		}
 		// Get the relative path to the git repo root
 		relPath, err := filepath.Rel(root, path)
 		if err != nil {
 			return err
+		}
+		// TODO: remove this temporary fix for stdout and stderr
+		if relPath == "stdout" || relPath == "stderr" {
+			return nil
 		}
 		match := ignore.Relative(relPath, true)
 
