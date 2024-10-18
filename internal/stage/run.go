@@ -5,11 +5,10 @@ import (
 	"log/slog"
 )
 
-func Run(stages []Stage) (stageResults []StageResult, err error) {
+func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error) {
 	var executorResults []ExecutorResult
 	var parserResults []ParserResult
 	var tmpParserResults []ParserResult
-	var forceQuit bool
 	slog.Info("stage run start")
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
@@ -32,7 +31,7 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 			slog.Debug("executor run done", "result.Files", executorResult.Files)
 		}
 		parserResults = []ParserResult{}
-		stageForceQuit := false
+		forceQuit = false
 		for _, stageParser := range stage.Parsers {
 			slog.Info("parser run start", "name", stageParser.Name)
 			slog.Debug("parser run start", "name", stageParser.Name,
@@ -43,13 +42,17 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 				err = fmt.Errorf("parser not found: %s", stageParser.Name)
 				return
 			}
-			tmpParserResults, forceQuit, err = parser.Run(
+			var parserForceQuit bool
+			tmpParserResults, parserForceQuit, err = parser.Run(
 				executorResults, stageParser.Conf)
 			if err != nil {
 				slog.Error("parser run error", "name", stageParser.Name, "error", err)
 				return
 			}
-			stageForceQuit = stageForceQuit || forceQuit
+			if parserForceQuit {
+				slog.Error("parser force quit", "name", stageParser.Name)
+			}
+			forceQuit = forceQuit || parserForceQuit
 			slog.Debug("parser run done", "results", tmpParserResults)
 			if len(parserResults) == 0 {
 				parserResults = tmpParserResults
@@ -59,16 +62,13 @@ func Run(stages []Stage) (stageResults []StageResult, err error) {
 					parserResults[i].Comment += tmpParserResults[i].Comment
 				}
 			}
-			if forceQuit {
-				slog.Error("parser force quit", "name", stageParser.Name)
-			}
 		}
 		stageResults = append(stageResults, StageResult{
 			Name:      stage.Name,
 			Results:   parserResults,
-			ForceQuit: stageForceQuit,
+			ForceQuit: forceQuit,
 		})
-		if stageForceQuit {
+		if forceQuit {
 			break
 		}
 	}

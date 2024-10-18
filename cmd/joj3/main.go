@@ -69,13 +69,18 @@ func mainImpl() error {
 		slog.Error("conf check expire", "error", err)
 		return err
 	}
-	if err := stage.Run(confObj, group); err != nil {
+	stageForceQuit, err := stage.Run(confObj, group)
+	if err != nil {
 		slog.Error("stage run", "error", err)
 		return err
 	}
 	if err := teapot.Run(confObj); err != nil {
 		slog.Error("teapot run", "error", err)
 		return err
+	}
+	if stageForceQuit {
+		slog.Info("stage force quit")
+		return fmt.Errorf("stage force quit")
 	}
 	return nil
 }
