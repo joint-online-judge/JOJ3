@@ -20,13 +20,7 @@ func getForbiddens(root string) ([]string, error) {
 		return false
 	})
 
-	var err error
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -38,7 +32,10 @@ func getForbiddens(root string) ([]string, error) {
 				return nil
 			}
 		}
-
+		// TODO: remove this temporary fix for stdout and stderr
+		if path == root && (info.Name() == "stdout" || info.Name() == "stderr") {
+			return nil
+		}
 		// Get the relative path to the git repo root
 		relPath, err := filepath.Rel(root, path)
 		if err != nil {
