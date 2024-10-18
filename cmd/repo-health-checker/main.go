@@ -39,13 +39,15 @@ var Version string
 
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
-	var metaFile []string
+	// TODO: remove gitWhitelist, it is only for backward compatibility now
+	var gitWhitelist, metaFile []string
 	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", "", "")
 	size := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
 	localList := flag.String("localList", "", "")
 	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
 	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
+	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
 	parseMultiValueFlag(&metaFile, "meta", "")
 	flag.Parse()
 	if *showVersion {
