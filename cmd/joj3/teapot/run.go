@@ -1,6 +1,7 @@
 package teapot
 
 import (
+	"bufio"
 	"fmt"
 	"log/slog"
 	"os"
@@ -35,14 +36,35 @@ func Run(conf *conf.Conf) error {
 	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 	execCommand := func(name string, cmdArgs []string) error {
 		cmd := exec.Command(name, cmdArgs...) // #nosec G204
-		outputBytes, err := cmd.CombinedOutput()
-		output := re.ReplaceAllString(string(outputBytes), "")
-		for _, line := range strings.Split(output, "\n") {
-			if line == "" {
-				continue
-			}
-			slog.Info(fmt.Sprintf("%s %s", name, cmdArgs[0]), "output", line)
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			slog.Error("stderr pipe", "error", err)
+			return err
 		}
+		if err := cmd.Start(); err != nil {
+			slog.Error("cmd start", "error", err)
+			return err
+		}
+		var wg sync.WaitGroup
+		wg.Add(1)
+		scanner := bufio.NewScanner(stderr)
+		go func() {
+			for scanner.Scan() {
+				text := re.ReplaceAllString(scanner.Text(), "")
+				if text == "" {
+					continue
+				}
+				slog.Info(fmt.Sprintf("%s %s", name, cmdArgs[0]), "stderr", text)
+			}
+			wg.Done()
+			if scanner.Err() != nil {
+				slog.Error("stderr scanner", "error", scanner.Err())
+			}
+		}()
+		if err = cmd.Start(); err != nil {
+			return err
+		}
+		wg.Wait()
 		return err
 	}
 	var wg sync.WaitGroup
