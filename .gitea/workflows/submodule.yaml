@@ -30,5 +30,11 @@ jobs:
             - name: Commit update
               shell: bash
               run: |
-                  git diff-index --quiet HEAD || git commit -am "chore: update submodule references"
+                  git fetch --all
+                  git checkout master
+                  git reset --hard origin/master
+                  git status
+                  git add .
+                  git status
+                  git diff-index --quiet HEAD || git commit -m "chore: update submodule references"
                   git push
