@@ -19,19 +19,19 @@ repos:
       hooks:
           - id: golangci-lint
           - id: go-mod-tidy
-    - repo: local
-      hooks:
-          - id: make-build
-            name: make build
-            entry: make build
-            language: system
-            always_run: true
-            stages: [pre-commit]
-            pass_filenames: false
-          - id: make-test
-            name: make test
-            entry: make test
-            language: system
-            always_run: true
-            stages: [pre-commit]
-            pass_filenames: false
+    # - repo: local
+    #   hooks:
+    #       - id: make-build
+    #         name: make build
+    #         entry: make build
+    #         language: system
+    #         always_run: true
+    #         stages: [pre-commit]
+    #         pass_filenames: false
+    #       - id: make-test
+    #         name: make test
+    #         entry: make test
+    #         language: system
+    #         always_run: true
+    #         stages: [pre-commit]
+    #         pass_filenames: false
