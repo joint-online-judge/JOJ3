@@ -1,37 +1,36 @@
----
 repos:
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
-      hooks:
-          - id: check-yaml
-          - id: end-of-file-fixer
-          - id: trailing-whitespace
-    - repo: https://github.com/mrtazz/checkmake.git
-      rev: 0.2.2
-      hooks:
-          - id: checkmake
-    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-      rev: 0.2.3
-      hooks:
-          - id: yamlfmt
-    - repo: https://github.com/dnephin/pre-commit-golang
-      rev: v0.5.1
-      hooks:
-          - id: golangci-lint
-          - id: go-mod-tidy
-    # - repo: local
-    #   hooks:
-    #       - id: make-build
-    #         name: make build
-    #         entry: make build
-    #         language: system
-    #         always_run: true
-    #         stages: [pre-commit]
-    #         pass_filenames: false
-    #       - id: make-test
-    #         name: make test
-    #         entry: make test
-    #         language: system
-    #         always_run: true
-    #         stages: [pre-commit]
-    #         pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/mrtazz/checkmake.git
+    rev: 0.2.2
+    hooks:
+      - id: checkmake
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.13.0
+    hooks:
+      - id: yamlfmt
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: golangci-lint
+      - id: go-mod-tidy
+# - repo: local
+#   hooks:
+#       - id: make-build
+#         name: make build
+#         entry: make build
+#         language: system
+#         always_run: true
+#         stages: [pre-commit]
+#         pass_filenames: false
+#       - id: make-test
+#         name: make test
+#         entry: make test
+#         language: system
+#         always_run: true
+#         stages: [pre-commit]
+#         pass_filenames: false

@@ -1,49 +1,47 @@
----
 name: submodules sync
 on:
-    push:
-        branches:
-            - master
-
+  push:
+    branches:
+      - master
 jobs:
-    sync:
-        container:
-            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
-            volumes:
-                - /home/actions/.ssh:/root/.ssh
-        steps:
-            - name: Check out repository code
-              uses: https://gitea.com/BoYanZh/checkout@focs
-              with:
-                  fetch-depth: 0
-            - name: Set up Git
-              run: |
-                  git config --global user.name "gitea-actions[bot]"
-                  git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
-                  chown -R root:root /root/.ssh
-                  git remote set-url origin ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
-            - name: Check Git status
-              run: |
-                  echo git remote -v
-                  git remote -v
-                  echo ssh -T git@focs.ji.sjtu.edu.cn -p 2222
-                  ssh -T git@focs.ji.sjtu.edu.cn -p 2222
-                  echo git status
-                  git status
-            - name: Git Submodule Update
-              run: |
-                  git submodule init
-                  git submodule update --init --recursive
-                  git pull --recurse-submodules
-                  git submodule update --remote --recursive
-            - name: Commit update
-              shell: bash
-              run: |
-                  git fetch --all
-                  git checkout master
-                  git reset --hard origin/master
-                  git status
-                  git add .
-                  git status
-                  git diff-index --quiet HEAD || git commit -m "chore: update submodule references"
-                  git push
+  sync:
+    container:
+      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+      volumes:
+        - /home/actions/.ssh:/root/.ssh
+    steps:
+      - name: Check out repository code
+        uses: https://gitea.com/BoYanZh/checkout@focs
+        with:
+          fetch-depth: 0
+      - name: Set up Git
+        run: |
+          git config --global user.name "gitea-actions[bot]"
+          git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+          chown -R root:root /root/.ssh
+          git remote set-url origin ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
+      - name: Check Git status
+        run: |
+          echo git remote -v
+          git remote -v
+          echo ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+          ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+          echo git status
+          git status
+      - name: Git Submodule Update
+        run: |
+          git submodule init
+          git submodule update --init --recursive
+          git pull --recurse-submodules
+          git submodule update --remote --recursive
+      - name: Commit update
+        shell: bash
+        run: |
+          git fetch --all
+          git checkout master
+          git reset --hard origin/master
+          git status
+          git add .
+          git status
+          git diff-index --quiet HEAD || git commit -m "chore: update submodule references"
+          git push

@@ -1,13 +1,12 @@
----
 linters:
-    enable:
-        - gosec
-        - gocritic
-        - gofumpt
-        - gofmt
-        - goimports
+  enable:
+    - gosec
+    - gocritic
+    - gofumpt
+    - gofmt
+    - goimports
 issues:
-    exclude-rules:
-        - linters:
-              - gosec
-          text: G601   # false positive since go 1.22
+  exclude-rules:
+    - linters:
+        - gosec
+      text: G601 # false positive since go 1.22

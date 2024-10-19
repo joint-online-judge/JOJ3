@@ -1,61 +1,59 @@
----
 name: build
 on:
-    - push
-    - pull_request
-
+  - push
+  - pull_request
 jobs:
-    build:
-        container:
-            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:golang-ubuntu-latest
-            volumes:
-                - /home/actions/.ssh:/root/.ssh
-        steps:
-            - name: Check out repository code
-              uses: https://gitea.com/BoYanZh/checkout@focs
-            - name: Display Go version
-              run: go version
-            - name: Prepare
-              run: |
-                  go env -w GO111MODULE=on
-                  go env -w GOPROXY=https://goproxy.io,direct
-                  chown -R root:root /root/.ssh
-            # - name: Setup Joint-Teapot
-            #   run: |
-            #       pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
-            - name: Lint
-              run: make lint
-            - name: Build
-              run: make build
-            - name: Version
-              run: ./build/joj3 -version
-            - name: Test
-              run: |
-                  make prepare-test
-                  make ci-test
-    trigger-build-image:
-        container:
-            image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
-            volumes:
-                - /home/actions/.ssh:/root/.ssh
-        needs: build
-        if: github.ref == 'refs/heads/master'
-        steps:
-            - name: Set up Git
-              run: |
-                  git config --global user.name "gitea-actions[bot]"
-                  git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
-                  chown -R root:root /root/.ssh
-            - name: Clone, Commit and Push
-              shell: bash
-              run: |
-                  git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
-                  cd runner-images
-                  git submodule update --init --remote --force
-                  git add -A
-                  if echo "${{ github.event.head_commit.message }}" | grep -q "force build"; then
-                    git commit --allow-empty -m "chore: trigger force build gitea actions by JOJ3"
-                  else
-                    git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
-                  fi
-                  git push
+  build:
+    container:
+      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:golang-ubuntu-latest
+      volumes:
+        - /home/actions/.ssh:/root/.ssh
+    steps:
+      - name: Check out repository code
+        uses: https://gitea.com/BoYanZh/checkout@focs
+      - name: Display Go version
+        run: go version
+      - name: Prepare
+        run: |
+          go env -w GO111MODULE=on
+          go env -w GOPROXY=https://goproxy.io,direct
+          chown -R root:root /root/.ssh
+      # - name: Setup Joint-Teapot
+      #   run: |
+      #       pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
+      - name: Lint
+        run: make lint
+      - name: Build
+        run: make build
+      - name: Version
+        run: ./build/joj3 -version
+      - name: Test
+        run: |
+          make prepare-test
+          make ci-test
+  trigger-build-image:
+    container:
+      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+      volumes:
+        - /home/actions/.ssh:/root/.ssh
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Set up Git
+        run: |
+          git config --global user.name "gitea-actions[bot]"
+          git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+          chown -R root:root /root/.ssh
+      - name: Clone, Commit and Push
+        shell: bash
+        run: |
+          git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
+          cd runner-images
+          git submodule update --init --remote --force
+          git add -A
+          if echo "${{ github.event.head_commit.message }}" | grep -q "force build"; then
+            git commit --allow-empty -m "chore: trigger force build gitea actions by JOJ3"
+          else
+            git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+          fi
+          git push
