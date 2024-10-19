@@ -26,14 +26,6 @@ jobs:
           git config --global user.name "gitea-actions[bot]"
           git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
           git remote set-url origin ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
-      - name: Check Git status
-        run: |
-          echo git remote -v
-          git remote -v
-          echo ssh -T git@focs.ji.sjtu.edu.cn -p 2222
-          ssh -T git@focs.ji.sjtu.edu.cn -p 2222
-          echo git status
-          git status
       - name: Git Submodule Update
         run: |
           git submodule init
@@ -43,11 +35,6 @@ jobs:
       - name: Commit update
         shell: bash
         run: |
-          git fetch --all
-          git checkout master
-          git reset --hard origin/master
-          git status
           git add .
-          git status
           git diff-index --quiet HEAD || git commit -m "chore: update submodule references"
           git push
