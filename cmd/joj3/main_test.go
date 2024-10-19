@@ -105,6 +105,7 @@ func TestRun(t *testing.T) {
 			os.Args = []string{"./joj3"}
 			outputFile := "joj3_result.json"
 			defer os.Remove(outputFile)
+			runningTest = true
 			_ = mainImpl()
 			stageResults := readStageResults(t, outputFile)
 			regex := true

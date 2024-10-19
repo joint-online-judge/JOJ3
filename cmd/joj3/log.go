@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var runningTest bool
+
 type multiHandler struct {
 	handlers []slog.Handler
 }
@@ -60,9 +62,13 @@ func setupSlog(logPath string) error {
 		})
 		handlers = append(handlers, debugHandler)
 	}
+	stderrLogLevel := slog.LevelInfo
+	if runningTest {
+		stderrLogLevel = slog.LevelDebug
+	}
 	// Stderr handler for info logs and above
 	stderrHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: stderrLogLevel,
 	})
 	handlers = append(handlers, stderrHandler)
 	// Create a multi-handler
