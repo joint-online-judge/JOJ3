@@ -39,16 +39,17 @@ var Version string
 
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
-	// TODO: remove gitWhitelist, it is only for backward compatibility now
-	var gitWhitelist, metaFile []string
+	var metaFile []string
 	showVersion := flag.Bool("version", false, "print current version")
-	rootDir := flag.String("root", "", "")
-	size := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
-	localList := flag.String("localList", "", "")
-	checkFileNameList := flag.String("checkFileNameList", "", "Comma-separated list of files to check.")
-	checkFileSumList := flag.String("checkFileSumList", "", "Comma-separated list of expected checksums.")
-	parseMultiValueFlag(&gitWhitelist, "whitelist", "")
-	parseMultiValueFlag(&metaFile, "meta", "")
+	rootDir := flag.String("root", ".", "root dir for forbidden files check")
+	repoSize := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
+	localList := flag.String("localList", "", "local file list for non-ascii file check")
+	checkFileNameList := flag.String("checkFileNameList", "", "comma-separated list of files to check")
+	checkFileSumList := flag.String("checkFileSumList", "", "comma-separated list of expected checksums")
+	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
+	// TODO: remove gitWhitelist, it is only for backward compatibility now
+	var gitWhitelist []string
+	parseMultiValueFlag(&gitWhitelist, "whitelist", "[DEPRECATED] will be ignored")
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -57,14 +58,14 @@ func main() {
 	setupSlog()
 	slog.Info("start repo-health-checker", "version", Version)
 	slog.Debug("cli args",
-		"repoSize", size,
+		"repoSize", repoSize,
 		"localList", localList,
 		"checkFileNameList", checkFileNameList,
 		"checkFileSumList", checkFileSumList,
 		"meta", metaFile,
 	)
 	var err error
-	err = healthcheck.RepoSize(*size)
+	err = healthcheck.RepoSize(*repoSize)
 	if err != nil {
 		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
