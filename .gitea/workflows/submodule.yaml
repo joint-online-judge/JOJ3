@@ -21,6 +21,14 @@ jobs:
                   git config --global user.name "gitea-actions[bot]"
                   git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
                   chown -R root:root /root/.ssh
+            - name: Check Git status
+              run: |
+                  echo git remote -v
+                  git remote -v
+                  echo ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+                  ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+                  echo git status
+                  git status
             - name: Git Submodule Update
               run: |
                   git submodule init
