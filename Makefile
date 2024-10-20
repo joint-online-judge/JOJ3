@@ -1,7 +1,7 @@
 .PHONY: all build clean lint prepare-test test ci-test
 
-BUILD_DIR = ./build
-TMP_DIR = ./tmp
+BUILD_DIR := ./build
+TMP_DIR := ./tmp
 APPS := $(notdir $(wildcard ./cmd/*))
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 DATE := $(shell date +"%Y%m%d-%H%M%S")
