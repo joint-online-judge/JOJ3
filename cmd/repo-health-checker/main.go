@@ -43,6 +43,7 @@ func main() {
 	showVersion := flag.Bool("version", false, "print current version")
 	rootDir := flag.String("root", ".", "root dir for forbidden files check")
 	repoSize := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
+	// TODO: remove localList, it is only for backward compatibility now
 	localList := flag.String("localList", "", "local file list for non-ascii file check")
 	checkFileNameList := flag.String("checkFileNameList", "", "comma-separated list of files to check")
 	checkFileSumList := flag.String("checkFileSumList", "", "comma-separated list of expected checksums")
@@ -77,7 +78,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.NonAsciiFiles(*rootDir, *localList)
+	err = healthcheck.NonAsciiFiles(*rootDir)
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
 	}

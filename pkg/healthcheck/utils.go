@@ -5,15 +5,6 @@ import (
 	"regexp"
 )
 
-func inString(str1 string, strList []string) bool {
-	for _, str := range strList {
-		if str1 == str {
-			return true
-		}
-	}
-	return false
-}
-
 // addExt appends the specified extension to each file name in the given fileList.
 // It modifies the original fileList in place.
 func addExt(fileList []string, ext string) {
