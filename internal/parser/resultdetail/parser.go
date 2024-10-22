@@ -7,13 +7,14 @@ import (
 )
 
 type Conf struct {
-	Score          int
-	ShowExitStatus bool `default:"false"`
-	ShowError      bool `default:"false"`
-	ShowTime       bool `default:"true"`
-	ShowMemory     bool `default:"true"`
-	ShowRunTime    bool `default:"false"`
-	ShowFiles      []string
+	Score              int
+	ShowExecutorStatus bool `default:"true"`
+	ShowExitStatus     bool `default:"false"`
+	ShowError          bool `default:"false"`
+	ShowTime           bool `default:"true"`
+	ShowMemory         bool `default:"true"`
+	ShowRunTime        bool `default:"false"`
+	ShowFiles          []string
 }
 
 type ResultDetail struct{}
@@ -29,6 +30,9 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	for _, result := range results {
 		comment := ""
+		if conf.ShowExecutorStatus {
+			comment += fmt.Sprintf("Executor Status: `%s`\n", result.Status.String())
+		}
 		if conf.ShowExitStatus {
 			comment += fmt.Sprintf("Exit Status: `%d`\n", result.ExitStatus)
 		}
