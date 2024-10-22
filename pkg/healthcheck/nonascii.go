@@ -56,7 +56,7 @@ func getNonAscii(root string) ([]string, error) {
 				return err
 			}
 			ret, matched := matcher.Match(strings.Split(relPath, "/"), nil)
-			if matched && ret["text"].IsUnset() {
+			if matched && ret["text"].IsUnset() && !ret["text"].IsSet() {
 				return nil
 			}
 		}
