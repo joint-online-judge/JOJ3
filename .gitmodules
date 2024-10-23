@@ -66,10 +66,6 @@
 	path = examples/healthcheck/repoverify
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = healthcheck/repoverify
-[submodule "examples/cppcheck/sillycode"]
-	path = examples/cppcheck/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
-	branch = cppcheck/sillycode
 [submodule "examples/keyword/script"]
 	path = examples/keyword/script
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git

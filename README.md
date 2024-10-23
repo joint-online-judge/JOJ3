@@ -52,7 +52,6 @@ For now, the following checking tools are needed for test:
 3. `cmake`
 4. `make`
 5. `cpplint`
-6. `cppcheck`
 
 ```bash
 $ make test
