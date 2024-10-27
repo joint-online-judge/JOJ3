@@ -64,53 +64,26 @@ func Run(conf *conf.Conf) error {
 		wg.Wait()
 		return err
 	}
-	var wg sync.WaitGroup
-	var scoreboardErr, failedTableErr, issueErr error
-	if !conf.Teapot.SkipScoreboard {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			err := execCommand("joint-teapot", []string{
-				"joj3-scoreboard", envFilePath, conf.Stage.OutputPath, actor,
-				conf.Teapot.GradingRepoName, repoName, runNumber,
-				conf.Teapot.ScoreboardPath, conf.Name, sha,
-			})
-			if err != nil {
-				scoreboardErr = err
-			}
-		}()
+	skipIssueArg := "--no-skip-result-issue"
+	if conf.Teapot.SkipIssue {
+		skipIssueArg = "--skip-result-issue"
 	}
-	if !conf.Teapot.SkipFailedTable {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			err := execCommand("joint-teapot", []string{
-				"joj3-failed-table", envFilePath, conf.Stage.OutputPath, actor,
-				conf.Teapot.GradingRepoName, repoName, runNumber,
-				conf.Teapot.FailedTablePath, conf.Name, sha,
-			})
-			if err != nil {
-				failedTableErr = err
-			}
-		}()
+	skipScoreboardArg := "--no-skip-scoreboard"
+	if conf.Teapot.SkipScoreboard {
+		skipScoreboardArg = "--skip-scoreboard"
 	}
-	if !conf.Teapot.SkipIssue {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			err := execCommand("joint-teapot", []string{
-				"joj3-create-result-issue", envFilePath, conf.Stage.OutputPath,
-				repoName, runNumber, conf.Name, actor, sha,
-			})
-			if err != nil {
-				issueErr = err
-			}
-		}()
+	skipFailedTableArg := "--no-skip-failed-table"
+	if conf.Teapot.SkipFailedTable {
+		skipFailedTableArg = "--skip-failed-table"
 	}
-	wg.Wait()
-	if scoreboardErr != nil || failedTableErr != nil || issueErr != nil {
-		slog.Error("teapot exit", "scoreboardErr", scoreboardErr,
-			"failedTableErr", failedTableErr, "issueErr", issueErr)
+	if err := execCommand("joint-teapot", []string{
+		"joj3-all", envFilePath, conf.Stage.OutputPath, actor,
+		conf.Teapot.GradingRepoName, repoName, runNumber,
+		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
+		conf.Name, sha, skipIssueArg, skipScoreboardArg,
+		skipFailedTableArg,
+	}); err != nil {
+		slog.Error("teapot exit", "error", err)
 		return fmt.Errorf("teapot exit")
 	}
 	return nil
