@@ -42,6 +42,7 @@ type Conf struct {
 	}
 	Teapot struct {
 		LogPath         string `default:"/home/tt/.cache/joint-teapot-debug.log"`
+		EnvFilePath     string `default:"/home/tt/.config/teapot/teapot.env"`
 		ScoreboardPath  string `default:"scoreboard.csv"`
 		FailedTablePath string `default:"failed-table.md"`
 		GradingRepoName string `default:""`

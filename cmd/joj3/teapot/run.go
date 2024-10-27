@@ -21,7 +21,6 @@ func Run(conf *conf.Conf) error {
 	}
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
-	envFilePath := "/home/tt/.config/teapot/teapot.env"
 	sha := os.Getenv("GITHUB_SHA")
 	actor := os.Getenv("GITHUB_ACTOR")
 	repository := os.Getenv("GITHUB_REPOSITORY")
@@ -77,7 +76,7 @@ func Run(conf *conf.Conf) error {
 		skipFailedTableArg = "--skip-failed-table"
 	}
 	if err := execCommand("joint-teapot", []string{
-		"joj3-all", envFilePath, conf.Stage.OutputPath, actor,
+		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
 		conf.Name, sha, skipIssueArg, skipScoreboardArg,
