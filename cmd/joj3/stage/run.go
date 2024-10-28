@@ -1,9 +1,7 @@
 package stage
 
 import (
-	"encoding/json"
 	"log/slog"
-	"os"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	executors "github.com/joint-online-judge/JOJ3/internal/executor"
@@ -70,18 +68,19 @@ func generateStages(conf *conf.Conf, group string) ([]stage.Stage, error) {
 	return stages, nil
 }
 
-func outputResult(outputPath string, results []stage.StageResult) error {
-	slog.Info("output result start", "path", outputPath)
-	slog.Debug("output result start", "path", outputPath, "results", results)
-	content, err := json.Marshal(results)
-	if err != nil {
-		return err
+func Run(conf *conf.Conf, group string) (
+	stageResults []stage.StageResult, forceQuit bool, err error,
+) {
+	stageResultsOnError := []stage.StageResult{
+		{
+			Name: "Internal Error",
+			Results: []stage.ParserResult{{
+				Score:   0,
+				Comment: "JOJ3 internal error, check the log in Gitea Actions.",
+			}},
+			ForceQuit: true,
+		},
 	}
-	return os.WriteFile(outputPath,
-		append(content, []byte("\n")...), 0o600)
-}
-
-func Run(conf *conf.Conf, group string) (forceQuit bool, err error) {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
@@ -89,16 +88,16 @@ func Run(conf *conf.Conf, group string) (forceQuit bool, err error) {
 	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
+		stageResults = stageResultsOnError
+		forceQuit = true
 		return
 	}
 	defer stage.Cleanup()
-	results, forceQuit, err := stage.Run(stages)
+	stageResults, forceQuit, err = stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
-		return
-	}
-	if err = outputResult(conf.Stage.OutputPath, results); err != nil {
-		slog.Error("output result", "error", err)
+		stageResults = stageResultsOnError
+		forceQuit = true
 		return
 	}
 	return
