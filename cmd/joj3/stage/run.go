@@ -1,6 +1,7 @@
 package stage
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
@@ -68,19 +69,24 @@ func generateStages(conf *conf.Conf, group string) ([]stage.Stage, error) {
 	return stages, nil
 }
 
-func Run(conf *conf.Conf, group string) (
-	stageResults []stage.StageResult, forceQuit bool, err error,
-) {
-	stageResultsOnError := []stage.StageResult{
+func newErrorStageResults(err error) []stage.StageResult {
+	return []stage.StageResult{
 		{
 			Name: "Internal Error",
 			Results: []stage.ParserResult{{
-				Score:   0,
-				Comment: "JOJ3 internal error, check the log in Gitea Actions.",
+				Score: 0,
+				Comment: "JOJ3 internal error, " +
+					"check the log in Gitea Actions.\n" +
+					fmt.Sprintf("Error: `%s`", err),
 			}},
 			ForceQuit: true,
 		},
 	}
+}
+
+func Run(conf *conf.Conf, group string) (
+	stageResults []stage.StageResult, forceQuit bool, err error,
+) {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
@@ -88,7 +94,7 @@ func Run(conf *conf.Conf, group string) (
 	stages, err := generateStages(conf, group)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
-		stageResults = stageResultsOnError
+		stageResults = newErrorStageResults(err)
 		forceQuit = true
 		return
 	}
@@ -96,7 +102,7 @@ func Run(conf *conf.Conf, group string) (
 	stageResults, forceQuit, err = stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
-		stageResults = stageResultsOnError
+		stageResults = newErrorStageResults(err)
 		forceQuit = true
 		return
 	}
