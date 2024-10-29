@@ -52,12 +52,22 @@ func mainImpl() error {
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
+	confStat, err := os.Stat(confPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			conf.HintValidScopes(confRoot, confName)
+		}
+		slog.Error("stat conf", "error", err)
+		return err
+	}
+	sha256, err := conf.GetSHA256(confPath)
+	if err != nil {
+		slog.Error("get sha256", "error", err)
+		return err
+	}
 	confObj, err := conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
-		if _, statErr := os.Stat(confPath); os.IsNotExist(statErr) {
-			conf.HintValidScopes(confRoot, confName)
-		}
 		return err
 	}
 	slog.Debug("conf loaded", "conf", confObj)
@@ -65,6 +75,8 @@ func mainImpl() error {
 		slog.Error("setup slog", "error", err)
 		return err
 	}
+	slog.Info("conf info", "sha256", sha256, "modTime", confStat.ModTime(),
+		"size", confStat.Size())
 	if err := conf.CheckExpire(confObj); err != nil {
 		slog.Error("conf check expire", "error", err)
 		return err

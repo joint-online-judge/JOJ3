@@ -1,7 +1,10 @@
 package conf
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -193,6 +196,23 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 		}
 	}
 	return
+}
+
+func GetSHA256(filePath string) (string, error) {
+	// Open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Calculate SHA-256
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
 func ParseMsg(confRoot, confName, msg, tag string) (confPath, group string, err error) {
