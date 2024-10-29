@@ -12,13 +12,15 @@ import (
 type Conf struct {
 	Score   int
 	Comment string
+	Stdout  string `default:"stdout"`
+	Stderr  string `default:"stderr"`
 }
 
 type Sample struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
-	stdout := executorResult.Files["stdout"]
-	stderr := executorResult.Files["stderr"]
+	stdout := executorResult.Files[conf.Stdout]
+	stderr := executorResult.Files[conf.Stderr]
 	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
 		return stage.ParserResult{
 			Score: 0,

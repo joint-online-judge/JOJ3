@@ -17,13 +17,15 @@ type Conf struct {
 	Score   int    `default:"100"`
 	RootDir string `default:"/w"`
 	Matches []Match
+	Stdout  string `default:"stdout"`
+	Stderr  string `default:"stderr"`
 }
 
 type ClangTidy struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
-	stdout := executorResult.Files["stdout"]
-	stderr := executorResult.Files["stderr"]
+	stdout := executorResult.Files[conf.Stdout]
+	stderr := executorResult.Files[conf.Stderr]
 	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
 		if !((executorResult.Status == stage.Status(envexec.StatusNonzeroExitStatus)) &&
 			(executorResult.ExitStatus == 1)) {
