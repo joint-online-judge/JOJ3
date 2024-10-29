@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -215,7 +216,9 @@ func GetSHA256(filePath string) (string, error) {
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
-func ParseMsg(confRoot, confName, msg, tag string) (confPath, group string, err error) {
+func parseMsg(confRoot, confName, msg, tag string) (
+	confPath, group string, err error,
+) {
 	slog.Info("parse msg", "msg", msg)
 	conventionalCommit, err := parseConventionalCommit(msg)
 	if err != nil {
@@ -249,7 +252,7 @@ func ParseMsg(confRoot, confName, msg, tag string) (confPath, group string, err 
 	return
 }
 
-func HintValidScopes(confRoot, confName string) {
+func hintValidScopes(confRoot, confName string) {
 	confRoot = filepath.Clean(confRoot)
 	validScopes := []string{}
 	_ = filepath.Walk(confRoot, func(
@@ -277,6 +280,32 @@ func HintValidScopes(confRoot, confName string) {
 	})
 	slog.Info("HINT: use valid scopes in commit message",
 		"valid scopes", validScopes)
+}
+
+func GetConfPath(confRoot, confName, msg, tag string) (
+	confPath, group string, confStat fs.FileInfo, err error,
+) {
+	confPath, group, err = parseMsg(confRoot, confName, msg, tag)
+	if err != nil {
+		slog.Error("parse msg", "error", err)
+		// fallback to conf file in conf root on parse error
+		confPath = filepath.Clean(fmt.Sprintf("%s/%s", confRoot, confName))
+	}
+	confStat, err = os.Stat(confPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			hintValidScopes(confRoot, confName)
+		}
+		slog.Error("stat conf", "error", err)
+		// fallback to conf file in conf root on conf not exist
+		confPath = filepath.Clean(fmt.Sprintf("%s/%s", confRoot, confName))
+		confStat, err = os.Stat(confPath)
+		if err != nil {
+			slog.Error("stat fallback conf", "error", err)
+			return
+		}
+	}
+	return
 }
 
 func CheckExpire(conf *Conf) error {

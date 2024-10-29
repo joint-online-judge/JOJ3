@@ -45,26 +45,13 @@ func mainImpl() error {
 		slog.Error("get commit msg", "error", err)
 		return err
 	}
-	confPath, group, err := conf.ParseMsg(confRoot, confName, msg, tag)
+	confPath, group, confStat, err := conf.GetConfPath(
+		confRoot, confName, msg, tag)
 	if err != nil {
-		slog.Error("parse msg", "error", err)
-		conf.HintValidScopes(confRoot, confName)
+		slog.Error("get conf path", "error", err)
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	confStat, err := os.Stat(confPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			conf.HintValidScopes(confRoot, confName)
-		}
-		slog.Error("stat conf", "error", err)
-		return err
-	}
-	sha256, err := conf.GetSHA256(confPath)
-	if err != nil {
-		slog.Error("get sha256", "error", err)
-		return err
-	}
 	confObj, err := conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
@@ -73,6 +60,11 @@ func mainImpl() error {
 	slog.Debug("conf loaded", "conf", confObj)
 	if err := setupSlog(confObj.LogPath); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)
+		return err
+	}
+	sha256, err := conf.GetSHA256(confPath)
+	if err != nil {
+		slog.Error("get sha256", "error", err)
 		return err
 	}
 	slog.Info("conf info", "sha256", sha256, "modTime", confStat.ModTime(),
