@@ -282,14 +282,16 @@ func hintValidScopes(confRoot, confName string) {
 		"valid scopes", validScopes)
 }
 
-func GetConfPath(confRoot, confName, msg, tag string) (
+func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 	confPath, group string, confStat fs.FileInfo, err error,
 ) {
 	confPath, group, err = parseMsg(confRoot, confName, msg, tag)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		// fallback to conf file in conf root on parse error
-		confPath = filepath.Clean(fmt.Sprintf("%s/%s", confRoot, confName))
+		confPath = filepath.Clean(
+			fmt.Sprintf("%s/%s", confRoot, fallbackConfName))
+		slog.Info("fallback to conf", "path", confPath)
 	}
 	confStat, err = os.Stat(confPath)
 	if err != nil {
@@ -298,7 +300,9 @@ func GetConfPath(confRoot, confName, msg, tag string) (
 		}
 		slog.Error("stat conf", "error", err)
 		// fallback to conf file in conf root on conf not exist
-		confPath = filepath.Clean(fmt.Sprintf("%s/%s", confRoot, confName))
+		confPath = filepath.Clean(
+			fmt.Sprintf("%s/%s", confRoot, fallbackConfName))
+		slog.Info("fallback to conf", "path", confPath)
 		confStat, err = os.Stat(confPath)
 		if err != nil {
 			slog.Error("stat fallback conf", "error", err)

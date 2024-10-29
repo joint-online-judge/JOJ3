@@ -12,17 +12,19 @@ import (
 )
 
 var (
-	confRoot    string
-	confName    string
-	tag         string
-	msg         string
-	showVersion *bool
-	Version     string = "debug"
+	confRoot         string
+	confName         string
+	fallbackConfName string
+	tag              string
+	msg              string
+	showVersion      *bool
+	Version          string = "debug"
 )
 
 func init() {
 	flag.StringVar(&confRoot, "conf-root", ".", "root path for all config files")
 	flag.StringVar(&confName, "conf-name", "conf.json", "filename for config files")
+	flag.StringVar(&fallbackConfName, "fallback-conf-name", "", "filename for the fallback config file in conf-root, leave empty to use conf-name")
 	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
 	// TODO: remove this flag
 	flag.StringVar(&msg, "msg", "", "[DEPRECATED] will be ignored")
@@ -39,6 +41,9 @@ func mainImpl() error {
 		fmt.Println(Version)
 		return nil
 	}
+	if fallbackConfName == "" {
+		fallbackConfName = confName
+	}
 	slog.Info("start joj3", "version", Version)
 	msg, err := conf.GetCommitMsg()
 	if err != nil {
@@ -46,7 +51,7 @@ func mainImpl() error {
 		return err
 	}
 	confPath, group, confStat, err := conf.GetConfPath(
-		confRoot, confName, msg, tag)
+		confRoot, confName, fallbackConfName, msg, tag)
 	if err != nil {
 		slog.Error("get conf path", "error", err)
 		return err
