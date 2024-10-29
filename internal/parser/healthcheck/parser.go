@@ -21,7 +21,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, 
 		return stage.ParserResult{
 			Score: 0,
 			Comment: fmt.Sprintf(
-				"Unexpected executor status: %s.\nStdout: %s\nStderr: %s",
+				"Unexpected executor status: %s.\n`stdout`: ```%s\n```\n`stderr`: ```%s\n```",
 				executorResult.Status, stdout, stderr,
 			),
 		}, true
