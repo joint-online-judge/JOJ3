@@ -226,8 +226,7 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	}
 	slog.Info("conventional commit", "commit", conventionalCommit)
 	confRoot = filepath.Clean(confRoot)
-	confPath = filepath.Clean(fmt.Sprintf("%s/%s/%s",
-		confRoot, conventionalCommit.Scope, confName))
+	confPath = filepath.Join(confRoot, conventionalCommit.Scope, confName)
 	relPath, err := filepath.Rel(confRoot, confPath)
 	if err != nil {
 		return
@@ -289,8 +288,7 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		// fallback to conf file in conf root on parse error
-		confPath = filepath.Clean(
-			fmt.Sprintf("%s/%s", confRoot, fallbackConfName))
+		confPath = filepath.Join(confRoot, fallbackConfName)
 		slog.Info("fallback to conf", "path", confPath)
 	}
 	confStat, err = os.Stat(confPath)
@@ -300,8 +298,7 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 		}
 		slog.Error("stat conf", "error", err)
 		// fallback to conf file in conf root on conf not exist
-		confPath = filepath.Clean(
-			fmt.Sprintf("%s/%s", confRoot, fallbackConfName))
+		confPath = filepath.Join(confRoot, fallbackConfName)
 		slog.Info("fallback to conf", "path", confPath)
 		confStat, err = os.Stat(confPath)
 		if err != nil {
