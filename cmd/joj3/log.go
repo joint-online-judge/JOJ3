@@ -2,14 +2,22 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
+	"time"
 )
 
 var runningTest bool
 
 type multiHandler struct {
 	handlers []slog.Handler
+}
+
+var runID string
+
+func init() {
+	runID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), os.Getpid())
 }
 
 func (h *multiHandler) Enabled(ctx context.Context, level slog.Level) bool {
@@ -69,7 +77,7 @@ func setupSlog(logPath string) error {
 	// Stderr handler for info logs and above
 	stderrHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: stderrLogLevel,
-	})
+	}).WithAttrs([]slog.Attr{slog.String("runID", runID)})
 	handlers = append(handlers, stderrHandler)
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
