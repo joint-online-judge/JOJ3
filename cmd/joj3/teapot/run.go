@@ -14,11 +14,6 @@ import (
 )
 
 func Run(conf *conf.Conf) error {
-	actions := os.Getenv("GITHUB_ACTIONS")
-	if actions != "true" {
-		slog.Info("teapot exit", "GITHUB_ACTIONS", actions)
-		return nil
-	}
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	sha := os.Getenv("GITHUB_SHA")
