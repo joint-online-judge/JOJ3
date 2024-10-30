@@ -13,7 +13,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 )
 
-func Run(conf *conf.Conf) error {
+func Run(conf *conf.Conf, runID string) error {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	sha := os.Getenv("GITHUB_SHA")
@@ -78,7 +78,7 @@ func Run(conf *conf.Conf) error {
 		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
-		conf.Name, sha, skipIssueArg, skipScoreboardArg,
+		conf.Name, sha, runID, skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
 	}); err != nil {
 		slog.Error("teapot exit", "error", err)

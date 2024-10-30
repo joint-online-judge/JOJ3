@@ -87,7 +87,7 @@ func mainImpl() error {
 		slog.Error("stage write", "error", err)
 		return err
 	}
-	if err := teapot.Run(confObj); err != nil {
+	if err := teapot.Run(confObj, runID); err != nil {
 		slog.Error("teapot run", "error", err)
 		return err
 	}
