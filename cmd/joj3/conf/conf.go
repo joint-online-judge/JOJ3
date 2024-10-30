@@ -35,9 +35,10 @@ type ConfStage struct {
 }
 
 type Conf struct {
-	Name                string `default:"unknown"`
-	LogPath             string `default:""`
-	ExpireUnixTimestamp int64  `default:"-1"`
+	Name                string   `default:"unknown"`
+	LogPath             string   `default:""`
+	ExpireUnixTimestamp int64    `default:"-1"`
+	GroupKeywords       []string `default:"joj"`
 	Stage               struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
@@ -217,10 +218,10 @@ func GetSHA256(filePath string) (string, error) {
 }
 
 func parseMsg(confRoot, confName, msg, tag string) (
-	confPath, group string, err error,
+	confPath string, conventionalCommit *ConventionalCommit, err error,
 ) {
 	slog.Info("parse msg", "msg", msg)
-	conventionalCommit, err := parseConventionalCommit(msg)
+	conventionalCommit, err = parseConventionalCommit(msg)
 	if err != nil {
 		return
 	}
@@ -239,14 +240,6 @@ func parseMsg(confRoot, confName, msg, tag string) (
 		err = fmt.Errorf("tag does not match scope: %s != %s", tag,
 			conventionalCommit.Scope)
 		return
-	}
-	groupKeywords := []string{"joj"}
-	for _, groupKeyword := range groupKeywords {
-		if strings.Contains(
-			strings.ToLower(conventionalCommit.Description), groupKeyword) {
-			group = groupKeyword
-			break
-		}
 	}
 	return
 }
@@ -282,9 +275,10 @@ func hintValidScopes(confRoot, confName string) {
 }
 
 func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
-	confPath, group string, confStat fs.FileInfo, err error,
+	confPath string, confStat fs.FileInfo,
+	conventionalCommit *ConventionalCommit, err error,
 ) {
-	confPath, group, err = parseMsg(confRoot, confName, msg, tag)
+	confPath, conventionalCommit, err = parseMsg(confRoot, confName, msg, tag)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
 		// fallback to conf file in conf root on parse error
@@ -315,4 +309,17 @@ func CheckExpire(conf *Conf) error {
 		return fmt.Errorf("config file expired: %d", conf.ExpireUnixTimestamp)
 	}
 	return nil
+}
+
+func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
+	keywords := conf.GroupKeywords
+	groups := []string{}
+	loweredDescription := strings.ToLower(conventionalCommit.Description)
+	for _, keyword := range keywords {
+		loweredKeyword := strings.ToLower(keyword)
+		if strings.Contains(loweredDescription, loweredKeyword) {
+			groups = append(groups, loweredKeyword)
+		}
+	}
+	return groups
 }

@@ -3,6 +3,7 @@ package stage
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	executors "github.com/joint-online-judge/JOJ3/internal/executor"
@@ -12,12 +13,22 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-func generateStages(conf *conf.Conf, group string) ([]stage.Stage, error) {
+func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
 	for _, s := range conf.Stage.Stages {
-		if s.Group != "" && group != s.Group {
-			continue
+		if s.Group != "" {
+			var ok bool
+			loweredStageGroup := strings.ToLower(s.Group)
+			for _, group := range groups {
+				if group == loweredStageGroup {
+					ok = true
+					break
+				}
+			}
+			if !ok {
+				continue
+			}
 		}
 		_, ok := existNames[s.Name] // check for existence
 		if ok {
@@ -84,14 +95,14 @@ func newErrorStageResults(err error) []stage.StageResult {
 	}
 }
 
-func Run(conf *conf.Conf, group string) (
+func Run(conf *conf.Conf, groups []string) (
 	stageResults []stage.StageResult, forceQuit bool, err error,
 ) {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
 	)
-	stages, err := generateStages(conf, group)
+	stages, err := generateStages(conf, groups)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		stageResults = newErrorStageResults(err)

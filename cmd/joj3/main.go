@@ -50,7 +50,7 @@ func mainImpl() error {
 		slog.Error("get commit msg", "error", err)
 		return err
 	}
-	confPath, group, confStat, err := conf.GetConfPath(
+	confPath, confStat, conventionalCommit, err := conf.GetConfPath(
 		confRoot, confName, fallbackConfName, msg, tag)
 	if err != nil {
 		slog.Error("get conf path", "error", err)
@@ -78,7 +78,8 @@ func mainImpl() error {
 		slog.Error("conf check expire", "error", err)
 		return err
 	}
-	stageResults, stageForceQuit, err := stage.Run(confObj, group)
+	groups := conf.MatchGroups(confObj, conventionalCommit)
+	stageResults, stageForceQuit, err := stage.Run(confObj, groups)
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
