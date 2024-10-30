@@ -23,8 +23,8 @@ jobs:
           ssh -T git@focs.ji.sjtu.edu.cn -p 2222
       - name: Set up Git
         run: |
-          git config --global user.name "gitea-actions[bot]"
-          git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+          git config --global user.name "bot-joj"
+          git config --global user.email "bot-joj@focs.ji.sjtu.edu.cn"
           git remote set-url origin ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
       - name: Git Submodule Update
         run: |

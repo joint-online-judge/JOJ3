@@ -52,8 +52,8 @@ jobs:
           ssh -T git@focs.ji.sjtu.edu.cn -p 2222
       - name: Set up Git
         run: |
-          git config --global user.name "gitea-actions[bot]"
-          git config --global user.email "gitea-actions[bot]@users.noreply.gitea.com"
+          git config --global user.name "bot-joj"
+          git config --global user.email "bot-joj@focs.ji.sjtu.edu.cn"
       - name: Clone, Commit and Push
         shell: bash
         run: |
