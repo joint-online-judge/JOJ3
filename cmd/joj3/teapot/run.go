@@ -70,12 +70,16 @@ func Run(conf *conf.Conf) error {
 	if conf.Teapot.SkipFailedTable {
 		skipFailedTableArg = "--skip-failed-table"
 	}
+	submitterInIssueTitleArg := "--no-submitter-in-issue-title"
+	if conf.Teapot.SubmitterInIssueTitle {
+		submitterInIssueTitleArg = "--submitter-in-issue-title"
+	}
 	if err := execCommand("joint-teapot", []string{
 		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
 		conf.Name, sha, skipIssueArg, skipScoreboardArg,
-		skipFailedTableArg,
+		skipFailedTableArg, submitterInIssueTitleArg,
 	}); err != nil {
 		slog.Error("teapot exit", "error", err)
 		return fmt.Errorf("teapot exit")
