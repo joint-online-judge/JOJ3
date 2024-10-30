@@ -29,16 +29,15 @@ func getChecksum(filePath string) (string, error) {
 }
 
 // checkFileChecksum checks if a single file's checksum matches the expected value
-func checkFileChecksum(rootDir, fileName, expectedChecksum string) error {
-	filePath := filepath.Join(rootDir, strings.TrimSpace(fileName))
+func checkFileChecksum(filePath, expectedChecksum string) (bool, error) {
 	actualChecksum, err := getChecksum(filePath)
 	if err != nil {
-		return fmt.Errorf("Error reading file %s: %v", filePath, err)
+		return false, fmt.Errorf("Error reading file %s: %v", filePath, err)
 	}
 	if actualChecksum != expectedChecksum {
-		return fmt.Errorf("Checksum for %s failed. Expected %s, but got %s. Please revert your changes or contact the teaching team if you have a valid reason for adjusting them.", filePath, expectedChecksum, actualChecksum)
+		return true, nil
 	}
-	return nil
+	return false, nil
 }
 
 func VerifyFiles(rootDir string, checkFileNameList string, checkFileSumList string) error {
@@ -52,12 +51,23 @@ func VerifyFiles(rootDir string, checkFileNameList string, checkFileSumList stri
 		return fmt.Errorf("Error: The number of files and checksums do not match.")
 	}
 	// Check each file's checksum
+	alteredFiles := []string{}
 	for i, fileName := range fileNames {
 		expectedChecksum := strings.TrimSpace(checkSums[i])
-		err := checkFileChecksum(rootDir, fileName, expectedChecksum)
+		filePath := filepath.Join(rootDir, strings.TrimSpace(fileName))
+		altered, err := checkFileChecksum(filePath, expectedChecksum)
 		if err != nil {
 			return err
 		}
+		if altered {
+			alteredFiles = append(alteredFiles, filePath)
+		}
+	}
+	if len(alteredFiles) > 0 {
+		return fmt.Errorf("The following files have been altered: `%s`.\n"+
+			"Please revert your changes or contact the teaching team "+
+			"if you have a valid reason for adjusting them.",
+			strings.Join(alteredFiles, "`, `"))
 	}
 	return nil
 }
