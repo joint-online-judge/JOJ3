@@ -62,8 +62,8 @@ jobs:
           git submodule update --init --remote --force
           git add -A
           if echo "${{ github.event.head_commit.message }}" | grep -q "force build"; then
-            git commit --allow-empty -m "chore: trigger force build gitea actions by JOJ3"
+            git commit --allow-empty -m "chore: ${{ github.repository }}@${{ github.sha }} trigger force build gitea actions"
           else
-            git commit --allow-empty -m "chore: trigger gitea actions by JOJ3"
+            git commit --allow-empty -m "chore: ${{ github.repository }}@${{ github.sha }} trigger build gitea actions"
           fi
           git push
