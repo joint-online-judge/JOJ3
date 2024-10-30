@@ -112,14 +112,16 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 	case i.Src != nil:
 		if !filepath.IsAbs(*i.Src) {
 			absPath, err := filepath.Abs(*i.Src)
-			if err == nil {
-				i.Src = &absPath
+			if err != nil {
+				slog.Error("convert pb file get abs path", "path", *i.Src, "error", err)
+				absPath = "/"
 			}
+			i.Src = &absPath
 		}
 		s, err := os.ReadFile(*i.Src)
 		if err != nil {
 			s = []byte{}
-			slog.Error("read file error", "path", *i.Src, "error", err)
+			slog.Error("convert pb file read file", "path", *i.Src, "error", err)
 		}
 		return &pb.Request_File{File: &pb.Request_File_Memory{Memory: &pb.Request_MemoryFile{Content: s}}}
 	case i.Content != nil:
