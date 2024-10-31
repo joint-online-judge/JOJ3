@@ -87,7 +87,7 @@ These steps are executed in runner-images. We use `sudo -u tt` to elevate the pe
         - We have `conf-root` and `conf-name` specified in the CLI argument. Then the full path of configuration file is `<conf-root>/<scope>/<conf-name>`.
     3. Generate stages.
         - We have an empty list of stages at the beginning.
-        - We check all the stages from the configuration file. Stages with empty `group` field will always be added. And stages with `group = joj` will be added when `description` contains "joj" (case insensitive). You can set arbitrary group keywords in config file, in `groupKeywords` field, but by default the only group keyword is joj.
+        - We check all the stages from the configuration file. Stages with empty `group` field will always be added. Stages with non-empty `group` field requires that value (case insensitive) appears in the commit description. e.g. with commit msg `feat(h5/e3): joj msan`, stages with the following `group` field will run: `""`, `"joj"`, `"msan"`.
         - Every stage needs to have an unique `name`, which means if two stages have the same name, only the first one will be added.
     4. Run stages.
         - By default, all the stages will run sequentially.
