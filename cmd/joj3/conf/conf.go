@@ -35,10 +35,9 @@ type ConfStage struct {
 }
 
 type Conf struct {
-	Name                string   `default:"unknown"`
-	LogPath             string   `default:""`
-	ExpireUnixTimestamp int64    `default:"-1"`
-	GroupKeywords       []string `default:"joj"`
+	Name                string `default:"unknown"`
+	LogPath             string `default:""`
+	ExpireUnixTimestamp int64  `default:"-1"`
 	Stage               struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
@@ -313,13 +312,15 @@ func CheckExpire(conf *Conf) error {
 }
 
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
-	keywords := conf.GroupKeywords
+	keywords := []string{}
+	for _, stage := range conf.Stage.Stages {
+		keywords = append(keywords, strings.ToLower(stage.Group))
+	}
 	groups := []string{}
 	loweredDescription := strings.ToLower(conventionalCommit.Description)
 	for _, keyword := range keywords {
-		loweredKeyword := strings.ToLower(keyword)
-		if strings.Contains(loweredDescription, loweredKeyword) {
-			groups = append(groups, loweredKeyword)
+		if strings.Contains(loweredDescription, keyword) {
+			groups = append(groups, keyword)
 		}
 	}
 	return groups
