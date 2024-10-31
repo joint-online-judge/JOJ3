@@ -312,10 +312,19 @@ func CheckExpire(conf *Conf) error {
 }
 
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
+	seen := make(map[string]bool)
 	keywords := []string{}
 	for _, stage := range conf.Stage.Stages {
-		keywords = append(keywords, strings.ToLower(stage.Group))
+		if stage.Group == "" {
+			continue
+		}
+		keyword := strings.ToLower(stage.Group)
+		if _, exists := seen[keyword]; !exists {
+			seen[keyword] = true
+			keywords = append(keywords, keyword)
+		}
 	}
+	slog.Info("group keywords from stages", "keywords", keywords)
 	groups := []string{}
 	loweredDescription := strings.ToLower(conventionalCommit.Description)
 	for _, keyword := range keywords {
