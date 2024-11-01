@@ -8,8 +8,9 @@ import (
 )
 
 type Match struct {
-	Keyword string
-	Score   int
+	Keyword       string
+	Score         int
+	MaxMatchCount int
 }
 
 type Conf struct {
@@ -33,6 +34,9 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (
 		content := executorResult.Files[file]
 		for _, match := range conf.Matches {
 			count := strings.Count(content, match.Keyword)
+			if match.MaxMatchCount > 0 {
+				count = min(count, match.MaxMatchCount)
+			}
 			if count > 0 {
 				matched = true
 				score -= count * match.Score
