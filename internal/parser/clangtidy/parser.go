@@ -14,7 +14,7 @@ type Match struct {
 }
 
 type Conf struct {
-	Score   int    `default:"100"`
+	Score   int
 	RootDir string `default:"/w"`
 	Matches []Match
 	Stdout  string `default:"stdout"`

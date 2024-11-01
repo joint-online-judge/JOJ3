@@ -13,7 +13,8 @@ type Match struct {
 }
 
 type Conf struct {
-	FullScore        int
+	Score            int
+	FullScore        int // TODO: remove me
 	MinScore         int
 	Files            []string
 	ForceQuitOnMatch bool
@@ -25,7 +26,7 @@ type Keyword struct{}
 func Parse(executorResult stage.ExecutorResult, conf Conf) (
 	stage.ParserResult, bool,
 ) {
-	score := conf.FullScore
+	score := conf.Score
 	comment := ""
 	matched := false
 	for _, file := range conf.Files {
@@ -53,6 +54,10 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	conf, err := stage.DecodeConf[Conf](confAny)
 	if err != nil {
 		return nil, true, err
+	}
+	// TODO: remove me on FullScore field removed
+	if conf.FullScore != 0 && conf.Score == 0 {
+		conf.Score = conf.FullScore
 	}
 	var res []stage.ParserResult
 	forceQuit := false
