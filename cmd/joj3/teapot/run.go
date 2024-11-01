@@ -79,7 +79,8 @@ func Run(conf *conf.Conf, runID string) error {
 		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
-		conf.Name, sha, runID, strconv.Itoa(conf.Teapot.MaxTotalScore),
+		conf.Name, sha, runID,
+		"--max-total-score", strconv.Itoa(conf.Teapot.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
 	}); err != nil {
