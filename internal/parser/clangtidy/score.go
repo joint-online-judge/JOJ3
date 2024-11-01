@@ -25,6 +25,10 @@ func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
 			parts := strings.Split(checkName, "-")
 			if len(parts) > 0 {
 				category := parts[0]
+				// checkName might be: -warnings-as-errors
+				if category == "" {
+					continue
+				}
 				categoryCount[category] += 1
 			}
 		}
