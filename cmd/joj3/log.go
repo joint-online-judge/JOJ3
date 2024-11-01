@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -17,7 +18,9 @@ type multiHandler struct {
 var runID string
 
 func init() {
-	runID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), os.Getpid())
+	runID = fmt.Sprintf("%06s%04s",
+		strconv.FormatInt(time.Now().Unix(), 36),
+		strconv.FormatInt(int64(os.Getpid()), 36))
 }
 
 func (h *multiHandler) Enabled(ctx context.Context, level slog.Level) bool {
