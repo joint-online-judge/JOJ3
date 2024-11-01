@@ -77,7 +77,7 @@ func isIgnored(line string) bool {
 }
 
 func parseMessage(line string) ClangMessage {
-	messageRegex := regexp.MustCompile(`^(?P<filepath>.+):(?P<line>\d+):(?P<column>\d+): (?P<level>\S+): (?P<message>.*?)(?: \[(?P<diagnostic_name>.*)\])?\n$`)
+	messageRegex := regexp.MustCompile(`^(?P<filepath>.+):(?P<line>\d+):(?P<column>\d+): (?P<level>\S+): (?P<message>.*?) \[(?P<diagnostic_name>[^\]]+)\]?\n$`)
 	regexRes := messageRegex.FindStringSubmatch(line)
 	if len(regexRes) == 0 {
 		return *newClangMessage("", 0, 0, UNKNOWN, "", "", nil, nil)
@@ -138,7 +138,7 @@ func ParseLines(lines []string, conf Conf) []ClangMessage {
 		message := parseMessage(string(line))
 		if message.level == UNKNOWN && len(messages) > 0 {
 			messages[len(messages)-1].detailsLines = append(messages[len(messages)-1].detailsLines, string(line))
-		} else {
+		} else if message.level != UNKNOWN {
 			messages = append(messages, message)
 		}
 	}
