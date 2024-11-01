@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -78,7 +79,8 @@ func Run(conf *conf.Conf, runID string) error {
 		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
-		conf.Name, sha, runID, skipIssueArg, skipScoreboardArg,
+		conf.Name, sha, runID, strconv.Itoa(conf.Teapot.MaxTotalScore),
+		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
 	}); err != nil {
 		slog.Error("teapot exit", "error", err)

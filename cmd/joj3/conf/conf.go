@@ -54,6 +54,7 @@ type Conf struct {
 		SkipScoreboard        bool   `default:"false"`
 		SkipFailedTable       bool   `default:"false"`
 		SubmitterInIssueTitle bool   `default:"true"`
+		MaxTotalScore         int    `default:"-1"`
 	}
 	// TODO: remove the following backward compatibility fields
 	SandboxExecServer string `default:"localhost:5051"`
