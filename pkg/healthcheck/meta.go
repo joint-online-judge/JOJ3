@@ -4,53 +4,59 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"regexp"
+	"strings"
 )
 
 // getMetas retrieves a list of metadata files that are expected to exist in the specified root directory.
 // It checks for the existence of each file in the fileList and provides instructions if any file is missing.
 func getMetas(rootDir string, fileList []string) ([]string, string, error) {
-	addExt(fileList, "\\.*")
-	regexList, err := getRegex(fileList)
-	var unmatchedList []string
-
-	if err != nil {
-		return nil, "", err
+	var regexList []*regexp.Regexp
+	for _, file := range fileList {
+		pattern := "(?i)" + file
+		if !strings.Contains(pattern, "\\.") {
+			pattern += "(\\.[^\\.]*)?"
+		}
+		regex, err := regexp.Compile(pattern)
+		if err != nil {
+			return nil, "", fmt.Errorf("error compiling regex:%w", err)
+		}
+		regexList = append(regexList, regex)
 	}
-
 	files, err := os.ReadDir(rootDir)
 	if err != nil {
 		return nil, "", fmt.Errorf("error reading directory: %w", err)
 	}
 
-	matched := false
-	umatchedRes := ""
+	matched := make([]bool, len(fileList))
 
-	// TODO: it seems that there is no good find substitution now
-	// modify current code if exist a better solution
-	for i, regex := range regexList {
-		for _, file := range files {
-			if file.IsDir() {
-				continue
-			}
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		fileName := file.Name()
 
-			if regex.MatchString(file.Name()) {
-				matched = true
-				break
+		for i, regex := range regexList {
+			if regex.MatchString(fileName) {
+				matched[i] = true
 			}
 		}
-		if !matched {
+	}
+
+	// Process unmatched patterns
+	var unmatchedList []string
+	var umatchedRes string
+
+	for i, wasFound := range matched {
+		if !wasFound {
 			unmatchedList = append(unmatchedList, fileList[i])
-			str := fmt.Sprint("\tno ", fileList[i], " file found")
-			switch fileList[i] {
-			case "readme\\.*":
-				str += ", please refer to https://www.makeareadme.com/ for more information"
-			case "changelog\\.*":
-				str += ", please refer to https://keepachangelog.com/en/1.1.0/ for more information"
-			default:
-				str += ""
+			str := fmt.Sprintf("%d. No %s file found", i+1, fileList[i])
+			if strings.Index(strings.ToLower(fileList[i]), "readme") == 0 {
+				str += ", please refer to https://www.makeareadme.com/ for more information."
+			} else if strings.Index(strings.ToLower(fileList[i]), "changelog") == 0 {
+				str += ", please refer to https://keepachangelog.com/en/1.1.0/ for more information."
 			}
 			str += "\n"
-
 			umatchedRes += str
 		}
 	}
@@ -67,7 +73,7 @@ func MetaCheck(rootDir string, fileList []string) error {
 		return fmt.Errorf("error getting metas: %w", err)
 	}
 	if len(unmatchedList) != 0 {
-		return fmt.Errorf("%d important project files missing\n"+umatchedRes, len(unmatchedList))
+		return fmt.Errorf("%d important project file(s) missing:\n"+umatchedRes, len(unmatchedList))
 	}
 	return nil
 }

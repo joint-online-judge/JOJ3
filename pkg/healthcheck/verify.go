@@ -32,7 +32,7 @@ func getChecksum(filePath string) (string, error) {
 func checkFileChecksum(filePath, expectedChecksum string) (bool, error) {
 	actualChecksum, err := getChecksum(filePath)
 	if err != nil {
-		return false, fmt.Errorf("Error reading file %s: %v", filePath, err)
+		return false, fmt.Errorf("error reading file %s: %v", filePath, err)
 	}
 	if actualChecksum != expectedChecksum {
 		return true, nil
@@ -48,7 +48,7 @@ func VerifyFiles(rootDir string, checkFileNameList string, checkFileSumList stri
 	checkSums := strings.Split(checkFileSumList, ",")
 	// Check if the number of files matches the number of checksums
 	if len(fileNames) != len(checkSums) {
-		return fmt.Errorf("Error: The number of files and checksums do not match.")
+		return fmt.Errorf("error: The number of files and checksums do not match.")
 	}
 	// Check each file's checksum
 	alteredFiles := []string{}
