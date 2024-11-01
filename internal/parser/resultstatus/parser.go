@@ -21,18 +21,20 @@ func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 	if err != nil {
 		return nil, true, err
 	}
+	score := conf.Score
 	forceQuit := false
 	var res []stage.ParserResult
 	for _, result := range results {
 		comment := conf.Comment
 		if result.Status != stage.Status(envexec.StatusAccepted) {
-			forceQuit = true
+			score = 0
 			comment = fmt.Sprintf(
 				"Unexpected executor status: %s.", result.Status,
 			)
+			forceQuit = true
 		}
 		res = append(res, stage.ParserResult{
-			Score:   conf.Score,
+			Score:   score,
 			Comment: comment,
 		})
 	}
