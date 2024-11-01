@@ -52,11 +52,11 @@ func getMetas(rootDir string, fileList []string) ([]string, string, error) {
 			unmatchedList = append(unmatchedList, fileList[i])
 			str := fmt.Sprintf("%d. No %s file found", i+1, fileList[i])
 			if strings.Index(strings.ToLower(fileList[i]), "readme") == 0 {
-				str += ", please refer to https://www.makeareadme.com/ for more information."
+				str += ", please refer to https://www.makeareadme.com/ for more information"
 			} else if strings.Index(strings.ToLower(fileList[i]), "changelog") == 0 {
-				str += ", please refer to https://keepachangelog.com/en/1.1.0/ for more information."
+				str += ", please refer to https://keepachangelog.com/en/1.1.0/ for more information"
 			}
-			str += "\n"
+			str += ".\n"
 			umatchedRes += str
 		}
 	}
