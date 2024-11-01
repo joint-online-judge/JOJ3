@@ -8,8 +8,9 @@ import (
 )
 
 type Conf struct {
-	Score   int
-	Comment string
+	Score                  int
+	Comment                string
+	ForceQuitOnNotAccepted bool `default:"false"`
 }
 
 type ResultStatus struct{}
@@ -31,7 +32,9 @@ func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 			comment = fmt.Sprintf(
 				"Unexpected executor status: %s.", result.Status,
 			)
-			forceQuit = true
+			if conf.ForceQuitOnNotAccepted {
+				forceQuit = true
+			}
 		}
 		res = append(res, stage.ParserResult{
 			Score:   score,
