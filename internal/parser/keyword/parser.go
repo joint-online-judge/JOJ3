@@ -16,7 +16,6 @@ type Match struct {
 type Conf struct {
 	Score            int
 	FullScore        int // TODO: remove me
-	MinScore         int
 	Files            []string
 	ForceQuitOnMatch bool
 	Matches          []Match
@@ -47,7 +46,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (
 		}
 	}
 	return stage.ParserResult{
-		Score:   max(score, conf.MinScore),
+		Score:   score,
 		Comment: comment,
 	}, matched
 }
