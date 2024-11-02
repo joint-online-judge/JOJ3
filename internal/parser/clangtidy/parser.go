@@ -14,11 +14,12 @@ type Match struct {
 }
 
 type Conf struct {
-	Score   int
-	RootDir string `default:"/w"`
-	Matches []Match
-	Stdout  string `default:"stdout"`
-	Stderr  string `default:"stderr"`
+	Score             int
+	RootDir           string `default:"/w"`
+	Matches           []Match
+	Stdout            string `default:"stdout"`
+	Stderr            string `default:"stderr"`
+	ForceQuitOnDeduct bool   `default:"false"`
 }
 
 type ClangTidy struct{}
@@ -56,8 +57,13 @@ func (*ClangTidy) Run(results []stage.ExecutorResult, confAny any) (
 		return nil, true, err
 	}
 	var res []stage.ParserResult
+	forceQuit := false
 	for _, result := range results {
-		res = append(res, Parse(result, *conf))
+		parseRes := Parse(result, *conf)
+		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
+			forceQuit = true
+		}
+		res = append(res, parseRes)
 	}
-	return res, false, nil
+	return res, forceQuit, nil
 }

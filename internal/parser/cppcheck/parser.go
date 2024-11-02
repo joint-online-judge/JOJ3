@@ -9,18 +9,18 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type CppCheck struct{}
-
 type Match struct {
-	Severity []string
+	Keywords []string
+	Severity []string // TODO: remove me
 	Score    int
 }
 
 type Conf struct {
-	Score   int
-	Matches []Match
-	Stdout  string `default:"stdout"`
-	Stderr  string `default:"stderr"`
+	Score             int
+	Matches           []Match
+	Stdout            string `default:"stdout"`
+	Stderr            string `default:"stderr"`
+	ForceQuitOnDeduct bool   `default:"false"`
 }
 
 type Record struct {
@@ -31,6 +31,8 @@ type Record struct {
 	Message  string `json:"message"`
 	Id       string `json:"id"`
 }
+
+type CppCheck struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]
@@ -89,8 +91,13 @@ func (*CppCheck) Run(results []stage.ExecutorResult, confAny any) (
 		return nil, true, err
 	}
 	var res []stage.ParserResult
+	forceQuit := false
 	for _, result := range results {
-		res = append(res, Parse(result, *conf))
+		parseRes := Parse(result, *conf)
+		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
+			forceQuit = true
+		}
+		res = append(res, parseRes)
 	}
-	return res, false, nil
+	return res, forceQuit, nil
 }

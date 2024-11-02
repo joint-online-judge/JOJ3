@@ -3,6 +3,7 @@ package cppcheck
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 )
 
 type Severity int
@@ -42,28 +43,38 @@ func severityFromString(severityString string) (Severity, error) {
 func GetResult(records []Record, conf Conf) (string, int, error) {
 	result := "### Test results summary\n\n"
 	var severityCounts [UNKNOWN + 1]int
-	var severityScore [UNKNOWN + 1]int
 	score := conf.Score
-
-	for _, match := range conf.Matches {
-		severities := match.Severity
-		score := match.Score
-		for _, severityString := range severities {
-			severity, err := severityFromString(severityString)
-			if err != nil {
-				return "", 0, err
+	// TODO: remove me
+	if len(conf.Matches) == 0 {
+		var severityScore [UNKNOWN + 1]int
+		for _, match := range conf.Matches {
+			severities := match.Severity
+			score := match.Score
+			for _, severityString := range severities {
+				severity, err := severityFromString(severityString)
+				if err != nil {
+					return "", 0, err
+				}
+				severityScore[int(severity)] = score
 			}
-			severityScore[int(severity)] = score
+		}
+		for _, record := range records {
+			severity, err := severityFromString(record.Severity)
+			if err != nil {
+				slog.Error("parse severity", "error", err)
+			}
+			severityCounts[int(severity)] += 1
+			score -= severityScore[int(severity)]
 		}
 	}
-
 	for _, record := range records {
-		severity, err := severityFromString(record.Severity)
-		if err != nil {
-			slog.Error("parse severity", "error", err)
+		for _, match := range conf.Matches {
+			for _, keyword := range match.Keywords {
+				if strings.Contains(record.Id, keyword) {
+					score -= match.Score
+				}
+			}
 		}
-		severityCounts[int(severity)] += 1
-		score -= severityScore[int(severity)]
 	}
 	result += fmt.Sprintf("1. error: %d\n", severityCounts[0])
 	result += fmt.Sprintf("2. warning: %d\n", severityCounts[1])
