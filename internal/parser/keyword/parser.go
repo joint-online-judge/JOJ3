@@ -14,21 +14,18 @@ type Match struct {
 }
 
 type Conf struct {
-	Score            int
-	FullScore        int // TODO: remove me
-	Files            []string
-	ForceQuitOnMatch bool
-	Matches          []Match
+	Score             int
+	FullScore         int // TODO: remove me
+	Files             []string
+	ForceQuitOnDeduct bool `default:"false"`
+	Matches           []Match
 }
 
 type Keyword struct{}
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) (
-	stage.ParserResult, bool,
-) {
+func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	score := conf.Score
 	comment := ""
-	matched := false
 	for _, file := range conf.Files {
 		content := executorResult.Files[file]
 		for _, match := range conf.Matches {
@@ -37,7 +34,6 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (
 				count = min(count, match.MaxMatchCount)
 			}
 			if count > 0 {
-				matched = true
 				score -= count * match.Score
 				comment += fmt.Sprintf(
 					"Matched keyword %d time(s): %s\n",
@@ -48,7 +44,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (
 	return stage.ParserResult{
 		Score:   score,
 		Comment: comment,
-	}, matched
+	}
 }
 
 func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
@@ -65,11 +61,11 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		tmp, matched := Parse(result, *conf)
-		if matched && conf.ForceQuitOnMatch {
+		parseRes := Parse(result, *conf)
+		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}
-		res = append(res, tmp)
+		res = append(res, parseRes)
 	}
 	return res, forceQuit, nil
 }
