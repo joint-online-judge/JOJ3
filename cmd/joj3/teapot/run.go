@@ -45,7 +45,7 @@ func Run(conf *conf.Conf, runID string) error {
 				if text == "" {
 					continue
 				}
-				slog.Info(fmt.Sprintf("%s %s", name, cmdArgs[0]), "stderr", text)
+				slog.Info(name, "stderr", text)
 			}
 			wg.Done()
 			if scanner.Err() != nil {
