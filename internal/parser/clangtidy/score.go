@@ -2,8 +2,9 @@ package clangtidy
 
 import (
 	"fmt"
-	"sort"
 	"strings"
+
+	"github.com/joint-online-judge/JOJ3/pkg/utils"
 )
 
 func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
@@ -33,21 +34,14 @@ func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
 			}
 		}
 	}
-	type kv struct {
-		Key   string
-		Value int
-	}
-	var ss []kv
-	for k, v := range categoryCount {
-		ss = append(ss, kv{k, v})
-	}
-	sort.Slice(ss, func(i, j int) bool {
-		if ss[i].Value == ss[j].Value {
-			return ss[i].Key < ss[j].Key
-		}
-		return ss[i].Value > ss[j].Value
-	})
-	for i, kv := range ss {
+	sortedMap := utils.SortMap(categoryCount,
+		func(i, j utils.Pair[string, int]) bool {
+			if i.Value == j.Value {
+				return i.Key < j.Key
+			}
+			return i.Value > j.Value
+		})
+	for i, kv := range sortedMap {
 		comment += fmt.Sprintf("%d. %s: %d\n", i+1, kv.Key, kv.Value)
 	}
 	return score, comment
