@@ -68,10 +68,10 @@ func setupSlog(logPath string) error {
 		if err != nil {
 			return err
 		}
-		debugHandler := slog.NewTextHandler(debugFile, &slog.HandlerOptions{
+		debugFileHandler := slog.NewTextHandler(debugFile, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
-		})
-		handlers = append(handlers, debugHandler)
+		}).WithAttrs([]slog.Attr{slog.String("runID", runID)})
+		handlers = append(handlers, debugFileHandler)
 	}
 	stderrLogLevel := slog.LevelInfo
 	if runningTest {
