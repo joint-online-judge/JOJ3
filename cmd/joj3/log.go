@@ -70,7 +70,7 @@ func setupSlog(logPath string) error {
 		}
 		debugFileHandler := slog.NewTextHandler(debugFile, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
-		}).WithAttrs([]slog.Attr{slog.String("runID", runID)})
+		})
 		handlers = append(handlers, debugFileHandler)
 	}
 	stderrLogLevel := slog.LevelInfo
@@ -80,10 +80,11 @@ func setupSlog(logPath string) error {
 	// Stderr handler for info logs and above
 	stderrHandler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: stderrLogLevel,
-	}).WithAttrs([]slog.Attr{slog.String("runID", runID)})
+	})
 	handlers = append(handlers, stderrHandler)
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
+	multiHandler.WithAttrs([]slog.Attr{slog.String("runID", runID)})
 	// Set the default logger
 	logger := slog.New(multiHandler)
 	slog.SetDefault(logger)
