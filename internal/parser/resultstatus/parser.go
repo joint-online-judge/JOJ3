@@ -10,7 +10,7 @@ import (
 type Conf struct {
 	Score                  int
 	Comment                string
-	ForceQuitOnNotAccepted bool `default:"false"`
+	ForceQuitOnNotAccepted bool `default:"true"`
 }
 
 type ResultStatus struct{}
