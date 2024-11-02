@@ -84,9 +84,10 @@ func setupSlog(logPath string) error {
 	handlers = append(handlers, stderrHandler)
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
-	multiHandler.WithAttrs([]slog.Attr{slog.String("runID", runID)})
+	multiHandlerWithAttrs := multiHandler.WithAttrs(
+		[]slog.Attr{slog.String("runID", runID)})
 	// Set the default logger
-	logger := slog.New(multiHandler)
+	logger := slog.New(multiHandlerWithAttrs)
 	slog.SetDefault(logger)
 	if logPath != "" {
 		slog.Info("debug log", "path", logPath)
