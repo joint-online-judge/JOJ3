@@ -57,7 +57,18 @@ func Run(conf *conf.Conf, runID string) error {
 			return err
 		}
 		wg.Wait()
-		return err
+		if err = cmd.Wait(); err != nil {
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				exitCode := exitErr.ExitCode()
+				slog.Error("cmd completed with non-zero exit code",
+					"error", err,
+					"exitCode", exitCode)
+			} else {
+				slog.Error("cmd wait", "error", err)
+			}
+			return err
+		}
+		return nil
 	}
 	skipIssueArg := "--no-skip-result-issue"
 	if conf.Teapot.SkipIssue {
