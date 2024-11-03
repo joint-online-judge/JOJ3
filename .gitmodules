@@ -22,6 +22,10 @@
 	path = examples/sample/error
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = sample/error
+[submodule "examples/keyword/cpplint/sillycode"]
+	path = examples/keyword/cpplint/sillycode
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
+	branch = keyword/cpplint/sillycode
 [submodule "examples/clangtidy/sillycode"]
 	path = examples/clangtidy/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
