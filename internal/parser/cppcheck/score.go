@@ -63,6 +63,9 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 	}
 	if totalSeverityScore != 0 {
 		for _, record := range records {
+			if record.File == "nofile" {
+				continue
+			}
 			severity, err := severityFromString(record.Severity)
 			if err != nil {
 				slog.Error("parse severity", "error", err)
