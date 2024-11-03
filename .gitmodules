@@ -6,10 +6,6 @@
 	path = examples/diff/complex
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = diff/complex
-[submodule "examples/cpplint/sillycode"]
-	path = examples/cpplint/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
-	branch = cpplint/sillycode
 [submodule "examples/compile/success"]
 	path = examples/compile/success
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
@@ -26,10 +22,6 @@
 	path = examples/sample/error
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = sample/error
-[submodule "examples/keyword/cpplint/sillycode"]
-	path = examples/keyword/cpplint/sillycode
-	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
-	branch = keyword/cpplint/sillycode
 [submodule "examples/clangtidy/sillycode"]
 	path = examples/clangtidy/sillycode
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
@@ -74,3 +66,7 @@
 	path = examples/cppcheck/simple
 	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
 	branch = cppcheck/simple
+[submodule "examples/cpplint/simple"]
+	path = examples/cpplint/simple
+	url = ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3-examples.git
+	branch = cpplint/simple
