@@ -45,19 +45,23 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 	var severityCounts [UNKNOWN + 1]int
 	score := conf.Score
 	// TODO: remove me
-	if len(conf.Matches) == 0 {
-		var severityScore [UNKNOWN + 1]int
-		for _, match := range conf.Matches {
-			severities := match.Severity
-			score := match.Score
-			for _, severityString := range severities {
-				severity, err := severityFromString(severityString)
-				if err != nil {
-					return "", 0, err
-				}
-				severityScore[int(severity)] = score
+	var severityScore [UNKNOWN + 1]int
+	for _, match := range conf.Matches {
+		severities := match.Severity
+		score := match.Score
+		for _, severityString := range severities {
+			severity, err := severityFromString(severityString)
+			if err != nil {
+				return "", 0, err
 			}
+			severityScore[int(severity)] = score
 		}
+	}
+	totalSeverityScore := 0
+	for _, score := range severityScore {
+		totalSeverityScore += score
+	}
+	if totalSeverityScore != 0 {
 		for _, record := range records {
 			severity, err := severityFromString(record.Severity)
 			if err != nil {
