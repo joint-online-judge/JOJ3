@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -37,16 +36,6 @@ type CppCheck struct{}
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
-
-	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
-		return stage.ParserResult{
-			Score: 0,
-			Comment: fmt.Sprintf(
-				"Unexpected executor status: %s.\nStderr: %s",
-				executorResult.Status, stderr,
-			),
-		}
-	}
 	records := make([]Record, 0)
 	lines := strings.Split(stderr, "\n")
 	for _, line := range lines {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/joint-online-judge/JOJ3/pkg/sample"
 )
@@ -20,16 +19,7 @@ type Sample struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
-	stderr := executorResult.Files[conf.Stderr]
-	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
-		return stage.ParserResult{
-			Score: 0,
-			Comment: fmt.Sprintf(
-				"Unexpected executor status: %s.\nStderr: %s",
-				executorResult.Status, stderr,
-			),
-		}
-	}
+	// stderr := executorResult.Files[conf.Stderr]
 	var sampleResult sample.Result
 	err := json.Unmarshal([]byte(stdout), &sampleResult)
 	if err != nil {

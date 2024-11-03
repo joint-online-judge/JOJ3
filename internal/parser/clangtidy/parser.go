@@ -1,10 +1,8 @@
 package clangtidy
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -26,19 +24,7 @@ type ClangTidy struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
-	stderr := executorResult.Files[conf.Stderr]
-	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
-		if !((executorResult.Status == stage.Status(envexec.StatusNonzeroExitStatus)) &&
-			(executorResult.ExitStatus == 1)) {
-			return stage.ParserResult{
-				Score: 0,
-				Comment: fmt.Sprintf(
-					"Unexpected executor status: %s.\nStderr: %s",
-					executorResult.Status, stderr,
-				),
-			}
-		}
-	}
+	// stderr := executorResult.Files[conf.Stderr]
 	lines := strings.SplitAfter(stdout, "\n")
 	messages := ParseLines(lines, conf)
 	formattedMessages := Format(messages)
