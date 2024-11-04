@@ -87,7 +87,8 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 	for _, record := range records {
 		for _, match := range conf.Matches {
 			for _, keyword := range match.Keywords {
-				if strings.Contains(record.Id, keyword) {
+				if strings.Contains(record.Id, keyword) ||
+					strings.Contains(record.Severity, keyword) {
 					matchCount[keyword] += 1
 					scoreChange[keyword] += -match.Score
 					score += -match.Score
