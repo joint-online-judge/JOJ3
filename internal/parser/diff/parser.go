@@ -228,7 +228,7 @@ func reverse(s []operation) []operation {
 
 // generateDiffWithContext creates a diff block with surrounding context from stdout and result.
 func generateDiffWithContext(
-	stdoutLines, resultLines []string, ops []operation, maxSize int,
+	stdoutLines, resultLines []string, ops []operation, maxLength int,
 ) string {
 	var diffBuilder strings.Builder
 
@@ -255,8 +255,8 @@ func generateDiffWithContext(
 				lineCount += 1
 			}
 		}
-		if maxSize > 0 && diffBuilder.Len()+len(s) > maxSize {
-			remaining := maxSize - diffBuilder.Len()
+		if maxLength > 0 && diffBuilder.Len()+len(s) > maxLength {
+			remaining := maxLength - diffBuilder.Len()
 			if remaining > 0 {
 				diffBuilder.WriteString(s[:remaining])
 			}
