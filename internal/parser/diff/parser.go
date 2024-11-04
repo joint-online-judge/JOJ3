@@ -30,7 +30,7 @@ type Conf struct {
 			CompareSpace    bool
 			AlwaysHide      bool
 			ForceQuitOnDiff bool
-			MaxDiffLength   int
+			MaxDiffLength   int `default:"2048"` // just for reference
 		}
 	}
 }
@@ -83,7 +83,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 					// Generate Myers diff
 					diffOps := myersDiff(stdoutLines, resultLines)
-
+					if output.MaxDiffLength == 0 { // real default value
+						output.MaxDiffLength = 2048
+					}
 					// Generate diff block with surrounding context
 					diffOutput := generateDiffWithContext(
 						stdoutLines, resultLines, diffOps, output.MaxDiffLength)
