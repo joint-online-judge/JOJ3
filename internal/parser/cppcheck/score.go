@@ -3,6 +3,7 @@ package cppcheck
 import (
 	"fmt"
 	"log/slog"
+	"sort"
 	"strings"
 )
 
@@ -41,9 +42,9 @@ func severityFromString(severityString string) (Severity, error) {
 }
 
 func GetResult(records []Record, conf Conf) (string, int, error) {
-	result := "### Test results summary\n\n"
-	var severityCounts [UNKNOWN + 1]int
 	score := conf.Score
+	comment := "### Test results summary\n\n"
+	var severityCounts [UNKNOWN + 1]int
 	// TODO: remove me
 	var severityScore [UNKNOWN + 1]int
 	for _, match := range conf.Matches {
@@ -73,22 +74,52 @@ func GetResult(records []Record, conf Conf) (string, int, error) {
 			severityCounts[int(severity)] += 1
 			score -= severityScore[int(severity)]
 		}
+		comment += fmt.Sprintf("1. error: %d\n", severityCounts[0])
+		comment += fmt.Sprintf("2. warning: %d\n", severityCounts[1])
+		comment += fmt.Sprintf("3. portability: %d\n", severityCounts[2])
+		comment += fmt.Sprintf("4. performance: %d\n", severityCounts[3])
+		comment += fmt.Sprintf("5. style: %d\n", severityCounts[4])
+		comment += fmt.Sprintf("6. information: %d\n", severityCounts[5])
+		comment += fmt.Sprintf("7. debug: %d\n", severityCounts[6])
 	}
+	matchCount := make(map[string]int)
+	scoreChange := make(map[string]int)
 	for _, record := range records {
 		for _, match := range conf.Matches {
 			for _, keyword := range match.Keywords {
 				if strings.Contains(record.Id, keyword) {
-					score -= match.Score
+					matchCount[keyword] += 1
+					scoreChange[keyword] += -match.Score
+					score += -match.Score
 				}
 			}
 		}
 	}
-	result += fmt.Sprintf("1. error: %d\n", severityCounts[0])
-	result += fmt.Sprintf("2. warning: %d\n", severityCounts[1])
-	result += fmt.Sprintf("3. portability: %d\n", severityCounts[2])
-	result += fmt.Sprintf("4. performance: %d\n", severityCounts[3])
-	result += fmt.Sprintf("5. style: %d\n", severityCounts[4])
-	result += fmt.Sprintf("6. information: %d\n", severityCounts[5])
-	result += fmt.Sprintf("7. debug: %d\n", severityCounts[6])
-	return result, score, nil
+	type Result struct {
+		Keyword     string
+		Count       int
+		ScoreChange int
+	}
+	var results []Result
+	for keyword, count := range matchCount {
+		results = append(results, Result{
+			Keyword:     keyword,
+			Count:       count,
+			ScoreChange: scoreChange[keyword],
+		})
+	}
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].ScoreChange != results[j].ScoreChange {
+			return results[i].ScoreChange < results[j].ScoreChange
+		}
+		if results[i].Count != results[j].Count {
+			return results[i].Count > results[j].Count
+		}
+		return results[i].Keyword < results[j].Keyword
+	})
+	for i, result := range results {
+		comment += fmt.Sprintf("%d. `%s`: %d occurrence(s), %d point(s)\n",
+			i+1, result.Keyword, result.Count, result.ScoreChange)
+	}
+	return comment, score, nil
 }

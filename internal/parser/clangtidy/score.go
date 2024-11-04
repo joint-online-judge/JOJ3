@@ -2,47 +2,53 @@ package clangtidy
 
 import (
 	"fmt"
+	"sort"
 	"strings"
-
-	"github.com/joint-online-judge/JOJ3/pkg/utils"
 )
 
 func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
 	score := conf.Score
 	comment := "### Test results summary\n\n"
-	categoryCount := map[string]int{}
+	matchCount := make(map[string]int)
+	scoreChange := make(map[string]int)
 	for _, jsonMessage := range jsonMessages {
 		// checkName is commas separated string here
 		checkName := jsonMessage.CheckName
 		for _, match := range conf.Matches {
 			for _, keyword := range match.Keywords {
 				if strings.Contains(checkName, keyword) {
-					score -= match.Score
+					matchCount[keyword] += 1
+					scoreChange[keyword] += -match.Score
+					score += -match.Score
 				}
-			}
-		}
-		checkNames := strings.Split(checkName, ",")
-		for _, checkName := range checkNames {
-			parts := strings.Split(checkName, "-")
-			if len(parts) > 0 {
-				category := parts[0]
-				// checkName might be: -warnings-as-errors
-				if category == "" {
-					continue
-				}
-				categoryCount[category] += 1
 			}
 		}
 	}
-	sortedMap := utils.SortMap(categoryCount,
-		func(i, j utils.Pair[string, int]) bool {
-			if i.Value == j.Value {
-				return i.Key < j.Key
-			}
-			return i.Value > j.Value
+	type Result struct {
+		Keyword     string
+		Count       int
+		ScoreChange int
+	}
+	var results []Result
+	for keyword, count := range matchCount {
+		results = append(results, Result{
+			Keyword:     keyword,
+			Count:       count,
+			ScoreChange: scoreChange[keyword],
 		})
-	for i, kv := range sortedMap {
-		comment += fmt.Sprintf("%d. %s: %d\n", i+1, kv.Key, kv.Value)
+	}
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].ScoreChange != results[j].ScoreChange {
+			return results[i].ScoreChange < results[j].ScoreChange
+		}
+		if results[i].Count != results[j].Count {
+			return results[i].Count > results[j].Count
+		}
+		return results[i].Keyword < results[j].Keyword
+	})
+	for i, result := range results {
+		comment += fmt.Sprintf("%d. `%s`: %d occurrence(s), %d point(s)\n",
+			i+1, result.Keyword, result.Count, result.ScoreChange)
 	}
 	return score, comment
 }
