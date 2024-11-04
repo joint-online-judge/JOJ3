@@ -15,6 +15,7 @@ type Conf struct {
 	ShowMemory         bool `default:"true"`
 	ShowRunTime        bool `default:"false"`
 	ShowFiles          []string
+	MaxFilesLength     int `default:"2048"`
 }
 
 type ResultDetail struct{}
@@ -56,6 +57,9 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 			content, ok := result.Files[file]
 			comment += fmt.Sprintf("File `%s`:\n", file)
 			if ok {
+				if conf.MaxFilesLength > 0 && len(content) > conf.MaxFilesLength {
+					content = content[:conf.MaxFilesLength] + "\n\n(truncated)"
+				}
 				comment += fmt.Sprintf("```\n%s\n```\n", content)
 			} else {
 				comment += "Not found.\n"
