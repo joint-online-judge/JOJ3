@@ -30,6 +30,7 @@ type Conf struct {
 			CompareSpace    bool
 			AlwaysHide      bool
 			ForceQuitOnDiff bool
+			MaxDiffLines    int
 		}
 	}
 }
@@ -60,8 +61,8 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			}
 			slog.Debug("compare", "filename", output.FileName,
 				"answer path", output.AnswerPath,
-				"actual", result.Files[output.FileName],
-				"answer", string(answer))
+				"actual length", len(result.Files[output.FileName]),
+				"answer length", len(string(answer)))
 			// If no difference, assign score
 			if compareChars(string(answer), result.Files[output.FileName],
 				output.CompareSpace) {
@@ -85,7 +86,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 					// Generate diff block with surrounding context
 					diffOutput := generateDiffWithContext(
-						stdoutLines, resultLines, diffOps)
+						stdoutLines, resultLines, diffOps, output.MaxDiffLines)
 					diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
 					comment += fmt.Sprintf(
 						"```diff\n%s\n```\n",
@@ -226,31 +227,37 @@ func reverse(s []operation) []operation {
 }
 
 // generateDiffWithContext creates a diff block with surrounding context from stdout and result.
-func generateDiffWithContext(stdoutLines, resultLines []string, ops []operation) string {
+func generateDiffWithContext(
+	stdoutLines, resultLines []string, ops []operation, maxDiffLines int,
+) string {
 	var diffBuilder strings.Builder
 
-	srcIndex, dstIndex := 0, 0
+	srcIndex, dstIndex, lineCount := 0, 0, 0
 
 	for _, op := range ops {
 		switch op {
 		case INSERT:
 			if dstIndex < len(resultLines) {
 				diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLines[dstIndex]))
-				dstIndex++
+				dstIndex += 1
+				lineCount += 1
 			}
-
 		case MOVE:
 			if srcIndex < len(stdoutLines) {
 				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLines[srcIndex]))
-				srcIndex++
-				dstIndex++
+				srcIndex += 1
+				dstIndex += 1
+				lineCount += 1
 			}
-
 		case DELETE:
 			if srcIndex < len(stdoutLines) {
 				diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLines[srcIndex]))
-				srcIndex++
+				srcIndex += 1
+				lineCount += 1
 			}
+		}
+		if maxDiffLines > 0 && lineCount >= maxDiffLines {
+			break
 		}
 	}
 
