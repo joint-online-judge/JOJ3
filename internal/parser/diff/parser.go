@@ -30,7 +30,7 @@ type Conf struct {
 			CompareSpace    bool
 			AlwaysHide      bool
 			ForceQuitOnDiff bool
-			MaxDiffLines    int
+			MaxDiffSize     int
 		}
 	}
 }
@@ -86,7 +86,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 					// Generate diff block with surrounding context
 					diffOutput := generateDiffWithContext(
-						stdoutLines, resultLines, diffOps, output.MaxDiffLines)
+						stdoutLines, resultLines, diffOps, output.MaxDiffSize)
 					diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
 					comment += fmt.Sprintf(
 						"```diff\n%s\n```\n",
@@ -228,37 +228,42 @@ func reverse(s []operation) []operation {
 
 // generateDiffWithContext creates a diff block with surrounding context from stdout and result.
 func generateDiffWithContext(
-	stdoutLines, resultLines []string, ops []operation, maxDiffLines int,
+	stdoutLines, resultLines []string, ops []operation, maxSize int,
 ) string {
 	var diffBuilder strings.Builder
 
 	srcIndex, dstIndex, lineCount := 0, 0, 0
 
 	for _, op := range ops {
+		s := ""
 		switch op {
 		case INSERT:
 			if dstIndex < len(resultLines) {
-				diffBuilder.WriteString(fmt.Sprintf("+ %s\n", resultLines[dstIndex]))
+				s = fmt.Sprintf("+ %s\n", resultLines[dstIndex])
 				dstIndex += 1
-				lineCount += 1
 			}
 		case MOVE:
 			if srcIndex < len(stdoutLines) {
-				diffBuilder.WriteString(fmt.Sprintf("  %s\n", stdoutLines[srcIndex]))
+				s = fmt.Sprintf("  %s\n", stdoutLines[srcIndex])
 				srcIndex += 1
 				dstIndex += 1
-				lineCount += 1
 			}
 		case DELETE:
 			if srcIndex < len(stdoutLines) {
-				diffBuilder.WriteString(fmt.Sprintf("- %s\n", stdoutLines[srcIndex]))
+				s = fmt.Sprintf("- %s\n", stdoutLines[srcIndex])
 				srcIndex += 1
 				lineCount += 1
 			}
 		}
-		if maxDiffLines > 0 && lineCount >= maxDiffLines {
+		if maxSize > 0 && diffBuilder.Len()+len(s) > maxSize {
+			remaining := maxSize - diffBuilder.Len()
+			if remaining > 0 {
+				diffBuilder.WriteString(s[:remaining])
+			}
+			diffBuilder.WriteString("\n\n(truncated)")
 			break
 		}
+		diffBuilder.WriteString(s)
 	}
 
 	return diffBuilder.String()
