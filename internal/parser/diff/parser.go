@@ -136,14 +136,14 @@ func myersDiff(src, dst []string) []operation {
 	var x, y int
 
 loop:
-	for d := 0; d <= max; d++ {
+	for d := 0; d <= max; d += 1 {
 		v := make(map[int]int, d+2)
 		trace = append(trace, v)
 
 		if d == 0 {
 			t := 0
 			for len(src) > t && len(dst) > t && src[t] == dst[t] {
-				t++
+				t += 1
 			}
 			v[0] = t
 			if t == len(src) && len(src) == len(dst) {
@@ -180,7 +180,7 @@ loop:
 	y = m
 	var k, prevK, prevX, prevY int
 
-	for d := len(trace) - 1; d > 0; d-- {
+	for d := len(trace) - 1; d > 0; d -= 1 {
 		k = x - y
 		lastV := trace[d-1]
 
@@ -209,7 +209,7 @@ loop:
 	}
 
 	if trace[0][0] != 0 {
-		for i := 0; i < trace[0][0]; i++ {
+		for i := 0; i < trace[0][0]; i += 1 {
 			script = append(script, MOVE)
 		}
 	}

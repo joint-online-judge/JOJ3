@@ -25,7 +25,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		}
 	}
 	// cannot use range loop since we need to change the value
-	for i := 0; i < len(cmds); i++ {
+	for i := 0; i < len(cmds); i += 1 {
 		cmd := &cmds[i]
 		if cmd.CopyIn == nil {
 			cmd.CopyIn = make(map[string]stage.CmdFile)
