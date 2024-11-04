@@ -30,7 +30,7 @@ type Conf struct {
 			CompareSpace    bool
 			AlwaysHide      bool
 			ForceQuitOnDiff bool
-			MaxDiffSize     int
+			MaxDiffLength   int
 		}
 	}
 }
@@ -86,7 +86,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 					// Generate diff block with surrounding context
 					diffOutput := generateDiffWithContext(
-						stdoutLines, resultLines, diffOps, output.MaxDiffSize)
+						stdoutLines, resultLines, diffOps, output.MaxDiffLength)
 					diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
 					comment += fmt.Sprintf(
 						"```diff\n%s\n```\n",
