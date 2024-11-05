@@ -15,7 +15,7 @@ type Conf struct {
 	ShowMemory         bool `default:"true"`
 	ShowRunTime        bool `default:"false"`
 	ShowFiles          []string
-	MaxFilesLength     int `default:"2048"`
+	MaxFilesLength     int `default:"65536"`
 }
 
 type ResultDetail struct{}
