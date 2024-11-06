@@ -37,6 +37,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		}
 	}
 	pbReq := &pb.Request{Cmd: convertPBCmd(cmds)}
+	slog.Debug("sandbox execute", "protobuf request", pbReq)
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
