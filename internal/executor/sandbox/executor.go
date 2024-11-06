@@ -7,6 +7,7 @@ import (
 
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"google.golang.org/protobuf/proto"
 )
 
 type Sandbox struct {
@@ -37,7 +38,24 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		}
 	}
 	pbCmds := convertPBCmd(cmds)
-	slog.Debug("sandbox execute", "protobuf cmds", pbCmds)
+	for i, pbCmd := range pbCmds {
+		slog.Debug(
+			"sandbox execute",
+			"index", i,
+			"protobuf cmd size", proto.Size(pbCmd),
+			"protobuf cmd stdin size", proto.Size(pbCmd.Files[0]),
+			"protobuf cmd stdout size", proto.Size(pbCmd.Files[1]),
+			"protobuf cmd stderr size", proto.Size(pbCmd.Files[2]),
+		)
+		for k, v := range pbCmd.CopyIn {
+			slog.Debug(
+				"sandbox execute",
+				"index", i,
+				"CopyIn filename", k,
+				"protobuf file size", proto.Size(v),
+			)
+		}
+	}
 	pbReq := &pb.Request{Cmd: pbCmds}
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
