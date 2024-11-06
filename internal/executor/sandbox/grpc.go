@@ -3,6 +3,7 @@ package sandbox
 import (
 	"context"
 	"log/slog"
+	"math"
 
 	"github.com/criyle/go-judge/pb"
 	"google.golang.org/grpc"
@@ -21,10 +22,11 @@ func createExecClient(execServer, token string) (pb.ExecutorClient, error) {
 }
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
+	// max size according to https://protobuf.dev/programming-guides/encoding/#size-limit
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(512 * 1024 * 1024), // 512 MB
+			grpc.MaxCallRecvMsgSize(math.MaxInt32), // 2 GB
 		),
 	}
 	if token != "" {
