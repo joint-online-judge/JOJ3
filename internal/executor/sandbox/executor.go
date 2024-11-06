@@ -38,11 +38,14 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		}
 	}
 	pbCmds := convertPBCmd(cmds)
+	totalPbCmdSize := 0
 	for i, pbCmd := range pbCmds {
+		pbCmdSize := proto.Size(pbCmd)
+		totalPbCmdSize += pbCmdSize
 		slog.Debug(
 			"sandbox execute",
 			"index", i,
-			"protobuf cmd size", proto.Size(pbCmd),
+			"protobuf cmd size", pbCmdSize,
 			"protobuf cmd stdin size", proto.Size(pbCmd.Files[0]),
 			"protobuf cmd stdout size", proto.Size(pbCmd.Files[1]),
 			"protobuf cmd stderr size", proto.Size(pbCmd.Files[2]),
@@ -56,6 +59,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			)
 		}
 	}
+	slog.Debug("sandbox execute", "total protobuf cmd size", totalPbCmdSize)
 	pbReq := &pb.Request{Cmd: pbCmds}
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
