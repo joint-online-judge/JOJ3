@@ -23,6 +23,9 @@ func createExecClient(execServer, token string) (pb.ExecutorClient, error) {
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(512 * 1024 * 1024), // 512 MB
+		),
 	}
 	if token != "" {
 		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
