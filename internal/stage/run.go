@@ -27,9 +27,6 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 			return
 		}
 		slog.Debug("executor run done", "results", executorResults)
-		for _, executorResult := range executorResults {
-			slog.Debug("executor run done", "result.Files", executorResult.Files)
-		}
 		parserResults = []ParserResult{}
 		forceQuit = false
 		for _, stageParser := range stage.Parsers {
