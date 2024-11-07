@@ -62,16 +62,24 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 func setupSlog(logPath string) error {
 	handlers := []slog.Handler{}
 	if logPath != "" {
-		// File handler for debug logs
-		debugFile, err := os.OpenFile(logPath,
+		// Text file handler for debug logs
+		debugTextFile, err := os.OpenFile(logPath,
 			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
 		if err != nil {
 			return err
 		}
-		debugFileHandler := slog.NewTextHandler(debugFile, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		})
-		handlers = append(handlers, debugFileHandler)
+		debugTextHandler := slog.NewTextHandler(debugTextFile,
+			&slog.HandlerOptions{Level: slog.LevelDebug})
+		handlers = append(handlers, debugTextHandler)
+		// Json file handler for debug logs
+		debugJsonFile, err := os.OpenFile(logPath+".ndjson",
+			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
+		if err != nil {
+			return err
+		}
+		debugJsonHandler := slog.NewJSONHandler(debugJsonFile,
+			&slog.HandlerOptions{Level: slog.LevelDebug})
+		handlers = append(handlers, debugJsonHandler)
 	}
 	stderrLogLevel := slog.LevelInfo
 	if runningTest {
