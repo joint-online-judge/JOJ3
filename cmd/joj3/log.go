@@ -64,7 +64,7 @@ func setupSlog(logPath string) error {
 	if logPath != "" {
 		// File handler for debug logs
 		debugFile, err := os.OpenFile(logPath,
-			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600)
+			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
 		if err != nil {
 			return err
 		}
