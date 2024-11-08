@@ -83,6 +83,7 @@ func mainImpl() error {
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
+	stage.Summarize(confObj, stageResults, stageForceQuit)
 	if err = stage.Write(confObj.Stage.OutputPath, stageResults); err != nil {
 		slog.Error("stage write", "error", err)
 		return err
