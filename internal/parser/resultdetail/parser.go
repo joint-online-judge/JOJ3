@@ -62,7 +62,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 				}
 				comment += fmt.Sprintf("```\n%s\n```\n", content)
 			} else {
-				comment += "Not found.\n"
+				comment += "Not found\n"
 			}
 		}
 		res = append(res, stage.ParserResult{

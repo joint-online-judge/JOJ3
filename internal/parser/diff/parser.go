@@ -73,7 +73,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					forceQuit = true
 				}
 				comment += conf.FailComment
-				comment += fmt.Sprintf("Difference found in `%s`.\n",
+				comment += fmt.Sprintf("Difference found in `%s`\n",
 					output.FileName)
 				if !output.AlwaysHide {
 					// Convert answer to string and split by lines
