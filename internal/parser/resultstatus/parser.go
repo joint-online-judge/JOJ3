@@ -30,7 +30,7 @@ func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 		if result.Status != stage.Status(envexec.StatusAccepted) {
 			score = 0
 			comment = fmt.Sprintf(
-				"Unexpected executor status: %s.", result.Status,
+				"Unexpected executor status: `%s`.\n", result.Status,
 			)
 			if conf.ForceQuitOnNotAccepted {
 				forceQuit = true
