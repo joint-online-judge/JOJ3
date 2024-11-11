@@ -2,6 +2,8 @@ package teapot
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -14,7 +16,13 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 )
 
-func Run(conf *conf.Conf, runID string) error {
+type TeapotResult struct {
+	Issue  int    `json:"issue"`
+	Action int    `json:"action"`
+	Sha    string `json:"sha"`
+}
+
+func Run(conf *conf.Conf, runID string) (teapotResult TeapotResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	sha := os.Getenv("GITHUB_SHA")
@@ -24,52 +32,11 @@ func Run(conf *conf.Conf, runID string) error {
 	if actor == "" || repository == "" || strings.Count(repository, "/") != 1 ||
 		runNumber == "" {
 		slog.Error("teapot env not set")
-		return fmt.Errorf("teapot env not set")
+		err = fmt.Errorf("teapot env not set")
+		return
 	}
 	repoParts := strings.Split(repository, "/")
 	repoName := repoParts[1]
-	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
-	execCommand := func(name string, cmdArgs []string) error {
-		cmd := exec.Command(name, cmdArgs...) // #nosec G204
-		stderr, err := cmd.StderrPipe()
-		if err != nil {
-			slog.Error("stderr pipe", "error", err)
-			return err
-		}
-		var wg sync.WaitGroup
-		wg.Add(1)
-		scanner := bufio.NewScanner(stderr)
-		go func() {
-			for scanner.Scan() {
-				text := re.ReplaceAllString(scanner.Text(), "")
-				if text == "" {
-					continue
-				}
-				slog.Info(name, "stderr", text)
-			}
-			wg.Done()
-			if scanner.Err() != nil {
-				slog.Error("stderr scanner", "error", scanner.Err())
-			}
-		}()
-		if err = cmd.Start(); err != nil {
-			slog.Error("cmd start", "error", err)
-			return err
-		}
-		wg.Wait()
-		if err = cmd.Wait(); err != nil {
-			if exitErr, ok := err.(*exec.ExitError); ok {
-				exitCode := exitErr.ExitCode()
-				slog.Error("cmd completed with non-zero exit code",
-					"error", err,
-					"exitCode", exitCode)
-			} else {
-				slog.Error("cmd wait", "error", err)
-			}
-			return err
-		}
-		return nil
-	}
 	skipIssueArg := "--no-skip-result-issue"
 	if conf.Teapot.SkipIssue {
 		skipIssueArg = "--skip-result-issue"
@@ -86,7 +53,8 @@ func Run(conf *conf.Conf, runID string) error {
 	if conf.Teapot.SubmitterInIssueTitle {
 		submitterInIssueTitleArg = "--submitter-in-issue-title"
 	}
-	if err := execCommand("joint-teapot", []string{
+	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
+	cmd := exec.Command("joint-teapot",
 		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
 		conf.Teapot.GradingRepoName, repoName, runNumber,
 		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
@@ -94,9 +62,51 @@ func Run(conf *conf.Conf, runID string) error {
 		"--max-total-score", strconv.Itoa(conf.Teapot.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
-	}); err != nil {
-		slog.Error("teapot exit", "error", err)
-		return fmt.Errorf("teapot exit")
+	) // #nosec G204
+	stdoutBuf := new(bytes.Buffer)
+	cmd.Stdout = stdoutBuf
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		slog.Error("stderr pipe", "error", err)
+		return
 	}
-	return nil
+	var wg sync.WaitGroup
+	wg.Add(1)
+	scanner := bufio.NewScanner(stderr)
+	go func() {
+		for scanner.Scan() {
+			text := re.ReplaceAllString(scanner.Text(), "")
+			if text == "" {
+				continue
+			}
+			slog.Info("joint-teapot", "stderr", text)
+		}
+		wg.Done()
+		if scanner.Err() != nil {
+			slog.Error("stderr scanner", "error", scanner.Err())
+		}
+	}()
+	if err = cmd.Start(); err != nil {
+		slog.Error("cmd start", "error", err)
+		return
+	}
+	wg.Wait()
+	if err = cmd.Wait(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode := exitErr.ExitCode()
+			slog.Error("cmd completed with non-zero exit code",
+				"error", err,
+				"exitCode", exitCode)
+		} else {
+			slog.Error("cmd wait", "error", err)
+		}
+		return
+	}
+	if json.Unmarshal(stdoutBuf.Bytes(), &teapotResult) != nil {
+		slog.Error("unmarshal teapot result", "error", err,
+			"stdout", stdoutBuf.String())
+		return
+	}
+	slog.Info("teapot result", "result", teapotResult)
+	return
 }

@@ -13,6 +13,8 @@ import (
 	"github.com/jinzhu/copier"
 )
 
+type StageResult stage.StageResult
+
 func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}

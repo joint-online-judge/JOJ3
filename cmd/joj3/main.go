@@ -9,6 +9,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
+	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 var (
@@ -31,7 +32,37 @@ func init() {
 	showVersion = flag.Bool("version", false, "print current version")
 }
 
-func mainImpl() error {
+func mainImpl() (err error) {
+	confObj := new(conf.Conf)
+	var stageResults []internalStage.StageResult
+	var stageForceQuit bool
+	var teapotResult teapot.TeapotResult
+	defer func() {
+		actor := os.Getenv("GITHUB_ACTOR")
+		repository := os.Getenv("GITHUB_REPOSITORY")
+		ref := os.Getenv("GITHUB_REF")
+		workflow := os.Getenv("GITHUB_WORKFLOW")
+		totalScore := 0
+		for _, stageResult := range stageResults {
+			for _, result := range stageResult.Results {
+				totalScore += result.Score
+			}
+		}
+		slog.Info(
+			"joj3 summary",
+			"name", confObj.Name,
+			"totalScore", totalScore,
+			"forceQuit", stageForceQuit,
+			"actor", actor,
+			"repository", repository,
+			"ref", ref,
+			"workflow", workflow,
+			"issue", teapotResult.Issue,
+			"action", teapotResult.Action,
+			"sha", teapotResult.Sha,
+			"error", err,
+		)
+	}()
 	if err := setupSlog(""); err != nil { // before conf is loaded
 		slog.Error("setup slog", "error", err)
 		return err
@@ -57,7 +88,7 @@ func mainImpl() error {
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	confObj, err := conf.ParseConfFile(confPath)
+	confObj, err = conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return err
@@ -79,16 +110,16 @@ func mainImpl() error {
 		return err
 	}
 	groups := conf.MatchGroups(confObj, conventionalCommit)
-	stageResults, stageForceQuit, err := stage.Run(confObj, groups)
+	stageResults, stageForceQuit, err = stage.Run(confObj, groups)
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
-	stage.Summarize(confObj, stageResults, stageForceQuit)
 	if err = stage.Write(confObj.Stage.OutputPath, stageResults); err != nil {
 		slog.Error("stage write", "error", err)
 		return err
 	}
-	if err := teapot.Run(confObj, runID); err != nil {
+	teapotResult, err = teapot.Run(confObj, runID)
+	if err != nil {
 		slog.Error("teapot run", "error", err)
 		return err
 	}
