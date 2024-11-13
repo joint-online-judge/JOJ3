@@ -37,10 +37,12 @@ type Conf struct {
 }
 
 type DiffParserSummary struct {
-	Status  stage.Status
-	Time    uint64
-	Memory  uint64
-	RunTime uint64
+	Status     stage.Status
+	ExitStatus int
+	Error      string
+	Time       uint64
+	Memory     uint64
+	RunTime    uint64
 }
 
 type Diff struct{}
@@ -67,6 +69,12 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		if result.Status != stage.Status(envexec.StatusAccepted) &&
 			summary.Status == stage.Status(envexec.StatusAccepted) {
 			summary.Status = result.Status
+		}
+		if result.ExitStatus != 0 && summary.ExitStatus == 0 {
+			summary.ExitStatus = result.ExitStatus
+		}
+		if result.Error != "" && summary.Error == "" {
+			summary.Error = result.Error
 		}
 		summary.Time += result.Time
 		summary.Memory += result.Memory
