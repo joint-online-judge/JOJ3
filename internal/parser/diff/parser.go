@@ -124,12 +124,22 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				}
 			}
 		}
+		caseSummary := DiffParserSummary{
+			Status:     result.Status,
+			ExitStatus: result.ExitStatus,
+			Error:      result.Error,
+			Time:       result.Time,
+			Memory:     result.Memory,
+			RunTime:    result.RunTime,
+		}
+		slog.Debug("diff parser case parse done",
+			"case", i, "caseSummary", caseSummary)
 		res = append(res, stage.ParserResult{
 			Score:   score,
 			Comment: comment,
 		})
 	}
-	slog.Info("diff parser run done", "diffParserSummary", summary)
+	slog.Debug("diff parser run done", "diffParserSummary", summary)
 
 	return res, forceQuit, nil
 }
