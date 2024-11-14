@@ -7,7 +7,6 @@ import (
 
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -43,14 +42,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		slog.Debug("sandbox execute", "i", i, "pbCmd size", proto.Size(pbCmd))
 	}
 	pbReq := &pb.Request{Cmd: pbCmds}
-	pbReqBytes, err := protojson.Marshal(pbReq)
-	if err != nil {
-		slog.Error("failed to marshal json", "error", err)
-	}
-	slog.Info("sandbox execute",
-		"pbReq size", proto.Size(pbReq),
-		"pbReqBytes size", len(pbReqBytes),
-	)
+	slog.Info("sandbox execute", "pbReq size", proto.Size(pbReq))
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
