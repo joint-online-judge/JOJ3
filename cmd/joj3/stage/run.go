@@ -41,7 +41,11 @@ func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 		defaultCmd := s.Executor.With.Default
 		for _, optionalCmd := range s.Executor.With.Cases {
 			cmd := s.Executor.With.Default
-			err := copier.Copy(&cmd, &optionalCmd)
+			err := copier.CopyWithOption(
+				&cmd,
+				&optionalCmd,
+				copier.Option{DeepCopy: true},
+			)
 			if err != nil {
 				slog.Error("generate stages", "error", err)
 				return stages, err
@@ -49,13 +53,43 @@ func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 			// since these 3 values are pointers, copier will always copy
 			// them, so we need to check them manually
 			if defaultCmd.Stdin != nil && optionalCmd.Stdin == nil {
-				cmd.Stdin = defaultCmd.Stdin
+				var stdin stage.CmdFile
+				err := copier.CopyWithOption(
+					&stdin,
+					defaultCmd.Stdin,
+					copier.Option{DeepCopy: true},
+				)
+				if err != nil {
+					slog.Error("generate stages", "error", err)
+					return stages, err
+				}
+				cmd.Stdin = &stdin
 			}
 			if defaultCmd.Stdout != nil && optionalCmd.Stdout == nil {
-				cmd.Stdout = defaultCmd.Stdout
+				var stdout stage.CmdFile
+				err := copier.CopyWithOption(
+					&stdout,
+					defaultCmd.Stdout,
+					copier.Option{DeepCopy: true},
+				)
+				if err != nil {
+					slog.Error("generate stages", "error", err)
+					return stages, err
+				}
+				cmd.Stdout = &stdout
 			}
 			if defaultCmd.Stderr != nil && optionalCmd.Stderr == nil {
-				cmd.Stderr = defaultCmd.Stderr
+				var stderr stage.CmdFile
+				err := copier.CopyWithOption(
+					&stderr,
+					defaultCmd.Stderr,
+					copier.Option{DeepCopy: true},
+				)
+				if err != nil {
+					slog.Error("generate stages", "error", err)
+					return stages, err
+				}
+				cmd.Stderr = &stderr
 			}
 			cmds = append(cmds, cmd)
 		}
