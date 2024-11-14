@@ -25,8 +25,10 @@ func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
 	// max size according to https://protobuf.dev/programming-guides/encoding/#size-limit
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		// different to distinguish the error of ResourceExhausted
 		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(math.MaxInt32), // 2 GB
+			grpc.MaxCallRecvMsgSize(math.MaxInt32-2), // 2 GB - 2, 2147483645
+			grpc.MaxCallSendMsgSize(math.MaxInt32-1), // 2 GB - 1, 2147483646
 		),
 	}
 	if token != "" {
