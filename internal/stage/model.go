@@ -121,25 +121,26 @@ type ExecutorResult struct {
 	Buffs map[string][]byte `json:"-"`
 }
 
+type ExecutorResultSummary struct {
+	Status     Status            `json:"status"`
+	ExitStatus int               `json:"exitStatus"`
+	Error      string            `json:"error,omitempty"`
+	Time       uint64            `json:"time"`
+	Memory     uint64            `json:"memory"`
+	RunTime    uint64            `json:"runTime"`
+	Files      map[string]string `json:"files,omitempty"`
+	FileIDs    map[string]string `json:"fileIds,omitempty"`
+	FileError  []FileError       `json:"fileError,omitempty"`
+}
+
 func (r ExecutorResult) String() string {
-	type Result struct {
-		Status     Status
-		ExitStatus int
-		Error      string
-		Time       uint64
-		RunTime    uint64
-		Memory     envexec.Size
-		Files      map[string]string
-		FileIDs    map[string]string
-		FileError  []FileError
-	}
-	d := Result{
+	d := ExecutorResultSummary{
 		Status:     r.Status,
 		ExitStatus: r.ExitStatus,
 		Error:      r.Error,
 		Time:       r.Time,
+		Memory:     r.Memory,
 		RunTime:    r.RunTime,
-		Memory:     envexec.Size(r.Memory),
 		Files:      make(map[string]string),
 		FileIDs:    r.FileIDs,
 		FileError:  r.FileError,
@@ -148,6 +149,45 @@ func (r ExecutorResult) String() string {
 		d.Files[k] = "len:" + strconv.Itoa(len(v))
 	}
 	return fmt.Sprintf("%+v", d)
+}
+
+func (r ExecutorResult) MarshalJSON() ([]byte, error) {
+	d := ExecutorResultSummary{
+		Status:     r.Status,
+		ExitStatus: r.ExitStatus,
+		Error:      r.Error,
+		Time:       r.Time,
+		Memory:     r.Memory,
+		RunTime:    r.RunTime,
+		Files:      make(map[string]string),
+		FileIDs:    r.FileIDs,
+		FileError:  r.FileError,
+	}
+	for k, v := range r.Files {
+		d.Files[k] = "len:" + strconv.Itoa(len(v))
+	}
+	return json.Marshal(d)
+}
+
+func SummarizeExecutorResults(results []ExecutorResult) ExecutorResultSummary {
+	var summary ExecutorResultSummary
+	summary.Status = Status(envexec.StatusAccepted)
+	for _, result := range results {
+		if result.Status != Status(envexec.StatusAccepted) &&
+			summary.Status == Status(envexec.StatusAccepted) {
+			summary.Status = result.Status
+		}
+		if result.ExitStatus != 0 && summary.ExitStatus == 0 {
+			summary.ExitStatus = result.ExitStatus
+		}
+		if result.Error != "" && summary.Error == "" {
+			summary.Error = result.Error
+		}
+		summary.Time += result.Time
+		summary.Memory += result.Memory
+		summary.RunTime += result.RunTime
+	}
+	return summary
 }
 
 type StageExecutor struct {

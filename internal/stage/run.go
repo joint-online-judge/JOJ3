@@ -12,30 +12,65 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 	slog.Info("stage run start")
 	for _, stage := range stages {
 		slog.Info("stage start", "name", stage.Name)
-		slog.Info("executor run start", "name", stage.Executor.Name)
-		slog.Debug("executor run start", "name", stage.Executor.Name,
-			"cmds", stage.Executor.Cmds)
+		slog.Info(
+			"executor run start",
+			"stageName", stage.Name,
+			"name", stage.Executor.Name,
+		)
+		slog.Debug(
+			"executor run start",
+			"stageName", stage.Name,
+			"name", stage.Executor.Name,
+			"cmds", stage.Executor.Cmds,
+		)
 		executor, ok := executorMap[stage.Executor.Name]
 		if !ok {
-			slog.Error("executor not found", "name", stage.Executor.Name)
+			slog.Error(
+				"executor not found",
+				"stageName", stage.Name,
+				"name", stage.Executor.Name,
+			)
 			err = fmt.Errorf("executor not found: %s", stage.Executor.Name)
 			return
 		}
 		executorResults, err = executor.Run(stage.Executor.Cmds)
 		if err != nil {
-			slog.Error("executor run error", "name", stage.Executor.Name, "error", err)
+			slog.Error(
+				"executor run error",
+				"stageName", stage.Name,
+				"name", stage.Executor.Name,
+				"error", err,
+			)
 			return
 		}
-		slog.Debug("executor run done", "results", executorResults)
+		slog.Debug(
+			"executor run done",
+			"stageName", stage.Name,
+			"name", stage.Executor.Name,
+			"results", executorResults,
+			"summary", SummarizeExecutorResults(executorResults),
+		)
 		parserResults = []ParserResult{}
 		forceQuit = false
 		for _, stageParser := range stage.Parsers {
-			slog.Info("parser run start", "name", stageParser.Name)
-			slog.Debug("parser run start", "name", stageParser.Name,
-				"conf", stageParser.Conf)
+			slog.Info(
+				"parser run start",
+				"stageName", stage.Name,
+				"name", stageParser.Name,
+			)
+			slog.Debug(
+				"parser run start",
+				"stageName", stage.Name,
+				"name", stageParser.Name,
+				"conf", stageParser.Conf,
+			)
 			parser, ok := parserMap[stageParser.Name]
 			if !ok {
-				slog.Error("parser not found", "name", stageParser.Name)
+				slog.Error(
+					"parser not found",
+					"stageName", stage.Name,
+					"name", stageParser.Name,
+				)
 				err = fmt.Errorf("parser not found: %s", stageParser.Name)
 				return
 			}
@@ -43,14 +78,28 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 			tmpParserResults, parserForceQuit, err = parser.Run(
 				executorResults, stageParser.Conf)
 			if err != nil {
-				slog.Error("parser run error", "name", stageParser.Name, "error", err)
+				slog.Error(
+					"parser run error",
+					"stageName", stage.Name,
+					"name", stageParser.Name,
+					"error", err,
+				)
 				return
 			}
 			if parserForceQuit {
-				slog.Error("parser force quit", "name", stageParser.Name)
+				slog.Error(
+					"parser force quit",
+					"stageName", stage.Name,
+					"name", stageParser.Name,
+				)
 			}
 			forceQuit = forceQuit || parserForceQuit
-			slog.Debug("parser run done", "results", tmpParserResults)
+			slog.Debug(
+				"parser run done",
+				"stageName", stage.Name,
+				"name", stageParser.Name,
+				"results", tmpParserResults,
+			)
 			if len(parserResults) == 0 {
 				parserResults = tmpParserResults
 			} else {

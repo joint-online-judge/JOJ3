@@ -7,7 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -36,15 +35,6 @@ type Conf struct {
 	}
 }
 
-type DiffParserSummary struct {
-	Status     stage.Status
-	ExitStatus int
-	Error      string
-	Time       uint64
-	Memory     uint64
-	RunTime    uint64
-}
-
 type Diff struct{}
 
 func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
@@ -60,25 +50,10 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 	var res []stage.ParserResult
 	forceQuit := false
-	var summary DiffParserSummary
-	summary.Status = stage.Status(envexec.StatusAccepted)
 	for i, caseConf := range conf.Cases {
 		result := results[i]
 		score := 0
 		comment := ""
-		if result.Status != stage.Status(envexec.StatusAccepted) &&
-			summary.Status == stage.Status(envexec.StatusAccepted) {
-			summary.Status = result.Status
-		}
-		if result.ExitStatus != 0 && summary.ExitStatus == 0 {
-			summary.ExitStatus = result.ExitStatus
-		}
-		if result.Error != "" && summary.Error == "" {
-			summary.Error = result.Error
-		}
-		summary.Time += result.Time
-		summary.Memory += result.Memory
-		summary.RunTime += result.RunTime
 		for _, output := range caseConf.Outputs {
 			answer, err := os.ReadFile(output.AnswerPath)
 			if err != nil {
@@ -124,22 +99,11 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				}
 			}
 		}
-		caseSummary := DiffParserSummary{
-			Status:     result.Status,
-			ExitStatus: result.ExitStatus,
-			Error:      result.Error,
-			Time:       result.Time,
-			Memory:     result.Memory,
-			RunTime:    result.RunTime,
-		}
-		slog.Debug("diff parser case parse done",
-			"case", i, "caseSummary", caseSummary)
 		res = append(res, stage.ParserResult{
 			Score:   score,
 			Comment: comment,
 		})
 	}
-	slog.Debug("diff parser run done", "diffParserSummary", summary)
 
 	return res, forceQuit, nil
 }

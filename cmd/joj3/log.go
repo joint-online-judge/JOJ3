@@ -96,6 +96,12 @@ func setupSlog(logPath string) error {
 		Level: stderrLogLevel,
 	})
 	handlers = append(handlers, stderrHandler)
+	if runningTest {
+		stderrJSONHandler := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+			Level: stderrLogLevel,
+		})
+		handlers = append(handlers, stderrJSONHandler)
+	}
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
 	multiHandlerWithAttrs := multiHandler.WithAttrs(
