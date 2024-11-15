@@ -13,19 +13,19 @@ import (
 )
 
 var (
-	confRoot         string
-	confName         string
-	fallbackConfName string
-	tag              string
-	msg              string
-	showVersion      *bool
-	Version          string = "debug"
+	confFileRoot         string
+	confFileName         string
+	fallbackConfFileName string
+	tag                  string
+	msg                  string
+	showVersion          *bool
+	Version              string = "debug"
 )
 
 func init() {
-	flag.StringVar(&confRoot, "conf-root", ".", "root path for all config files")
-	flag.StringVar(&confName, "conf-name", "conf.json", "filename for config files")
-	flag.StringVar(&fallbackConfName, "fallback-conf-name", "", "filename for the fallback config file in conf-root, leave empty to use conf-name")
+	flag.StringVar(&confFileRoot, "conf-root", ".", "root path for all config files")
+	flag.StringVar(&confFileName, "conf-name", "conf.json", "filename for config files")
+	flag.StringVar(&fallbackConfFileName, "fallback-conf-name", "", "filename for the fallback config file in conf-root, leave empty to use conf-name")
 	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
 	// TODO: remove this flag
 	flag.StringVar(&msg, "msg", "", "[DEPRECATED] will be ignored")
@@ -38,10 +38,6 @@ func mainImpl() (err error) {
 	var forceQuitStageName string
 	var teapotResult teapot.TeapotResult
 	defer func() {
-		actor := os.Getenv("GITHUB_ACTOR")
-		repository := os.Getenv("GITHUB_REPOSITORY")
-		ref := os.Getenv("GITHUB_REF")
-		workflow := os.Getenv("GITHUB_WORKFLOW")
 		totalScore := 0
 		for _, stageResult := range stageResults {
 			for _, result := range stageResult.Results {
@@ -50,14 +46,9 @@ func mainImpl() (err error) {
 		}
 		slog.Info(
 			"joj3 summary",
-			"name", confObj.Name,
 			"totalScore", totalScore,
 			"forceQuit", forceQuitStageName != "",
 			"forceQuitStageName", forceQuitStageName,
-			"actor", actor,
-			"repository", repository,
-			"ref", ref,
-			"workflow", workflow,
 			"issue", teapotResult.Issue,
 			"action", teapotResult.Action,
 			"sha", teapotResult.Sha,
@@ -73,8 +64,8 @@ func mainImpl() (err error) {
 		fmt.Println(Version)
 		return nil
 	}
-	if fallbackConfName == "" {
-		fallbackConfName = confName
+	if fallbackConfFileName == "" {
+		fallbackConfFileName = confFileName
 	}
 	slog.Info("start joj3", "version", Version)
 	msg, err := conf.GetCommitMsg()
@@ -83,7 +74,7 @@ func mainImpl() (err error) {
 		return err
 	}
 	confPath, confStat, conventionalCommit, err := conf.GetConfPath(
-		confRoot, confName, fallbackConfName, msg, tag)
+		confFileRoot, confFileName, fallbackConfFileName, msg, tag)
 	if err != nil {
 		slog.Error("get conf path", "error", err)
 		return err
@@ -119,7 +110,7 @@ func mainImpl() (err error) {
 		slog.Error("stage write", "error", err)
 		return err
 	}
-	teapotResult, err = teapot.Run(confObj, runID)
+	teapotResult, err = teapot.Run(confObj)
 	if err != nil {
 		slog.Error("teapot run", "error", err)
 		return err

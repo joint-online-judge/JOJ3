@@ -2,31 +2,16 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
-	"time"
+
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 )
 
 var runningTest bool
 
 type multiHandler struct {
 	handlers []slog.Handler
-}
-
-var runID string
-
-func init() {
-	timestamp := time.Now().UnixNano()
-	pid := os.Getpid()
-	high := timestamp >> 32
-	low := timestamp & 0xFFFFFFFF
-	combined := high ^ low
-	combined ^= int64(pid)
-	combined ^= int64(timestamp >> 16)
-	combined ^= (combined >> 8)
-	combined ^= (combined << 16)
-	runID = fmt.Sprintf("%08X", combined&0xFFFFFFFF)
 }
 
 func (h *multiHandler) Enabled(ctx context.Context, level slog.Level) bool {
@@ -63,6 +48,14 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 		handlers[i] = handler.WithGroup(name)
 	}
 	return &multiHandler{handlers: handlers}
+}
+
+func getSlogAttrs() []slog.Attr {
+	return []slog.Attr{
+		slog.String("runID", env.Attr.RunID),
+		slog.String("confName", env.Attr.ConfName),
+		slog.String("actor", env.Attr.Actor),
+	}
 }
 
 func setupSlog(logPath string) error {
@@ -104,8 +97,7 @@ func setupSlog(logPath string) error {
 	}
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
-	multiHandlerWithAttrs := multiHandler.WithAttrs(
-		[]slog.Attr{slog.String("runID", runID)})
+	multiHandlerWithAttrs := multiHandler.WithAttrs(getSlogAttrs())
 	// Set the default logger
 	logger := slog.New(multiHandlerWithAttrs)
 	slog.SetDefault(logger)

@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 )
 
 type TeapotResult struct {
@@ -22,20 +23,18 @@ type TeapotResult struct {
 	Sha    string `json:"sha"`
 }
 
-func Run(conf *conf.Conf, runID string) (teapotResult TeapotResult, err error) {
+func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
-	sha := os.Getenv("GITHUB_SHA")
-	actor := os.Getenv("GITHUB_ACTOR")
-	repository := os.Getenv("GITHUB_REPOSITORY")
-	runNumber := os.Getenv("GITHUB_RUN_NUMBER")
-	if actor == "" || repository == "" || strings.Count(repository, "/") != 1 ||
-		runNumber == "" {
+	if env.Attr.Actor == "" ||
+		env.Attr.Repository == "" ||
+		strings.Count(env.Attr.Repository, "/") != 1 ||
+		env.Attr.RunNumber == "" {
 		slog.Error("teapot env not set")
 		err = fmt.Errorf("teapot env not set")
 		return
 	}
-	repoParts := strings.Split(repository, "/")
+	repoParts := strings.Split(env.Attr.Repository, "/")
 	repoName := repoParts[1]
 	skipIssueArg := "--no-skip-result-issue"
 	if conf.Teapot.SkipIssue {
@@ -55,10 +54,11 @@ func Run(conf *conf.Conf, runID string) (teapotResult TeapotResult, err error) {
 	}
 	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 	cmd := exec.Command("joint-teapot",
-		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath, actor,
-		conf.Teapot.GradingRepoName, repoName, runNumber,
-		conf.Teapot.ScoreboardPath, conf.Teapot.FailedTablePath,
-		conf.Name, sha, runID,
+		"joj3-all", conf.Teapot.EnvFilePath, conf.Stage.OutputPath,
+		env.Attr.Actor, conf.Teapot.GradingRepoName, repoName,
+		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
+		conf.Teapot.FailedTablePath,
+		conf.Name, env.Attr.Sha, env.Attr.RunID,
 		"--max-total-score", strconv.Itoa(conf.Teapot.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
