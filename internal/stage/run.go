@@ -5,7 +5,9 @@ import (
 	"log/slog"
 )
 
-func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error) {
+func Run(stages []Stage) (
+	stageResults []StageResult, forceQuitStageName string, err error,
+) {
 	var executorResults []ExecutorResult
 	var parserResults []ParserResult
 	var tmpParserResults []ParserResult
@@ -59,7 +61,6 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 			"summary", SummarizeExecutorResults(executorResults),
 		)
 		parserResults = []ParserResult{}
-		forceQuit = false
 		for _, stageParser := range stage.Parsers {
 			slog.Info(
 				"parser run start",
@@ -100,8 +101,8 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 					"stageName", stage.Name,
 					"name", stageParser.Name,
 				)
+				forceQuitStageName = stage.Name
 			}
-			forceQuit = forceQuit || parserForceQuit
 			slog.Debug(
 				"parser run done",
 				"stageName", stage.Name,
@@ -120,9 +121,9 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 		stageResults = append(stageResults, StageResult{
 			Name:      stage.Name,
 			Results:   parserResults,
-			ForceQuit: forceQuit,
+			ForceQuit: forceQuitStageName != "",
 		})
-		if forceQuit {
+		if forceQuitStageName != "" {
 			break
 		}
 	}

@@ -35,7 +35,7 @@ func init() {
 func mainImpl() (err error) {
 	confObj := new(conf.Conf)
 	var stageResults []internalStage.StageResult
-	var stageForceQuit bool
+	var forceQuitStageName string
 	var teapotResult teapot.TeapotResult
 	defer func() {
 		actor := os.Getenv("GITHUB_ACTOR")
@@ -52,7 +52,8 @@ func mainImpl() (err error) {
 			"joj3 summary",
 			"name", confObj.Name,
 			"totalScore", totalScore,
-			"forceQuit", stageForceQuit,
+			"forceQuit", forceQuitStageName != "",
+			"forceQuitStageName", forceQuitStageName,
 			"actor", actor,
 			"repository", repository,
 			"ref", ref,
@@ -110,7 +111,7 @@ func mainImpl() (err error) {
 		return err
 	}
 	groups := conf.MatchGroups(confObj, conventionalCommit)
-	stageResults, stageForceQuit, err = stage.Run(confObj, groups)
+	stageResults, forceQuitStageName, err = stage.Run(confObj, groups)
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
@@ -123,9 +124,9 @@ func mainImpl() (err error) {
 		slog.Error("teapot run", "error", err)
 		return err
 	}
-	if stageForceQuit {
-		slog.Info("stage force quit")
-		return fmt.Errorf("stage force quit")
+	if forceQuitStageName != "" {
+		slog.Info("stage force quit", "name", forceQuitStageName)
+		return fmt.Errorf("stage force quit with name %s", forceQuitStageName)
 	}
 	return nil
 }

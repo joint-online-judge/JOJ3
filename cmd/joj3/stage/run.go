@@ -132,7 +132,7 @@ func newErrorStageResults(err error) []stage.StageResult {
 }
 
 func Run(conf *conf.Conf, groups []string) (
-	stageResults []stage.StageResult, forceQuit bool, err error,
+	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
@@ -142,15 +142,15 @@ func Run(conf *conf.Conf, groups []string) (
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		stageResults = newErrorStageResults(err)
-		forceQuit = true
+		forceQuitStageName = "internal"
 		return
 	}
 	defer stage.Cleanup()
-	stageResults, forceQuit, err = stage.Run(stages)
+	stageResults, forceQuitStageName, err = stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
 		stageResults = newErrorStageResults(err)
-		forceQuit = true
+		forceQuitStageName = "internal"
 		return
 	}
 	return
