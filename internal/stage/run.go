@@ -43,11 +43,19 @@ func Run(stages []Stage) (stageResults []StageResult, forceQuit bool, err error)
 			)
 			return
 		}
+		for i, executorResult := range executorResults {
+			slog.Debug(
+				"executor run done",
+				"stageName", stage.Name,
+				"case", i,
+				"name", stage.Executor.Name,
+				"result", executorResult,
+			)
+		}
 		slog.Debug(
 			"executor run done",
 			"stageName", stage.Name,
 			"name", stage.Executor.Name,
-			"results", executorResults,
 			"summary", SummarizeExecutorResults(executorResults),
 		)
 		parserResults = []ParserResult{}
