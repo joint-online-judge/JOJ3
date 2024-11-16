@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"strings"
-	"unicode"
 
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
@@ -111,22 +110,47 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 
 // compareStrings compares two strings character by character, optionally ignoring whitespace.
 func compareStrings(str1, str2 string, compareSpace bool) bool {
-	if !compareSpace {
-		str1 = removeSpace(str1)
-		str2 = removeSpace(str2)
+	if compareSpace {
+		return str1 == str2
 	}
-	return str1 == str2
-}
-
-// removeSpace removes all whitespace characters from the string.
-func removeSpace(s string) string {
-	var b strings.Builder
-	for _, r := range s {
-		if !unicode.IsSpace(r) {
-			b.WriteRune(r)
+	var i, j int
+	l1 := len(str1)
+	l2 := len(str2)
+	for i < l1 && j < l2 {
+		for i < l1 && isWhitespace(str1[i]) {
+			i++
+		}
+		for j < l2 && isWhitespace(str2[j]) {
+			j++
+		}
+		if i < l1 && j < l2 && str1[i] != str2[j] {
+			return false
+		}
+		if i < l1 {
+			i++
+		}
+		if j < l2 {
+			j++
 		}
 	}
-	return b.String()
+	for i < l1 && isWhitespace(str1[i]) {
+		i++
+	}
+	for j < l2 && isWhitespace(str2[j]) {
+		j++
+	}
+	return i == l1 && j == l2
+}
+
+func isWhitespace(b byte) bool {
+	return b == ' ' ||
+		b == '\t' ||
+		b == '\n' ||
+		b == '\r' ||
+		b == '\v' ||
+		b == '\f' ||
+		b == 0x85 ||
+		b == 0xA0
 }
 
 // myersDiff computes the Myers' diff between two slices of strings.
