@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/koding/multiconfig"
 )
@@ -169,6 +170,7 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 		slog.Error("validate stages conf", "error", err)
 		return
 	}
+	env.Attr.ConfName = conf.Name
 	// TODO: remove the following backward compatibility codes
 	if len(conf.Stage.Stages) == 0 {
 		conf.Stage.SandboxExecServer = conf.SandboxExecServer
