@@ -64,7 +64,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				"actual length", len(result.Files[output.FileName]),
 				"answer length", len(string(answer)))
 			// If no difference, assign score
-			if compareChars(string(answer), result.Files[output.FileName],
+			if compareStrings(string(answer), result.Files[output.FileName],
 				output.CompareSpace) {
 				score += output.Score
 				comment += conf.PassComment
@@ -82,7 +82,8 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						result.Files[output.FileName], "\n")
 
 					// Generate Myers diff
-					diffOps := myersDiff(stdoutLines, resultLines)
+					diffOps := myersDiff(stdoutLines, resultLines,
+						output.CompareSpace)
 					if output.MaxDiffLength == 0 { // real default value
 						output.MaxDiffLength = 2048
 					}
@@ -108,13 +109,13 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 	return res, forceQuit, nil
 }
 
-// compareChars compares two strings character by character, optionally ignoring whitespace.
-func compareChars(stdout, result string, compareSpace bool) bool {
+// compareStrings compares two strings character by character, optionally ignoring whitespace.
+func compareStrings(str1, str2 string, compareSpace bool) bool {
 	if !compareSpace {
-		stdout = removeSpace(stdout)
-		result = removeSpace(result)
+		str1 = removeSpace(str1)
+		str2 = removeSpace(str2)
 	}
-	return stdout == result
+	return str1 == str2
 }
 
 // removeSpace removes all whitespace characters from the string.
@@ -130,7 +131,7 @@ func removeSpace(s string) string {
 
 // myersDiff computes the Myers' diff between two slices of strings.
 // src: https://github.com/cj1128/myers-diff/blob/master/main.go
-func myersDiff(src, dst []string) []operation {
+func myersDiff(src, dst []string, compareSpace bool) []operation {
 	n := len(src)
 	m := len(dst)
 	max := n + m
@@ -144,7 +145,9 @@ loop:
 
 		if d == 0 {
 			t := 0
-			for len(src) > t && len(dst) > t && src[t] == dst[t] {
+			for len(src) > t &&
+				len(dst) > t &&
+				compareStrings(src[t], dst[t], compareSpace) {
 				t += 1
 			}
 			v[0] = t
@@ -165,7 +168,7 @@ loop:
 
 			y = x - k
 
-			for x < n && y < m && src[x] == dst[y] {
+			for x < n && y < m && compareStrings(src[x], dst[y], compareSpace) {
 				x, y = x+1, y+1
 			}
 
