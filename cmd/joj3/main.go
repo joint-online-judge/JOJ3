@@ -44,9 +44,14 @@ func mainImpl() (err error) {
 				totalScore += result.Score
 			}
 		}
+		cappedTotalScore := totalScore
+		if confObj.MaxTotalScore >= 0 {
+			cappedTotalScore = min(totalScore, confObj.MaxTotalScore)
+		}
 		slog.Info(
 			"joj3 summary",
 			"totalScore", totalScore,
+			"cappedTotalScore", cappedTotalScore,
 			"forceQuit", forceQuitStageName != "",
 			"forceQuitStageName", forceQuitStageName,
 			"issue", teapotResult.Issue,

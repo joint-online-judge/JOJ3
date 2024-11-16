@@ -39,6 +39,7 @@ type Conf struct {
 	Name                string `default:"unknown"`
 	LogPath             string `default:""`
 	ExpireUnixTimestamp int64  `default:"-1"`
+	MaxTotalScore       int    `default:"-1"`
 	Stage               struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
@@ -55,7 +56,7 @@ type Conf struct {
 		SkipScoreboard        bool   `default:"false"`
 		SkipFailedTable       bool   `default:"false"`
 		SubmitterInIssueTitle bool   `default:"true"`
-		MaxTotalScore         int    `default:"-1"`
+		MaxTotalScore         int    `default:"-1"` // TODO: remove me
 	}
 	// TODO: remove the following backward compatibility fields
 	SandboxExecServer string `default:"localhost:5051"`
@@ -172,6 +173,9 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 	}
 	env.Attr.ConfName = conf.Name
 	// TODO: remove the following backward compatibility codes
+	if conf.MaxTotalScore < 0 && conf.Teapot.MaxTotalScore >= 0 {
+		conf.MaxTotalScore = conf.Teapot.MaxTotalScore
+	}
 	if len(conf.Stage.Stages) == 0 {
 		conf.Stage.SandboxExecServer = conf.SandboxExecServer
 		conf.Stage.SandboxToken = conf.SandboxToken

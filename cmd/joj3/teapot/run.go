@@ -59,7 +59,7 @@ func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
 		conf.Teapot.FailedTablePath,
 		conf.Name, env.Attr.Sha, env.Attr.RunID,
-		"--max-total-score", strconv.Itoa(conf.Teapot.MaxTotalScore),
+		"--max-total-score", strconv.Itoa(conf.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
 	) // #nosec G204
