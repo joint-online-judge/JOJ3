@@ -55,6 +55,7 @@ func getSlogAttrs() []slog.Attr {
 		slog.String("runID", env.Attr.RunID),
 		slog.String("confName", env.Attr.ConfName),
 		slog.String("actor", env.Attr.Actor),
+		slog.String("repository", env.Attr.Repository),
 	}
 }
 
