@@ -60,7 +60,7 @@ func mainImpl() (err error) {
 			"error", err,
 		)
 	}()
-	if err := setupSlog(""); err != nil { // before conf is loaded
+	if err := setupSlog(confObj); err != nil { // before conf is loaded
 		slog.Error("setup slog", "error", err)
 		return err
 	}
@@ -91,7 +91,7 @@ func mainImpl() (err error) {
 		return err
 	}
 	slog.Debug("conf loaded", "conf", confObj)
-	if err := setupSlog(confObj.LogPath); err != nil { // after conf is loaded
+	if err := setupSlog(confObj); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)
 		return err
 	}

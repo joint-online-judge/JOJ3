@@ -15,6 +15,8 @@ type Attribute struct {
 	Ref        string
 	Workflow   string
 	RunNumber  string
+	ActorName  string
+	ActorID    string
 }
 
 var Attr Attribute

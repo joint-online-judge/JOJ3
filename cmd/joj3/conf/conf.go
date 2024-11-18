@@ -38,6 +38,7 @@ type ConfStage struct {
 type Conf struct {
 	Name                string `default:"unknown"`
 	LogPath             string `default:""`
+	ActorCsvPath        string `default:""`
 	ExpireUnixTimestamp int64  `default:"-1"`
 	MaxTotalScore       int    `default:"-1"`
 	Stage               struct {

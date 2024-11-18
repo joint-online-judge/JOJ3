@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/csv"
+	"io"
 	"log/slog"
 	"os"
 
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 )
 
@@ -50,17 +53,56 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 	return &multiHandler{handlers: handlers}
 }
 
-func getSlogAttrs() []slog.Attr {
-	return []slog.Attr{
+func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
+	attrs = []slog.Attr{
 		slog.String("runID", env.Attr.RunID),
 		slog.String("confName", env.Attr.ConfName),
 		slog.String("actor", env.Attr.Actor),
+		slog.String("actorName", env.Attr.ActorName),
+		slog.String("actorID", env.Attr.ActorID),
 		slog.String("repository", env.Attr.Repository),
 		slog.String("sha", env.Attr.Sha),
 	}
+	file, err := os.Open(csvPath)
+	if err != nil {
+		slog.Error("open csv", "error", err)
+		return
+	}
+	defer file.Close()
+	reader := csv.NewReader(file)
+	for {
+		row, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			slog.Error("read csv", "error", err)
+			return
+		}
+		if len(row) < 3 {
+			continue
+		}
+		actor := row[2]
+		slog.Info("actor", "actor", actor)
+		if actor == env.Attr.Actor {
+			env.Attr.ActorName = row[0]
+			env.Attr.ActorID = row[1]
+			return []slog.Attr{
+				slog.String("runID", env.Attr.RunID),
+				slog.String("confName", env.Attr.ConfName),
+				slog.String("actor", env.Attr.Actor),
+				slog.String("actorName", env.Attr.ActorName),
+				slog.String("actorID", env.Attr.ActorID),
+				slog.String("repository", env.Attr.Repository),
+				slog.String("sha", env.Attr.Sha),
+			}
+		}
+	}
+	return
 }
 
-func setupSlog(logPath string) error {
+func setupSlog(conf *conf.Conf) error {
+	logPath := conf.LogPath
 	handlers := []slog.Handler{}
 	if logPath != "" {
 		// Text file handler for debug logs
@@ -99,7 +141,9 @@ func setupSlog(logPath string) error {
 	}
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
-	multiHandlerWithAttrs := multiHandler.WithAttrs(getSlogAttrs())
+	multiHandlerWithAttrs := multiHandler.WithAttrs(
+		getSlogAttrs(conf.ActorCsvPath),
+	)
 	// Set the default logger
 	logger := slog.New(multiHandlerWithAttrs)
 	slog.SetDefault(logger)
