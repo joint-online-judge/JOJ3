@@ -63,6 +63,10 @@ func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
 		slog.String("repository", env.Attr.Repository),
 		slog.String("sha", env.Attr.Sha),
 	}
+	// if csvPath is empty, just return
+	if csvPath == "" {
+		return
+	}
 	file, err := os.Open(csvPath)
 	if err != nil {
 		slog.Error("open csv", "error", err)
