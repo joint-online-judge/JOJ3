@@ -87,7 +87,6 @@ func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
 			continue
 		}
 		actor := row[2]
-		slog.Info("actor", "actor", actor)
 		if actor == env.Attr.Actor {
 			env.Attr.ActorName = row[0]
 			env.Attr.ActorID = row[1]
