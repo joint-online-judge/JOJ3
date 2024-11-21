@@ -17,7 +17,6 @@ var (
 	confFileName         string
 	fallbackConfFileName string
 	tag                  string
-	msg                  string
 	showVersion          *bool
 	Version              string = "debug"
 )
@@ -27,8 +26,6 @@ func init() {
 	flag.StringVar(&confFileName, "conf-name", "conf.json", "filename for config files")
 	flag.StringVar(&fallbackConfFileName, "fallback-conf-name", "", "filename for the fallback config file in conf-root, leave empty to use conf-name")
 	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
-	// TODO: remove this flag
-	flag.StringVar(&msg, "msg", "", "[DEPRECATED] will be ignored")
 	showVersion = flag.Bool("version", false, "print current version")
 }
 
@@ -37,6 +34,7 @@ func mainImpl() (err error) {
 	var stageResults []internalStage.StageResult
 	var forceQuitStageName string
 	var teapotResult teapot.TeapotResult
+	var msg string
 	defer func() {
 		totalScore := 0
 		for _, stageResult := range stageResults {
@@ -57,6 +55,7 @@ func mainImpl() (err error) {
 			"issue", teapotResult.Issue,
 			"action", teapotResult.Action,
 			"sha", teapotResult.Sha,
+			"msg", msg,
 			"error", err,
 		)
 	}()
@@ -73,7 +72,7 @@ func mainImpl() (err error) {
 		fallbackConfFileName = confFileName
 	}
 	slog.Info("start joj3", "version", Version)
-	msg, err := conf.GetCommitMsg()
+	msg, err = conf.GetCommitMsg()
 	if err != nil {
 		slog.Error("get commit msg", "error", err)
 		return err
