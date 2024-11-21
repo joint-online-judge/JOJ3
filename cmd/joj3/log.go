@@ -62,6 +62,7 @@ func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
 		slog.String("actorID", env.Attr.ActorID),
 		slog.String("repository", env.Attr.Repository),
 		slog.String("sha", env.Attr.Sha),
+		slog.String("ref", env.Attr.Ref),
 	}
 	// if csvPath is empty, just return
 	if csvPath == "" {
@@ -98,6 +99,7 @@ func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
 				slog.String("actorID", env.Attr.ActorID),
 				slog.String("repository", env.Attr.Repository),
 				slog.String("sha", env.Attr.Sha),
+				slog.String("ref", env.Attr.Ref),
 			}
 		}
 	}
