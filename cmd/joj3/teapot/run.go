@@ -23,7 +23,9 @@ type TeapotResult struct {
 	Sha    string `json:"sha"`
 }
 
-func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
+func Run(conf *conf.Conf, groups []string) (
+	teapotResult TeapotResult, err error,
+) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	if env.Attr.Actor == "" ||
@@ -59,6 +61,7 @@ func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
 		conf.Teapot.FailedTablePath,
 		conf.Name, env.Attr.Sha, env.Attr.RunID,
+		strings.Join(groups, ","),
 		"--max-total-score", strconv.Itoa(conf.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,

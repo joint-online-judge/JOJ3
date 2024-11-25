@@ -340,5 +340,6 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 			groups = append(groups, keyword)
 		}
 	}
+	slog.Info("matched groups", "groups", groups)
 	return groups
 }
