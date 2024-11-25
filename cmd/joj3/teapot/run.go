@@ -26,7 +26,7 @@ type TeapotResult struct {
 func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
-	if env.Attr.Actor == "" ||
+	if env.Attr.TriggeringActor == "" ||
 		env.Attr.Repository == "" ||
 		strings.Count(env.Attr.Repository, "/") != 1 ||
 		env.Attr.RunNumber == "" {
@@ -58,7 +58,7 @@ func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 		env.Attr.Actor, conf.Teapot.GradingRepoName, repoName,
 		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
 		conf.Teapot.FailedTablePath,
-		conf.Name, env.Attr.Sha, env.Attr.RunID,
+		conf.Name, env.Attr.Sha, env.Attr.RunID, env.Attr.TriggeringActor,
 		"--max-total-score", strconv.Itoa(conf.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
