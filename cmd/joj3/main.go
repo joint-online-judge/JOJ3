@@ -106,6 +106,14 @@ func mainImpl() (err error) {
 		return err
 	}
 	groups := conf.MatchGroups(confObj, conventionalCommit)
+	if len(confObj.Teapot.Groups) != 0 {
+		if err = teapot.Check(confObj); err != nil {
+			slog.Error("teapot check", "error", err)
+			return err
+		}
+	} else {
+		slog.Info("teapot check disabled")
+	}
 	stageResults, forceQuitStageName, err = stage.Run(confObj, groups)
 	if err != nil {
 		slog.Error("stage run", "error", err)

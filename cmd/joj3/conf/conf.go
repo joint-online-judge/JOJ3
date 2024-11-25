@@ -35,6 +35,12 @@ type ConfStage struct {
 	}
 }
 
+type ConfGroup struct {
+	Name           string
+	MaxCount       int
+	TimePeriodHour int
+}
+
 type Conf struct {
 	Name                string `default:"unknown"`
 	LogPath             string `default:""`
@@ -57,7 +63,8 @@ type Conf struct {
 		SkipScoreboard        bool   `default:"false"`
 		SkipFailedTable       bool   `default:"false"`
 		SubmitterInIssueTitle bool   `default:"true"`
-		MaxTotalScore         int    `default:"-1"` // TODO: remove me
+		Groups                []ConfGroup
+		MaxTotalScore         int `default:"-1"` // TODO: remove me
 	}
 	// TODO: remove the following backward compatibility fields
 	SandboxExecServer string `default:"localhost:5051"`
