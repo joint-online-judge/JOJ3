@@ -7,17 +7,16 @@ import (
 )
 
 type Attribute struct {
-	ConfName        string
-	RunID           string
-	Actor           string
-	TriggeringActor string
-	Repository      string
-	Sha             string
-	Ref             string
-	Workflow        string
-	RunNumber       string
-	ActorName       string
-	ActorID         string
+	ConfName   string
+	RunID      string
+	Actor      string
+	Repository string
+	Sha        string
+	Ref        string
+	Workflow   string
+	RunNumber  string
+	ActorName  string
+	ActorID    string
 }
 
 var Attr Attribute
@@ -34,7 +33,6 @@ func init() {
 	combined ^= (combined << 16)
 	Attr.RunID = fmt.Sprintf("%08X", combined&0xFFFFFFFF)
 	Attr.Actor = os.Getenv("GITHUB_ACTOR")
-	Attr.TriggeringActor = os.Getenv("GITHUB_TRIGGERING_ACTOR")
 	Attr.Repository = os.Getenv("GITHUB_REPOSITORY")
 	Attr.Sha = os.Getenv("GITHUB_SHA")
 	Attr.Ref = os.Getenv("GITHUB_REF")

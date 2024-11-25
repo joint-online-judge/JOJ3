@@ -58,7 +58,7 @@ func Run(conf *conf.Conf) (teapotResult TeapotResult, err error) {
 		env.Attr.Actor, conf.Teapot.GradingRepoName, repoName,
 		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
 		conf.Teapot.FailedTablePath,
-		conf.Name, env.Attr.Sha, env.Attr.RunID, env.Attr.TriggeringActor,
+		conf.Name, env.Attr.Sha, env.Attr.RunID,
 		"--max-total-score", strconv.Itoa(conf.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,
