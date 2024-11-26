@@ -142,7 +142,7 @@ func newTeapotCheckStageResults(
 	forceQuit := false
 	for _, checkResult := range checkResults {
 		comment += fmt.Sprintf(
-			"Keyword `%s` in last %d hour(s): submit count %d, max count %d\n",
+			"keyword `%s` in last %d hour(s): submit count %d, max count %d\n",
 			checkResult.Name,
 			checkResult.TimePeriod,
 			checkResult.SubmitCount,
