@@ -177,6 +177,7 @@ func Run(
 	)
 	if err != nil {
 		slog.Error("teapot check", "error", err)
+		conf.Teapot.SkipScoreboard = true // avoid adding extra submit count
 		return
 	}
 	executors.InitWithConf(
