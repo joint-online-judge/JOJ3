@@ -1,6 +1,7 @@
 package teapot
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -10,7 +11,14 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 )
 
-func Check(conf *conf.Conf) (err error) {
+type CheckResult struct {
+	Name        string `json:"name"`
+	SubmitCount int    `json:"submit_count"`
+	MaxCount    int    `json:"max_count"`
+	TimePeriod  int    `json:"time_period"`
+}
+
+func Check(conf *conf.Conf) (checkResults []CheckResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	if env.Attr.Actor == "" ||
@@ -34,10 +42,16 @@ func Check(conf *conf.Conf) (err error) {
 		conf.Teapot.ScoreboardPath, conf.Name,
 		"--group-config", strings.Join(formattedGroups, ","),
 	}
-	_, err = runCommand(args)
+	stdoutBuf, err := runCommand(args)
 	if err != nil {
 		slog.Error("teapot check exec", "error", err)
 		return
 	}
+	if json.Unmarshal(stdoutBuf.Bytes(), &checkResults) != nil {
+		slog.Error("unmarshal teapot result", "error", err,
+			"stdout", stdoutBuf.String())
+		return
+	}
+	slog.Info("teapot result", "result", checkResults)
 	return
 }

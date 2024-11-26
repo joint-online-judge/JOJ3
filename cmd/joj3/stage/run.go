@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
 	executors "github.com/joint-online-judge/JOJ3/internal/executor"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
@@ -116,7 +117,7 @@ func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 	return stages, nil
 }
 
-func newErrorStageResults(err error) []stage.StageResult {
+func newErrorStageResults(err error) ([]stage.StageResult, string) {
 	return []stage.StageResult{
 		{
 			Name: "Internal Error",
@@ -128,12 +129,56 @@ func newErrorStageResults(err error) []stage.StageResult {
 			}},
 			ForceQuit: true,
 		},
-	}
+	}, "Internal Error"
 }
 
-func Run(conf *conf.Conf, groups []string) (
+func newTeapotCheckStageResults(
+	checkResults []teapot.CheckResult,
+) (stageResults []stage.StageResult, forceQuitStageName string, err error) {
+	if len(checkResults) == 0 {
+		return
+	}
+	comment := ""
+	forceQuit := false
+	for _, checkResult := range checkResults {
+		comment += fmt.Sprintf(
+			"Keyword `%s` in last %d hour(s): submit count %d, max count %d\n",
+			checkResult.Name,
+			checkResult.TimePeriod,
+			checkResult.SubmitCount,
+			checkResult.MaxCount,
+		)
+		if checkResult.SubmitCount+1 > checkResult.MaxCount {
+			forceQuit = true
+			err = fmt.Errorf("submit count exceeded")
+		}
+	}
+	stageResults = []stage.StageResult{
+		{
+			Name: "Teapot Check",
+			Results: []stage.ParserResult{{
+				Score:   0,
+				Comment: comment,
+			}},
+			ForceQuit: forceQuit,
+		},
+	}
+	forceQuitStageName = "Teapot Check"
+	return
+}
+
+func Run(
+	conf *conf.Conf, groups []string, checkResults []teapot.CheckResult,
+) (
 	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
+	stageResults, forceQuitStageName, err = newTeapotCheckStageResults(
+		checkResults,
+	)
+	if err != nil {
+		slog.Error("teapot check", "error", err)
+		return
+	}
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
@@ -141,17 +186,16 @@ func Run(conf *conf.Conf, groups []string) (
 	stages, err := generateStages(conf, groups)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
-		stageResults = newErrorStageResults(err)
-		forceQuitStageName = "internal"
+		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return
 	}
 	defer stage.Cleanup()
-	stageResults, forceQuitStageName, err = stage.Run(stages)
+	newStageResults, forceQuitStageName, err := stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
-		stageResults = newErrorStageResults(err)
-		forceQuitStageName = "internal"
+		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return
 	}
+	stageResults = append(stageResults, newStageResults...)
 	return
 }

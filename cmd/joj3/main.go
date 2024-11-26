@@ -33,7 +33,8 @@ func mainImpl() (err error) {
 	confObj := new(conf.Conf)
 	var stageResults []internalStage.StageResult
 	var forceQuitStageName string
-	var teapotResult teapot.TeapotResult
+	var teapotCheckResults []teapot.CheckResult
+	var teapotRunResult teapot.RunResult
 	var commitMsg string
 	defer func() {
 		totalScore := 0
@@ -52,9 +53,9 @@ func mainImpl() (err error) {
 			"cappedTotalScore", cappedTotalScore,
 			"forceQuit", forceQuitStageName != "",
 			"forceQuitStageName", forceQuitStageName,
-			"issue", teapotResult.Issue,
-			"action", teapotResult.Action,
-			"sha", teapotResult.Sha,
+			"issue", teapotRunResult.Issue,
+			"action", teapotRunResult.Action,
+			"sha", teapotRunResult.Sha,
 			"commitMsg", commitMsg,
 			"error", err,
 		)
@@ -107,14 +108,16 @@ func mainImpl() (err error) {
 	}
 	groups := conf.MatchGroups(confObj, conventionalCommit)
 	if len(confObj.Teapot.Groups) != 0 {
-		if err = teapot.Check(confObj); err != nil {
+		teapotCheckResults, err = teapot.Check(confObj)
+		if err != nil {
 			slog.Error("teapot check", "error", err)
-			return err
 		}
 	} else {
 		slog.Info("teapot check disabled")
 	}
-	stageResults, forceQuitStageName, err = stage.Run(confObj, groups)
+	stageResults, forceQuitStageName, err = stage.Run(
+		confObj, groups, teapotCheckResults,
+	)
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
@@ -122,7 +125,7 @@ func mainImpl() (err error) {
 		slog.Error("stage write", "error", err)
 		return err
 	}
-	teapotResult, err = teapot.Run(confObj, groups)
+	teapotRunResult, err = teapot.Run(confObj, groups)
 	if err != nil {
 		slog.Error("teapot run", "error", err)
 		return err

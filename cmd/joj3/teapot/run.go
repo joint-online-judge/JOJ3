@@ -12,14 +12,14 @@ import (
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 )
 
-type TeapotResult struct {
+type RunResult struct {
 	Issue  int    `json:"issue"`
 	Action int    `json:"action"`
 	Sha    string `json:"sha"`
 }
 
 func Run(conf *conf.Conf, groups []string) (
-	teapotResult TeapotResult, err error,
+	runResult RunResult, err error,
 ) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
@@ -65,11 +65,11 @@ func Run(conf *conf.Conf, groups []string) (
 		slog.Error("teapot run exec", "error", err)
 		return
 	}
-	if json.Unmarshal(stdoutBuf.Bytes(), &teapotResult) != nil {
+	if json.Unmarshal(stdoutBuf.Bytes(), &runResult) != nil {
 		slog.Error("unmarshal teapot result", "error", err,
 			"stdout", stdoutBuf.String())
 		return
 	}
-	slog.Info("teapot result", "result", teapotResult)
+	slog.Info("teapot result", "result", runResult)
 	return
 }
