@@ -76,7 +76,7 @@ func main() {
 	}
 	err = healthcheck.MetaCheck(*rootDir, metaFile)
 	if err != nil {
-		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
+		fmt.Printf("### Meta File Check Failed:\n%s\n", err.Error())
 	}
 	err = healthcheck.NonAsciiFiles(*rootDir)
 	if err != nil {
