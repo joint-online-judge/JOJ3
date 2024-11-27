@@ -52,6 +52,28 @@ func TestParseConventionalCommit(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:   "Commit with body and group",
+			commit: "docs: update README [group]\n\nAdd installation instructions and improve examples",
+			want: &ConventionalCommit{
+				Type:        "docs",
+				Description: "update README [group]",
+				Group:       "group",
+				Body:        "Add installation instructions and improve examples",
+			},
+			wantErr: false,
+		},
+		{
+			name:   "Commit with body and empty group",
+			commit: "docs: update README []\n\nAdd installation instructions and improve examples",
+			want: &ConventionalCommit{
+				Type:        "docs",
+				Description: "update README []",
+				Group:       "",
+				Body:        "Add installation instructions and improve examples",
+			},
+			wantErr: false,
+		},
+		{
 			name:   "Full commit with body and footer",
 			commit: "feat(auth)!: implement OAuth2\n\nThis commit adds OAuth2 support to the authentication system.\n\nBREAKING CHANGE: Previous authentication tokens are no longer valid.",
 			want: &ConventionalCommit{

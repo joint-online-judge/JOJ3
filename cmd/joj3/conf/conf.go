@@ -126,6 +126,7 @@ type ConventionalCommit struct {
 	Type        string
 	Scope       string
 	Description string
+	Group       string
 	Body        string
 	Footer      string
 }
@@ -148,7 +149,7 @@ func GetCommitMsg() (msg string, err error) {
 }
 
 func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
-	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?)(\n\n(.+?))?(\n\n(.+))?$`)
+	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?(\[([^\]]+)\])?)(\n\n(.+?))?(\n\n(.+))?$`)
 	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
 	if matches == nil {
 		return nil, fmt.Errorf("invalid conventional commit format")
@@ -157,8 +158,9 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 		Type:        matches[1],
 		Scope:       matches[3],
 		Description: strings.TrimSpace(matches[4]),
-		Body:        strings.TrimSpace(matches[6]),
-		Footer:      strings.TrimSpace(matches[8]),
+		Group:       matches[6],
+		Body:        strings.TrimSpace(matches[8]),
+		Footer:      strings.TrimSpace(matches[10]),
 	}
 	return cc, nil
 }
@@ -329,7 +331,12 @@ func CheckExpire(conf *Conf) error {
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	seen := make(map[string]bool)
 	keywords := []string{}
-	for _, stage := range conf.Stage.Stages {
+	loweredCommitGroup := strings.ToLower(conventionalCommit.Group)
+	loweredCommitDescription := strings.ToLower(conventionalCommit.Description)
+	for i, stage := range conf.Stage.Stages {
+		if loweredCommitGroup == "all" {
+			conf.Stage.Stages[i].Group = ""
+		}
 		if stage.Group == "" {
 			continue
 		}
@@ -341,9 +348,9 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	}
 	slog.Info("group keywords from stages", "keywords", keywords)
 	groups := []string{}
-	loweredDescription := strings.ToLower(conventionalCommit.Description)
 	for _, keyword := range keywords {
-		if strings.Contains(loweredDescription, keyword) {
+		if strings.Contains(loweredCommitGroup, keyword) ||
+			strings.Contains(loweredCommitDescription, keyword) { // TODO: remove me
 			groups = append(groups, keyword)
 		}
 	}
