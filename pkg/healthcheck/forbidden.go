@@ -47,6 +47,11 @@ func getForbiddens(root string) ([]string, error) {
 		}
 		match := ignore.Relative(relPath, true)
 
+		// Trim trailing spaces from the match pattern
+        if match != nil && strings.TrimSpace(match.Pattern()) != match.Pattern() {
+            match = gitignore.NewMatch(strings.TrimSpace(match.Pattern()))
+        }
+
 		// Check if the relative file path should be ignored based on the .gitignore rules
 		if match != nil && match.Ignore() {
 			matches = append(matches, path)
