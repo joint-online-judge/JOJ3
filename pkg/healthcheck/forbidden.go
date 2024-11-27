@@ -16,9 +16,13 @@ func getForbiddens(root string) ([]string, error) {
 	var matches []string
 
 	// Create a gitignore instance from the .gitignore file
-	ignore := gitignore.NewRepositoryWithCache(root, ".gitignore", gitignore.NewCache(), func(e gitignore.Error) bool {
-		return false
-	})
+	ignore := gitignore.NewRepositoryWithCache(
+		root, ".gitignore", gitignore.NewCache(),
+		func(e gitignore.Error) bool {
+			slog.Error("gitignore error", "error", e)
+			return true
+		},
+	)
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
