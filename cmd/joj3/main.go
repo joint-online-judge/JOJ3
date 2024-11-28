@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
 	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
@@ -85,11 +86,12 @@ func mainImpl() (err error) {
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	confObj, err = conf.ParseConfFile(confPath)
+	confObj, confName, err := conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return err
 	}
+	env.Attr.ConfName = confName
 	slog.Debug("conf loaded", "conf", confObj)
 	if err := setupSlog(confObj); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)

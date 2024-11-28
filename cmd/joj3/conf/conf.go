@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/koding/multiconfig"
 )
@@ -165,7 +164,7 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	return cc, nil
 }
 
-func ParseConfFile(path string) (conf *Conf, err error) {
+func ParseConfFile(path string) (conf *Conf, name string, err error) {
 	conf = new(Conf)
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
@@ -181,7 +180,7 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 		slog.Error("validate stages conf", "error", err)
 		return
 	}
-	env.Attr.ConfName = conf.Name
+	name = conf.Name
 	// TODO: remove the following backward compatibility codes
 	if conf.MaxTotalScore < 0 && conf.Teapot.MaxTotalScore >= 0 {
 		conf.MaxTotalScore = conf.Teapot.MaxTotalScore
