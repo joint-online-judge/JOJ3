@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
+	"github.com/joint-online-judge/JOJ3/internal/conf"
 	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
 )
 

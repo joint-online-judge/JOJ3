@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
+	"github.com/joint-online-judge/JOJ3/internal/conf"
 )
 
 type RunResult struct {
