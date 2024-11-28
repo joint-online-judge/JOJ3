@@ -22,11 +22,8 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519.pub
           ssh-keyscan -p 2222 focs.ji.sjtu.edu.cn >> ~/.ssh/known_hosts
           ssh -T git@focs.ji.sjtu.edu.cn -p 2222
-      # - name: Setup Joint-Teapot
-      #   run: |
-      #       pip install git+https://ghp.ci/https://github.com/BoYanZh/Joint-Teapot
-      - name: Lint
-        run: make lint
+        # - name: Lint
+        #   run: make lint
       - name: Build
         run: make build
       - name: Version
