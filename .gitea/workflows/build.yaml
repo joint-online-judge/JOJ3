@@ -14,7 +14,7 @@ jobs:
       - name: Prepare
         run: |
           go env -w GO111MODULE=on
-          go env -w GOPROXY=https://goproxy.io,direct
+          go env -w GOPROXY=https://goproxy.cn,direct
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519.pub
