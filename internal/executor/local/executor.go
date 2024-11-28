@@ -100,6 +100,9 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 // Helper function to handle copyOut files
 func handleCopyOut(result *stage.ExecutorResult, cmd stage.Cmd) error {
 	for _, filename := range cmd.CopyOut {
+		if _, ok := result.Files[filename]; ok {
+			continue
+		}
 		optional := false
 		if strings.HasSuffix(filename, "?") {
 			optional = true
