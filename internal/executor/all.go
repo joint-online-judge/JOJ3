@@ -2,6 +2,7 @@ package executors
 
 import (
 	_ "github.com/joint-online-judge/JOJ3/internal/executor/dummy"
+	_ "github.com/joint-online-judge/JOJ3/internal/executor/local"
 	"github.com/joint-online-judge/JOJ3/internal/executor/sandbox"
 )
 
