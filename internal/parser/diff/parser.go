@@ -63,51 +63,55 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			}
 			comment += conf.FailComment
 			comment += "Executor status not `Accepted`\n"
-			continue
-		}
-		for _, output := range caseConf.Outputs {
-			answer, err := os.ReadFile(output.AnswerPath)
-			if err != nil {
-				return nil, true, err
-			}
-			slog.Debug("compare", "filename", output.FileName,
-				"answer path", output.AnswerPath,
-				"actual length", len(result.Files[output.FileName]),
-				"answer length", len(string(answer)))
-			// If no difference, assign score
-			if compareStrings(string(answer), result.Files[output.FileName],
-				output.CompareSpace) {
-				score += output.Score
-				comment += conf.PassComment
-			} else {
-				if output.ForceQuitOnDiff || conf.ForceQuitOnFailed {
-					forceQuit = true
+		} else {
+			for _, output := range caseConf.Outputs {
+				answer, err := os.ReadFile(output.AnswerPath)
+				if err != nil {
+					return nil, true, err
 				}
-				comment += conf.FailComment
-				comment += fmt.Sprintf("Difference found in `%s`\n",
-					output.FileName)
-				if !output.AlwaysHide {
-					// Convert answer to string and split by lines
-					stdoutLines := strings.Split(string(answer), "\n")
-					resultLines := strings.Split(
-						result.Files[output.FileName], "\n")
-
-					// Generate Myers diff
-					diffOps := myersDiff(stdoutLines, resultLines,
-						output.CompareSpace)
-					if output.MaxDiffLength == 0 { // real default value
-						output.MaxDiffLength = 2048
-					}
-					// Generate diff block with surrounding context
-					diffOutput := generateDiffWithContext(
-						stdoutLines, resultLines, diffOps, output.MaxDiffLength)
-					diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
-					comment += fmt.Sprintf(
-						"```diff\n%s\n```\n",
-						diffOutput,
-					)
+				slog.Debug("compare", "filename", output.FileName,
+					"answer path", output.AnswerPath,
+					"actual length", len(result.Files[output.FileName]),
+					"answer length", len(string(answer)))
+				// If no difference, assign score
+				if compareStrings(string(answer), result.Files[output.FileName],
+					output.CompareSpace) {
+					score += output.Score
+					comment += conf.PassComment
 				} else {
-					comment += "(Content hidden.)\n"
+					if output.ForceQuitOnDiff || conf.ForceQuitOnFailed {
+						forceQuit = true
+					}
+					comment += conf.FailComment
+					comment += fmt.Sprintf("Difference found in `%s`\n",
+						output.FileName)
+					if !output.AlwaysHide {
+						// Convert answer to string and split by lines
+						stdoutLines := strings.Split(string(answer), "\n")
+						resultLines := strings.Split(
+							result.Files[output.FileName], "\n")
+
+						// Generate Myers diff
+						diffOps := myersDiff(stdoutLines, resultLines,
+							output.CompareSpace)
+						if output.MaxDiffLength == 0 { // real default value
+							output.MaxDiffLength = 2048
+						}
+						// Generate diff block with surrounding context
+						diffOutput := generateDiffWithContext(
+							stdoutLines,
+							resultLines,
+							diffOps,
+							output.MaxDiffLength,
+						)
+						diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
+						comment += fmt.Sprintf(
+							"```diff\n%s\n```\n",
+							diffOutput,
+						)
+					} else {
+						comment += "(Content hidden.)\n"
+					}
 				}
 			}
 		}
