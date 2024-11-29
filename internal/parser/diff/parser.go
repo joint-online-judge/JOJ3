@@ -20,11 +20,11 @@ const (
 )
 
 type Conf struct {
-	PassComment           string `default:"🥳Passed!\n"`
-	FailComment           string `default:"🧐Failed...\n"`
-	PassNonAcceptedStatus bool
-	ForceQuitOnFailed     bool
-	Cases                 []struct {
+	PassComment       string `default:"🥳Passed!\n"`
+	FailComment       string `default:"🧐Failed...\n"`
+	FailOnNotAccepted bool   `default:"true"`
+	ForceQuitOnFailed bool   `default:"false"`
+	Cases             []struct {
 		Outputs []struct {
 			Score           int
 			FileName        string
@@ -56,7 +56,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		result := results[i]
 		score := 0
 		comment := ""
-		if !conf.PassNonAcceptedStatus &&
+		if conf.FailOnNotAccepted &&
 			result.Status != stage.Status(envexec.StatusAccepted) {
 			if conf.ForceQuitOnFailed {
 				forceQuit = true
