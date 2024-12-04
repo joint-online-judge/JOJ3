@@ -35,22 +35,33 @@ func setupSlog() {
 	slog.SetDefault(logger)
 }
 
-var Version string
+var (
+	rootDir           string
+	repoSize          float64
+	localList         string
+	checkFileNameList string
+	checkFileSumList  string
+	metaFile          []string
+	gitWhitelist      []string
+	showVersion       *bool
+	Version           string
+)
+
+func init() {
+	showVersion = flag.Bool("version", false, "print current version")
+	flag.StringVar(&rootDir, "root", ".", "root dir for forbidden files check")
+	flag.Float64Var(&repoSize, "repoSize", 2, "maximum size of the repo in MiB")
+	// TODO: remove localList, it is only for backward compatibility now
+	flag.StringVar(&localList, "localList", "", "local file list for non-ascii file check")
+	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
+	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
+	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
+	// TODO: remove gitWhitelist, it is only for backward compatibility now
+	parseMultiValueFlag(&gitWhitelist, "whitelist", "[DEPRECATED] will be ignored")
+}
 
 // Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
 func main() {
-	var metaFile []string
-	showVersion := flag.Bool("version", false, "print current version")
-	rootDir := flag.String("root", ".", "root dir for forbidden files check")
-	repoSize := flag.Float64("repoSize", 2, "maximum size of the repo in MiB")
-	// TODO: remove localList, it is only for backward compatibility now
-	localList := flag.String("localList", "", "local file list for non-ascii file check")
-	checkFileNameList := flag.String("checkFileNameList", "", "comma-separated list of files to check")
-	checkFileSumList := flag.String("checkFileSumList", "", "comma-separated list of expected checksums")
-	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
-	// TODO: remove gitWhitelist, it is only for backward compatibility now
-	var gitWhitelist []string
-	parseMultiValueFlag(&gitWhitelist, "whitelist", "[DEPRECATED] will be ignored")
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -66,27 +77,27 @@ func main() {
 		"meta", metaFile,
 	)
 	var err error
-	err = healthcheck.RepoSize(*repoSize)
+	err = healthcheck.RepoSize(repoSize)
 	if err != nil {
 		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.ForbiddenCheck(*rootDir)
+	err = healthcheck.ForbiddenCheck(rootDir)
 	if err != nil {
 		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.MetaCheck(*rootDir, metaFile)
+	err = healthcheck.MetaCheck(rootDir, metaFile)
 	if err != nil {
 		fmt.Printf("### Meta File Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.NonAsciiFiles(*rootDir)
+	err = healthcheck.NonAsciiFiles(rootDir)
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.NonAsciiMsg(*rootDir)
+	err = healthcheck.NonAsciiMsg(rootDir)
 	if err != nil {
 		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 	}
-	err = healthcheck.VerifyFiles(*rootDir, *checkFileNameList, *checkFileSumList)
+	err = healthcheck.VerifyFiles(rootDir, checkFileNameList, checkFileSumList)
 	if err != nil {
 		fmt.Printf("### Repo File Check Failed:\n%s\n", err.Error())
 	}
