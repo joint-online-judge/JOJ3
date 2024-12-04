@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/criyle/go-judge/envexec"
@@ -52,11 +53,31 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		err = execCmd.Wait()
 		endTime := time.Now()
 		runTime := endTime.Sub(startTime)
-
+		processState := execCmd.ProcessState
 		result := stage.ExecutorResult{
 			Status:     stage.Status(envexec.StatusAccepted),
-			ExitStatus: 0,
+			ExitStatus: processState.ExitCode(),
 			Error:      "",
+			Time: func() uint64 {
+				nanos := processState.UserTime().Nanoseconds()
+				if nanos < 0 {
+					return 0
+				}
+				return uint64(nanos)
+			}(),
+			Memory: func() uint64 {
+				usage := processState.SysUsage()
+				rusage, ok := usage.(*syscall.Rusage)
+				if !ok {
+					return 0
+				}
+				maxRssKB := rusage.Maxrss
+				maxRssBytes := maxRssKB * 1024
+				if maxRssBytes < 0 {
+					return 0
+				}
+				return uint64(maxRssBytes)
+			}(),
 			RunTime: func() uint64 {
 				nanos := runTime.Nanoseconds()
 				if nanos < 0 {
@@ -70,7 +91,6 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 
 		if err != nil {
 			if exitErr, ok := err.(*exec.ExitError); ok {
-				result.ExitStatus = exitErr.ExitCode()
 				result.Status = stage.Status(envexec.StatusNonzeroExitStatus)
 				result.Error = exitErr.Error()
 			} else {
