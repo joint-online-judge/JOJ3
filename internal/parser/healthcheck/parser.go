@@ -3,6 +3,7 @@ package healthcheck
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
@@ -19,6 +20,7 @@ type Conf struct {
 func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, bool) {
 	stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
+	slog.Debug("healthcheck files", "stdout", stdout, "stderr", stderr)
 	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
 		return stage.ParserResult{
 			Score: 0,
@@ -39,6 +41,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, 
 			),
 		}, true
 	}
+	slog.Debug("healthcheck result", "res", res)
 	comment := res.Msg
 	forceQuit := res.Failed
 	return stage.ParserResult{
