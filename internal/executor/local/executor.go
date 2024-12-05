@@ -22,11 +22,11 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	for _, cmd := range cmds {
 		execCmd := exec.Command(cmd.Args[0], cmd.Args[1:]...) // #nosec G204
 
+		env := os.Environ()
 		if len(cmd.Env) > 0 {
-			env := os.Environ()
 			env = append(env, cmd.Env...)
-			execCmd.Env = env
 		}
+		execCmd.Env = env
 
 		if cmd.Stdin != nil {
 			if cmd.Stdin.Content != nil {
