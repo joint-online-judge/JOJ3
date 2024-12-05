@@ -68,6 +68,7 @@ func init() {
 func prepareTeapotCheck() (
 	confObj *conf.Conf, groups []string, actor, repoName string, err error,
 ) {
+	slog.Debug("teapot check prepare start", "env", os.Environ())
 	actor = os.Getenv("GITHUB_ACTOR")
 	repository := os.Getenv("GITHUB_REPOSITORY")
 	if actor == "" ||
