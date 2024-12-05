@@ -119,7 +119,7 @@ func TestParseConventionalCommit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseConventionalCommit(tt.commit)
+			got, err := ParseConventionalCommit(tt.commit)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseConventionalCommit() error = %v, wantErr %v", err, tt.wantErr)
 				return

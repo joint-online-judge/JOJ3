@@ -147,7 +147,7 @@ func GetCommitMsg() (msg string, err error) {
 	return
 }
 
-func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
+func ParseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?(\[([^\]]+)\])?)(\n\n(.+?))?(\n\n(.+))?$`)
 	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
 	if matches == nil {
@@ -237,7 +237,7 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	confPath string, conventionalCommit *ConventionalCommit, err error,
 ) {
 	slog.Info("parse msg", "msg", msg)
-	conventionalCommit, err = parseConventionalCommit(msg)
+	conventionalCommit, err = ParseConventionalCommit(msg)
 	if err != nil {
 		return
 	}

@@ -65,13 +65,25 @@ func check(conf *conf.Conf) (checkResults []CheckResult, err error) {
 	return
 }
 
-func generateOutput(checkResults []CheckResult) (comment string, err error) {
+func generateOutput(
+	checkResults []CheckResult,
+	groups []string,
+) (comment string, err error) {
 	if len(checkResults) == 0 {
 		return
 	}
 	for _, checkResult := range checkResults {
+		useGroup := false
 		if checkResult.Name != "" {
 			comment += fmt.Sprintf("keyword `%s` ", checkResult.Name)
+		} else {
+			useGroup = true
+		}
+		for _, group := range groups {
+			if strings.EqualFold(group, checkResult.Name) {
+				useGroup = true
+				break
+			}
 		}
 		comment += fmt.Sprintf(
 			"in last %d hour(s): submit count %d, max count %d\n",
@@ -79,7 +91,7 @@ func generateOutput(checkResults []CheckResult) (comment string, err error) {
 			checkResult.SubmitCount,
 			checkResult.MaxCount,
 		)
-		if checkResult.SubmitCount+1 > checkResult.MaxCount {
+		if useGroup && checkResult.SubmitCount+1 > checkResult.MaxCount {
 			err = fmt.Errorf("submit count exceeded")
 		}
 	}
@@ -98,7 +110,7 @@ var (
 	Version  string = "debug"
 )
 
-func main() {
+func mainImpl() (err error) {
 	showVersion := flag.Bool("version", false, "print current version")
 	flag.StringVar(&confPath, "conf-path", "./conf.json", "path for config file")
 	flag.Parse()
@@ -108,21 +120,39 @@ func main() {
 	}
 	setupSlog()
 	slog.Info("start teapot-checker", "version", Version)
+	commitMsg, err := conf.GetCommitMsg()
+	if err != nil {
+		slog.Error("get commit msg", "error", err)
+		return
+	}
+	conventionalCommit, err := conf.ParseConventionalCommit(commitMsg)
+	if err != nil {
+		slog.Error("parse commit msg", "error", err)
+		return
+	}
 	confObj, _, err := conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return
 	}
+	groups := conf.MatchGroups(confObj, conventionalCommit)
 	checkResults, err := check(confObj)
 	if err != nil {
 		slog.Error("teapot check", "error", err)
 		return
 	}
-	exitCode := 0
-	output, err := generateOutput(checkResults)
+	output, err := generateOutput(checkResults, groups)
 	if err != nil {
-		exitCode = 1
+		slog.Error("generate output", "error", err)
+		return
 	}
 	fmt.Println(output)
-	os.Exit(exitCode)
+	return
+}
+
+func main() {
+	if err := mainImpl(); err != nil {
+		slog.Error("main exit", "error", err)
+		os.Exit(1)
+	}
 }

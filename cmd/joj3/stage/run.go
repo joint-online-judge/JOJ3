@@ -22,9 +22,8 @@ func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
 	for _, s := range conf.Stage.Stages {
 		if s.Group != "" {
 			var ok bool
-			loweredStageGroup := strings.ToLower(s.Group)
 			for _, group := range groups {
-				if group == loweredStageGroup {
+				if strings.EqualFold(group, s.Group) {
 					ok = true
 					break
 				}
@@ -134,6 +133,7 @@ func newErrorStageResults(err error) ([]stage.StageResult, string) {
 
 func newTeapotCheckStageResults(
 	checkResults []teapot.CheckResult,
+	groups []string,
 ) (stageResults []stage.StageResult, forceQuitStageName string, err error) {
 	if len(checkResults) == 0 {
 		return
@@ -141,8 +141,17 @@ func newTeapotCheckStageResults(
 	comment := ""
 	forceQuit := false
 	for _, checkResult := range checkResults {
+		useGroup := false
 		if checkResult.Name != "" {
 			comment += fmt.Sprintf("keyword `%s` ", checkResult.Name)
+		} else {
+			useGroup = true
+		}
+		for _, group := range groups {
+			if strings.EqualFold(group, checkResult.Name) {
+				useGroup = true
+				break
+			}
 		}
 		comment += fmt.Sprintf(
 			"in last %d hour(s): submit count %d, max count %d\n",
@@ -150,7 +159,7 @@ func newTeapotCheckStageResults(
 			checkResult.SubmitCount,
 			checkResult.MaxCount,
 		)
-		if checkResult.SubmitCount+1 > checkResult.MaxCount {
+		if useGroup && checkResult.SubmitCount+1 > checkResult.MaxCount {
 			forceQuit = true
 			err = fmt.Errorf("submit count exceeded")
 		}
@@ -176,6 +185,7 @@ func Run(
 ) {
 	stageResults, forceQuitStageName, err = newTeapotCheckStageResults(
 		checkResults,
+		groups,
 	)
 	if err != nil {
 		slog.Error("teapot check", "error", err)
