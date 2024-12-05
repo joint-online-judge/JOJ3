@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
+	"github.com/joint-online-judge/JOJ3/internal/conf"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
@@ -43,6 +46,7 @@ var (
 	checkFileSumList  string
 	metaFile          []string
 	gitWhitelist      []string
+	confPath          string
 	showVersion       *bool
 	Version           string
 )
@@ -58,9 +62,42 @@ func init() {
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
 	// TODO: remove gitWhitelist, it is only for backward compatibility now
 	parseMultiValueFlag(&gitWhitelist, "whitelist", "[DEPRECATED] will be ignored")
+	flag.StringVar(&confPath, "confPath", "", "path to conf file for teapot check")
 }
 
-// Generally, err is used for runtime errors, and checkRes is used for the result of the checks.
+func prepareTeapotCheck() (
+	confObj *conf.Conf, groups []string, actor, repoName string, err error,
+) {
+	actor = os.Getenv("GITHUB_ACTOR")
+	repository := os.Getenv("GITHUB_REPOSITORY")
+	if actor == "" ||
+		repository != "" ||
+		strings.Count(repository, "/") != 1 ||
+		confPath != "" {
+		err = fmt.Errorf("teapot env not set")
+		return
+	}
+	repoParts := strings.Split(repository, "/")
+	repoName = repoParts[1]
+	commitMsg, err := conf.GetCommitMsg()
+	if err != nil {
+		slog.Error("get commit msg", "error", err)
+		return
+	}
+	conventionalCommit, err := conf.ParseConventionalCommit(commitMsg)
+	if err != nil {
+		slog.Error("parse commit msg", "error", err)
+		return
+	}
+	confObj, _, err = conf.ParseConfFile(confPath)
+	if err != nil {
+		slog.Error("parse conf", "error", err)
+		return
+	}
+	groups = conf.MatchGroups(confObj, conventionalCommit)
+	return
+}
+
 func main() {
 	flag.Parse()
 	if *showVersion {
@@ -77,28 +114,19 @@ func main() {
 		"meta", metaFile,
 	)
 	var err error
-	err = healthcheck.RepoSize(repoSize)
+	confObj, groups, actor, repoName, err := prepareTeapotCheck()
 	if err != nil {
-		fmt.Printf("### Repo Size Check Failed:\n%s\n", err.Error())
+		slog.Error("prepare teapot check", "error", err)
+		confObj = nil
 	}
-	err = healthcheck.ForbiddenCheck(rootDir)
+	res := healthcheck.All(
+		confObj, actor, repoName, rootDir, checkFileNameList, checkFileSumList,
+		groups, metaFile, repoSize,
+	)
+	jsonRes, err := json.Marshal(res)
 	if err != nil {
-		fmt.Printf("### Forbidden File Check Failed:\n%s\n", err.Error())
+		slog.Error("marshal result", "error", err)
+		os.Exit(1)
 	}
-	err = healthcheck.MetaCheck(rootDir, metaFile)
-	if err != nil {
-		fmt.Printf("### Meta File Check Failed:\n%s\n", err.Error())
-	}
-	err = healthcheck.NonAsciiFiles(rootDir)
-	if err != nil {
-		fmt.Printf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
-	}
-	err = healthcheck.NonAsciiMsg(rootDir)
-	if err != nil {
-		fmt.Printf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
-	}
-	err = healthcheck.VerifyFiles(rootDir, checkFileNameList, checkFileSumList)
-	if err != nil {
-		fmt.Printf("### Repo File Check Failed:\n%s\n", err.Error())
-	}
+	fmt.Println(string(jsonRes))
 }

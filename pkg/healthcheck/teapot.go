@@ -1,16 +1,14 @@
-package main
+package healthcheck
 
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/internal/conf"
 )
 
@@ -21,20 +19,9 @@ type CheckResult struct {
 	TimePeriod  int    `json:"time_period"`
 }
 
-func check(conf *conf.Conf) (checkResults []CheckResult, err error) {
+func runTeapot(conf *conf.Conf, actor, repoName string) (checkResults []CheckResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
-	actor := os.Getenv("GITHUB_ACTOR")
-	repository := os.Getenv("GITHUB_REPOSITORY")
-	if actor == "" ||
-		repository == "" ||
-		strings.Count(repository, "/") != 1 {
-		slog.Error("teapot env not set")
-		err = fmt.Errorf("teapot env not set")
-		return
-	}
-	repoParts := strings.Split(env.Attr.Repository, "/")
-	repoName := repoParts[1]
 	var formattedGroups []string
 	for _, group := range conf.Teapot.Groups {
 		groupConfig := fmt.Sprintf("%s=%d:%d",
@@ -56,7 +43,7 @@ func check(conf *conf.Conf) (checkResults []CheckResult, err error) {
 		slog.Error("teapot check exec", "error", err)
 		return
 	}
-	if json.Unmarshal(stdoutBuf.Bytes(), &checkResults) != nil {
+	if err = json.Unmarshal(stdoutBuf.Bytes(), &checkResults); err != nil {
 		slog.Error("unmarshal teapot check result", "error", err,
 			"stdout", stdoutBuf.String())
 		return
@@ -86,73 +73,35 @@ func generateOutput(
 			}
 		}
 		comment += fmt.Sprintf(
-			"in last %d hour(s): submit count %d, max count %d\n",
+			"in last %d hour(s): submit count %d, max count %d",
 			checkResult.TimePeriod,
 			checkResult.SubmitCount,
 			checkResult.MaxCount,
 		)
 		if useGroup && checkResult.SubmitCount+1 > checkResult.MaxCount {
-			err = fmt.Errorf("submit count exceeded")
+			err = fmt.Errorf(
+				"keyword `%s` submit count exceeded",
+				checkResult.Name,
+			)
+			comment += ", exceeded"
 		}
+		comment += "\n"
 	}
 	return
 }
 
-func setupSlog() {
-	opts := &slog.HandlerOptions{}
-	handler := slog.NewTextHandler(os.Stderr, opts)
-	logger := slog.New(handler)
-	slog.SetDefault(logger)
-}
-
-var (
-	confPath string
-	Version  string = "debug"
-)
-
-func mainImpl() (err error) {
-	showVersion := flag.Bool("version", false, "print current version")
-	flag.StringVar(&confPath, "conf-path", "./conf.json", "path for config file")
-	flag.Parse()
-	if *showVersion {
-		fmt.Println(Version)
-		return
-	}
-	setupSlog()
-	slog.Info("start teapot-checker", "version", Version)
-	commitMsg, err := conf.GetCommitMsg()
-	if err != nil {
-		slog.Error("get commit msg", "error", err)
-		return
-	}
-	conventionalCommit, err := conf.ParseConventionalCommit(commitMsg)
-	if err != nil {
-		slog.Error("parse commit msg", "error", err)
-		return
-	}
-	confObj, _, err := conf.ParseConfFile(confPath)
-	if err != nil {
-		slog.Error("parse conf", "error", err)
-		return
-	}
-	groups := conf.MatchGroups(confObj, conventionalCommit)
-	checkResults, err := check(confObj)
+func TeapotCheck(
+	conf *conf.Conf, actor, repoName string, groups []string,
+) (output string, err error) {
+	checkResults, err := runTeapot(conf, actor, repoName)
 	if err != nil {
 		slog.Error("teapot check", "error", err)
 		return
 	}
-	output, err := generateOutput(checkResults, groups)
+	output, err = generateOutput(checkResults, groups)
 	if err != nil {
 		slog.Error("generate output", "error", err)
 		return
 	}
-	fmt.Println(output)
 	return
-}
-
-func main() {
-	if err := mainImpl(); err != nil {
-		slog.Error("main exit", "error", err)
-		os.Exit(1)
-	}
 }

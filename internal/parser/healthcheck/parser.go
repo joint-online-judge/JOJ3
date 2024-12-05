@@ -1,10 +1,12 @@
 package healthcheck
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
 type Healthcheck struct{}
@@ -21,15 +23,28 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, 
 		return stage.ParserResult{
 			Score: 0,
 			Comment: fmt.Sprintf(
-				"Unexpected executor status: `%s`\n`stdout`:\n```%s\n```\n`stderr`:\n```%s\n```",
-				executorResult.Status, stdout, stderr,
+				"Unexpected executor status: `%s`\n`stderr`:\n```%s\n```\n",
+				executorResult.Status, stderr,
 			),
 		}, true
 	}
+	var res healthcheck.Result
+	err := json.Unmarshal([]byte(stdout), &res)
+	if err != nil {
+		return stage.ParserResult{
+			Score: 0,
+			Comment: fmt.Sprintf(
+				"Failed to parse result: `%s`\n`stderr`:\n```%s\n```\n",
+				err, stderr,
+			),
+		}, true
+	}
+	comment := res.Msg
+	forceQuit := res.Failed
 	return stage.ParserResult{
 		Score:   0,
-		Comment: stdout,
-	}, stdout != ""
+		Comment: comment,
+	}, forceQuit
 }
 
 func (*Healthcheck) Run(results []stage.ExecutorResult, confAny any) (
