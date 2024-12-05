@@ -68,13 +68,13 @@ func init() {
 func prepareTeapotCheck() (
 	confObj *conf.Conf, groups []string, actor, repoName string, err error,
 ) {
-	slog.Debug("teapot check prepare start", "env", os.Environ())
 	actor = os.Getenv("GITHUB_ACTOR")
 	repository := os.Getenv("GITHUB_REPOSITORY")
 	if actor == "" ||
 		repository != "" ||
 		strings.Count(repository, "/") != 1 ||
 		confPath != "" {
+		slog.Error("teapot env not set", "actor", actor, "repository", repository, "confPath", confPath, "env", os.Environ())
 		err = fmt.Errorf("teapot env not set")
 		return
 	}
