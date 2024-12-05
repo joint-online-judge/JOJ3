@@ -16,7 +16,7 @@ func RepoSize(confSize float64) error {
 	cmd := exec.Command("git", "count-objects", "-v")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		slog.Error("running git command:", "err", err)
+		slog.Error("running git command:", "err", err, "output", output)
 		return fmt.Errorf("error running git command: %w", err)
 	}
 	lines := strings.Split(string(output), "\n")
@@ -27,8 +27,8 @@ func RepoSize(confSize float64) error {
 			sizeStr := fields[1]
 			size, err := strconv.Atoi(sizeStr)
 			if err != nil {
-				slog.Error("running git command:", "err", err)
-				return fmt.Errorf("error running git command: %w", err)
+				slog.Error("parsing repo size:", "err", err, "line", line)
+				return fmt.Errorf("error parsing repo size: %w", err)
 			}
 			sum += size
 		}
