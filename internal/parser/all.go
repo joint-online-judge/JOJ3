@@ -6,7 +6,6 @@ import (
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/cpplint"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/diff"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/dummy"
-	_ "github.com/joint-online-judge/JOJ3/internal/parser/file"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/healthcheck"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/keyword"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/resultdetail"
