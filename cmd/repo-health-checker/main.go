@@ -71,9 +71,9 @@ func prepareTeapotCheck() (
 	actor = os.Getenv("GITHUB_ACTOR")
 	repository := os.Getenv("GITHUB_REPOSITORY")
 	if actor == "" ||
-		repository != "" ||
+		repository == "" ||
 		strings.Count(repository, "/") != 1 ||
-		confPath != "" {
+		confPath == "" {
 		slog.Error("teapot env not set", "actor", actor, "repository", repository, "confPath", confPath, "env", os.Environ())
 		err = fmt.Errorf("teapot env not set")
 		return
