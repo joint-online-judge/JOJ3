@@ -34,7 +34,6 @@ func mainImpl() (err error) {
 	confObj := new(conf.Conf)
 	var stageResults []internalStage.StageResult
 	var forceQuitStageName string
-	var teapotCheckResults []teapot.CheckResult
 	var teapotRunResult teapot.RunResult
 	var commitMsg string
 	defer func() {
@@ -109,16 +108,8 @@ func mainImpl() (err error) {
 		return err
 	}
 	groups := conf.MatchGroups(confObj, conventionalCommit)
-	if len(confObj.Teapot.Groups) != 0 {
-		teapotCheckResults, err = teapot.Check(confObj)
-		if err != nil {
-			slog.Error("teapot check", "error", err)
-		}
-	} else {
-		slog.Info("teapot check disabled")
-	}
 	stageResults, forceQuitStageName, err = stage.Run(
-		confObj, groups, teapotCheckResults,
+		confObj, groups,
 	)
 	if err != nil {
 		slog.Error("stage run", "error", err)

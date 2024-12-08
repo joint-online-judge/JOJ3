@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
 	"github.com/joint-online-judge/JOJ3/internal/conf"
 	executors "github.com/joint-online-judge/JOJ3/internal/executor"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser"
@@ -131,67 +130,9 @@ func newErrorStageResults(err error) ([]stage.StageResult, string) {
 	}, "Internal Error"
 }
 
-func newTeapotCheckStageResults(
-	checkResults []teapot.CheckResult,
-	groups []string,
-) (stageResults []stage.StageResult, forceQuitStageName string, err error) {
-	if len(checkResults) == 0 {
-		return
-	}
-	comment := ""
-	forceQuit := false
-	for _, checkResult := range checkResults {
-		useGroup := false
-		if checkResult.Name != "" {
-			comment += fmt.Sprintf("keyword `%s` ", checkResult.Name)
-		} else {
-			useGroup = true
-		}
-		for _, group := range groups {
-			if strings.EqualFold(group, checkResult.Name) {
-				useGroup = true
-				break
-			}
-		}
-		comment += fmt.Sprintf(
-			"in last %d hour(s): submit count %d, max count %d\n",
-			checkResult.TimePeriod,
-			checkResult.SubmitCount,
-			checkResult.MaxCount,
-		)
-		if useGroup && checkResult.SubmitCount+1 > checkResult.MaxCount {
-			forceQuit = true
-			err = fmt.Errorf("submit count exceeded")
-		}
-	}
-	stageResults = []stage.StageResult{
-		{
-			Name: "Teapot Check",
-			Results: []stage.ParserResult{{
-				Score:   0,
-				Comment: comment,
-			}},
-			ForceQuit: forceQuit,
-		},
-	}
-	forceQuitStageName = "Teapot Check"
-	return
-}
-
-func Run(
-	conf *conf.Conf, groups []string, checkResults []teapot.CheckResult,
-) (
+func Run(conf *conf.Conf, groups []string) (
 	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
-	stageResults, forceQuitStageName, err = newTeapotCheckStageResults(
-		checkResults,
-		groups,
-	)
-	if err != nil {
-		slog.Error("teapot check", "error", err)
-		conf.Teapot.SkipScoreboard = true // avoid adding extra submit count
-		return
-	}
 	executors.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
@@ -203,12 +144,11 @@ func Run(
 		return
 	}
 	defer stage.Cleanup()
-	newStageResults, forceQuitStageName, err := stage.Run(stages)
+	stageResults, forceQuitStageName, err = stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return
 	}
-	stageResults = append(stageResults, newStageResults...)
 	return
 }
