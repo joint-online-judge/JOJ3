@@ -14,7 +14,7 @@ $ git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
 
     - If you have problem on connecting to the Go website and Go packages, download Go from [studygolang](https://studygolang.com/dl) and run `go env -w GOPROXY=https://goproxy.io,direct` to set the Go modules mirror proxy after installing Go.
 
-3. Enable cgroup v2 for your OS. For WSL2, check [here](https://stackoverflow.com/a/73376219/13724598). So that you do not need root permission to run `go-judge`.
+3. Enable cgroup v2 for your OS. For WSL2, check [here](https://stackoverflow.com/a/73376219/13724598). Also, enable linger for the user you used to run `go-judge` if you are using `systemd`, e.g. if the user is `go-judge`, run `loginctl enable-linger go-judge`. So that you do not need root permission to run `go-judge` (it can create a nesting cgroup in its user slice).
 
 4. Clone [go-judge](https://github.com/criyle/go-judge).
 
