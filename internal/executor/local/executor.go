@@ -16,6 +16,32 @@ import (
 
 type Local struct{}
 
+func ToRlimit(c stage.Cmd) (map[int]syscall.Rlimit, error) {
+	limits := make(map[int]syscall.Rlimit)
+
+	if c.CPULimit > 0 {
+		// ns to s
+		timeLimit := (uint64(c.CPULimit) + 1e9 - 1) / 1e9
+		if timeLimit < 1 {
+			timeLimit = 1
+		}
+		limits[syscall.RLIMIT_CPU] = syscall.Rlimit{
+			Cur: timeLimit, Max: timeLimit,
+		}
+	}
+	if c.MemoryLimit > 0 {
+		limits[syscall.RLIMIT_AS] = syscall.Rlimit{
+			Cur: c.MemoryLimit, Max: c.MemoryLimit, // bytes
+		}
+	}
+	if c.StackLimit > 0 {
+		limits[syscall.RLIMIT_STACK] = syscall.Rlimit{
+			Cur: c.StackLimit, Max: c.StackLimit, // bytes
+		}
+	}
+	return limits, nil
+}
+
 func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var results []stage.ExecutorResult
 
@@ -27,6 +53,16 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			env = append(env, cmd.Env...)
 		}
 		execCmd.Env = env
+
+		limits, err := ToRlimit(cmd)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert rlimits: %v", err)
+		}
+		for resource, limit := range limits {
+			if err := syscall.Setrlimit(resource, &limit); err != nil {
+				return nil, fmt.Errorf("failed to set rlimit: %v", err)
+			}
+		}
 
 		if cmd.Stdin != nil {
 			if cmd.Stdin.Content != nil {
@@ -45,7 +81,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		execCmd.Stderr = &stderrBuffer
 
 		startTime := time.Now()
-		err := execCmd.Start()
+		err = execCmd.Start()
 		if err != nil {
 			return nil, fmt.Errorf("failed to start command: %v", err)
 		}
