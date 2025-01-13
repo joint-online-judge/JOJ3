@@ -41,11 +41,9 @@ func setupSlog() {
 var (
 	rootDir           string
 	repoSize          float64
-	localList         string
 	checkFileNameList string
 	checkFileSumList  string
 	metaFile          []string
-	gitWhitelist      []string
 	confPath          string
 	showVersion       *bool
 	Version           string
@@ -55,13 +53,9 @@ func init() {
 	showVersion = flag.Bool("version", false, "print current version")
 	flag.StringVar(&rootDir, "root", ".", "root dir for forbidden files check")
 	flag.Float64Var(&repoSize, "repoSize", 2, "maximum size of the repo in MiB")
-	// TODO: remove localList, it is only for backward compatibility now
-	flag.StringVar(&localList, "localList", "", "local file list for non-ascii file check")
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
-	// TODO: remove gitWhitelist, it is only for backward compatibility now
-	parseMultiValueFlag(&gitWhitelist, "whitelist", "[DEPRECATED] will be ignored")
 	flag.StringVar(&confPath, "confPath", "", "path to conf file for teapot check")
 }
 
@@ -109,7 +103,6 @@ func main() {
 	slog.Info("start repo-health-checker", "version", Version)
 	slog.Debug("cli args",
 		"repoSize", repoSize,
-		"localList", localList,
 		"checkFileNameList", checkFileNameList,
 		"checkFileSumList", checkFileSumList,
 		"meta", metaFile,
