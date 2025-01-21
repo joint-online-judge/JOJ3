@@ -331,7 +331,6 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	seen := make(map[string]bool)
 	keywords := []string{}
 	loweredCommitGroup := strings.ToLower(conventionalCommit.Group)
-	loweredCommitDescription := strings.ToLower(conventionalCommit.Description)
 	for i, stage := range conf.Stage.Stages {
 		if loweredCommitGroup == "all" {
 			conf.Stage.Stages[i].Group = ""
@@ -348,8 +347,7 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	slog.Info("group keywords from stages", "keywords", keywords)
 	groups := []string{}
 	for _, keyword := range keywords {
-		if strings.Contains(loweredCommitGroup, keyword) ||
-			strings.Contains(loweredCommitDescription, keyword) { // TODO: remove me
+		if strings.Contains(loweredCommitGroup, keyword) {
 			groups = append(groups, keyword)
 		}
 	}
