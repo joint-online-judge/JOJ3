@@ -2,14 +2,11 @@ package cpplint
 
 import (
 	"fmt"
-	"log/slog"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/internal/stage"
-	"github.com/joint-online-judge/JOJ3/pkg/utils"
 )
 
 type Match struct {
@@ -34,7 +31,6 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	regexMatches := re.FindAllStringSubmatch(stderr, -1)
 	score := conf.Score
 	comment := "### Test results summary\n\n"
-	categoryCount := make(map[string]int)
 	matchCount := make(map[string]int)
 	scoreChange := make(map[string]int)
 	for _, regexMatch := range regexMatches {
@@ -49,24 +45,6 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 		// }
 		// message := regexMatch[3]
 		category := regexMatch[4]
-		// TODO: remove me
-		if len(conf.Matches) == 0 {
-			confidence, err := strconv.Atoi(regexMatch[5])
-			if err != nil {
-				slog.Error("parse confidence", "error", err)
-				return stage.ParserResult{
-					Score:   0,
-					Comment: fmt.Sprintf("Unexpected parser error: %s.", err),
-				}
-			}
-			score -= confidence
-		}
-		parts := strings.Split(category, "/")
-		if len(parts) > 0 {
-			category := parts[0]
-			categoryCount[category] += 1
-		}
-		// TODO: remove me ends
 		for _, match := range conf.Matches {
 			for _, keyword := range match.Keywords {
 				if strings.Contains(category, keyword) {
@@ -77,18 +55,6 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 			}
 		}
 	}
-	// TODO: remove me
-	sortedMap := utils.SortMap(categoryCount,
-		func(i, j utils.Pair[string, int]) bool {
-			if i.Value == j.Value {
-				return i.Key < j.Key
-			}
-			return i.Value > j.Value
-		})
-	for i, kv := range sortedMap {
-		comment += fmt.Sprintf("%d. %s: %d\n", i+1, kv.Key, kv.Value)
-	}
-	// TODO: remove me ends
 	type Result struct {
 		Keyword     string
 		Count       int

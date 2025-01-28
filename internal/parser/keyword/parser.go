@@ -10,14 +10,12 @@ import (
 
 type Match struct {
 	Keywords      []string
-	Keyword       string // TODO: remove me
 	Score         int
 	MaxMatchCount int
 }
 
 type Conf struct {
 	Score             int
-	FullScore         int // TODO: remove me
 	Files             []string
 	ForceQuitOnDeduct bool `default:"false"`
 	Matches           []Match
@@ -82,17 +80,6 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	conf, err := stage.DecodeConf[Conf](confAny)
 	if err != nil {
 		return nil, true, err
-	}
-	// TODO: remove me on Matches.Keyword field removed
-	for i := range conf.Matches {
-		match := &conf.Matches[i]
-		if match.Keyword != "" && len(match.Keywords) == 0 {
-			match.Keywords = []string{match.Keyword}
-		}
-	}
-	// TODO: remove me on FullScore field removed
-	if conf.FullScore != 0 && conf.Score == 0 {
-		conf.Score = conf.FullScore
 	}
 	var res []stage.ParserResult
 	forceQuit := false

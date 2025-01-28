@@ -10,7 +10,6 @@ import (
 
 type Match struct {
 	Keywords []string
-	Severity []string // TODO: remove me
 	Score    int
 }
 
