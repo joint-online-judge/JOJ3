@@ -53,7 +53,7 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 	return &multiHandler{handlers: handlers}
 }
 
-func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
+func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
 	attrs = []slog.Attr{
 		slog.String("runID", env.Attr.RunID),
 		slog.String("confName", env.Attr.ConfName),
@@ -108,6 +108,7 @@ func getSlogAttrs(csvPath string) (attrs []slog.Attr) {
 
 func setupSlog(conf *conf.Conf) error {
 	logPath := conf.LogPath
+	attrs := newSlogAttrs(conf.ActorCsvPath)
 	handlers := []slog.Handler{}
 	if logPath != "" {
 		// Text file handler for debug logs
@@ -118,7 +119,7 @@ func setupSlog(conf *conf.Conf) error {
 		}
 		debugTextHandler := slog.NewTextHandler(debugTextFile,
 			&slog.HandlerOptions{Level: slog.LevelDebug})
-		handlers = append(handlers, debugTextHandler)
+		handlers = append(handlers, debugTextHandler.WithAttrs(attrs))
 		// Json file handler for debug logs
 		debugJsonFile, err := os.OpenFile(logPath+".ndjson",
 			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
@@ -127,7 +128,7 @@ func setupSlog(conf *conf.Conf) error {
 		}
 		debugJsonHandler := slog.NewJSONHandler(debugJsonFile,
 			&slog.HandlerOptions{Level: slog.LevelDebug})
-		handlers = append(handlers, debugJsonHandler)
+		handlers = append(handlers, debugJsonHandler.WithAttrs(attrs))
 	}
 	stderrLogLevel := slog.LevelInfo
 	if runningTest {
@@ -138,19 +139,10 @@ func setupSlog(conf *conf.Conf) error {
 		Level: stderrLogLevel,
 	})
 	handlers = append(handlers, stderrHandler)
-	if runningTest {
-		stderrJSONHandler := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-			Level: stderrLogLevel,
-		})
-		handlers = append(handlers, stderrJSONHandler)
-	}
 	// Create a multi-handler
 	multiHandler := &multiHandler{handlers: handlers}
-	multiHandlerWithAttrs := multiHandler.WithAttrs(
-		getSlogAttrs(conf.ActorCsvPath),
-	)
 	// Set the default logger
-	logger := slog.New(multiHandlerWithAttrs)
+	logger := slog.New(multiHandler)
 	slog.SetDefault(logger)
 	if logPath != "" {
 		slog.Info("debug log", "path", logPath)
