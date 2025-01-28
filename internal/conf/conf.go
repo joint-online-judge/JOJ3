@@ -63,30 +63,6 @@ type Conf struct {
 		SkipFailedTable       bool   `default:"false"`
 		SubmitterInIssueTitle bool   `default:"true"`
 		Groups                []ConfGroup
-		MaxTotalScore         int `default:"-1"` // TODO: remove me
-	}
-	// TODO: remove the following backward compatibility fields
-	SandboxExecServer string `default:"localhost:5051"`
-	SandboxToken      string `default:""`
-	OutputPath        string `default:"joj3_result.json"`
-	GradingRepoName   string `default:""`
-	SkipTeapot        bool   `default:"true"`
-	ScoreboardPath    string `default:"scoreboard.csv"`
-	FailedTablePath   string `default:"failed-table.md"`
-	Stages            []struct {
-		Name     string
-		Group    string
-		Executor struct {
-			Name string
-			With struct {
-				Default stage.Cmd
-				Cases   []OptionalCmd
-			}
-		}
-		Parser struct {
-			Name string
-			With interface{}
-		}
 	}
 }
 
@@ -181,38 +157,6 @@ func ParseConfFile(path string) (conf *Conf, name string, err error) {
 		return
 	}
 	name = conf.Name
-	// TODO: remove the following backward compatibility codes
-	if conf.MaxTotalScore < 0 && conf.Teapot.MaxTotalScore >= 0 {
-		conf.MaxTotalScore = conf.Teapot.MaxTotalScore
-	}
-	if len(conf.Stage.Stages) == 0 {
-		conf.Stage.SandboxExecServer = conf.SandboxExecServer
-		conf.Stage.SandboxToken = conf.SandboxToken
-		conf.Stage.OutputPath = conf.OutputPath
-		conf.Stage.Stages = make([]ConfStage, len(conf.Stages))
-		for i, stage := range conf.Stages {
-			conf.Stage.Stages[i].Name = stage.Name
-			conf.Stage.Stages[i].Group = stage.Group
-			conf.Stage.Stages[i].Executor = stage.Executor
-			conf.Stage.Stages[i].Parsers = []struct {
-				Name string
-				With interface{}
-			}{
-				{
-					Name: stage.Parser.Name,
-					With: stage.Parser.With,
-				},
-			}
-		}
-		conf.Teapot.GradingRepoName = conf.GradingRepoName
-		conf.Teapot.ScoreboardPath = conf.ScoreboardPath
-		conf.Teapot.FailedTablePath = conf.FailedTablePath
-		if conf.SkipTeapot {
-			conf.Teapot.SkipScoreboard = true
-			conf.Teapot.SkipFailedTable = true
-			conf.Teapot.SkipIssue = true
-		}
-	}
 	return
 }
 
