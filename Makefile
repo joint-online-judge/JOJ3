@@ -30,5 +30,5 @@ test:
 
 ci-test:
 	./scripts/prepare_test_repos.sh $(TMP_DIR)
-	./scripts/run_foreach_test_repos.sh $(TMP_DIR) "sed -i '2i \ \ \"sandboxExecServer\": \"172.17.0.1:5051\",' conf.json"
+	./scripts/run_foreach_test_repos.sh $(TMP_DIR) "sed -i '3i \ \ \"sandboxExecServer\": \"172.17.0.1:5051\",' conf.json"
 	GITHUB_ACTOR="" go test -coverprofile cover.out -v ./...
