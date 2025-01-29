@@ -51,7 +51,7 @@ func ParseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	return cc, nil
 }
 
-func ParseConfFile(path string) (conf *Conf, name string, err error) {
+func ParseConfFile(path string) (conf *Conf, err error) {
 	conf = new(Conf)
 	d := &multiconfig.DefaultLoader{}
 	d.Loader = multiconfig.MultiLoader(
@@ -67,7 +67,6 @@ func ParseConfFile(path string) (conf *Conf, name string, err error) {
 		slog.Error("validate stages conf", "error", err)
 		return
 	}
-	name = conf.Name
 	return
 }
 

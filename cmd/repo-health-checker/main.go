@@ -84,7 +84,7 @@ func prepareTeapotCheck() (
 		slog.Error("parse commit msg", "error", err)
 		return
 	}
-	confObj, _, err = conf.ParseConfFile(confPath)
+	confObj, err = conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return

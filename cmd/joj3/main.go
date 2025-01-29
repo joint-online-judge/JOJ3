@@ -90,12 +90,12 @@ func mainImpl() (err error) {
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	confObj, confName, err := conf.ParseConfFile(confPath)
+	confObj, err = conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return err
 	}
-	env.Attr.ConfName = confName
+	env.Attr.ConfName = confObj.Name
 	slog.Debug("conf loaded", "conf", confObj)
 	if err := setupSlog(confObj); err != nil { // after conf is loaded
 		slog.Error("setup slog", "error", err)
