@@ -36,6 +36,8 @@ func mainImpl() (err error) {
 	var forceQuitStageName string
 	var teapotRunResult teapot.RunResult
 	var commitMsg string
+
+	// summarize
 	defer func() {
 		totalScore := 0
 		for _, stageResult := range stageResults {
@@ -64,6 +66,8 @@ func mainImpl() (err error) {
 		slog.Error("setup slog", "error", err)
 		return err
 	}
+
+	// parse flag & conf file
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(Version)
@@ -96,6 +100,8 @@ func mainImpl() (err error) {
 		slog.Error("setup slog", "error", err)
 		return err
 	}
+
+	// log conf file info
 	sha256, err := conf.GetSHA256(confPath)
 	if err != nil {
 		slog.Error("get sha256", "error", err)
@@ -107,6 +113,8 @@ func mainImpl() (err error) {
 		slog.Error("conf check expire", "error", err)
 		return err
 	}
+
+	// run stages
 	groups := conf.MatchGroups(confObj, conventionalCommit)
 	stageResults, forceQuitStageName, err = stage.Run(
 		confObj, groups,
@@ -118,6 +126,8 @@ func mainImpl() (err error) {
 		slog.Error("stage write", "error", err)
 		return err
 	}
+
+	// run teapot
 	teapotRunResult, err = teapot.Run(confObj, groups)
 	if err != nil {
 		slog.Error("teapot run", "error", err)
