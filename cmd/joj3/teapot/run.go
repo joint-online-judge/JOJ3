@@ -18,7 +18,7 @@ type RunResult struct {
 	Sha    string `json:"sha"`
 }
 
-func Run(conf *conf.Conf, groups []string) (
+func Run(conf *conf.Conf) (
 	runResult RunResult, err error,
 ) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
@@ -55,7 +55,7 @@ func Run(conf *conf.Conf, groups []string) (
 		env.Attr.RunNumber, conf.Teapot.ScoreboardPath,
 		conf.Teapot.FailedTablePath,
 		conf.Name, env.Attr.Sha, env.Attr.RunID,
-		strings.Join(groups, ","),
+		env.Attr.Groups,
 		"--max-total-score", strconv.Itoa(conf.MaxTotalScore),
 		skipIssueArg, skipScoreboardArg,
 		skipFailedTableArg, submitterInIssueTitleArg,

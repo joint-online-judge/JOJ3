@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
@@ -116,6 +117,8 @@ func mainImpl() (err error) {
 
 	// run stages
 	groups := conf.MatchGroups(confObj, conventionalCommit)
+	env.Attr.Groups = strings.Join(groups, ",")
+	env.Set()
 	stageResults, forceQuitStageName, err = stage.Run(
 		confObj, groups,
 	)
@@ -128,7 +131,7 @@ func mainImpl() (err error) {
 	}
 
 	// run teapot
-	teapotRunResult, err = teapot.Run(confObj, groups)
+	teapotRunResult, err = teapot.Run(confObj)
 	if err != nil {
 		slog.Error("teapot run", "error", err)
 		return err

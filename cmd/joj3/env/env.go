@@ -8,6 +8,7 @@ import (
 
 type Attribute struct {
 	ConfName   string
+	Groups     string
 	RunID      string
 	Actor      string
 	Repository string
@@ -38,4 +39,10 @@ func init() {
 	Attr.Ref = os.Getenv("GITHUB_REF")
 	Attr.Workflow = os.Getenv("GITHUB_WORKFLOW")
 	Attr.RunNumber = os.Getenv("GITHUB_RUN_NUMBER")
+}
+
+func Set() {
+	os.Setenv("CONF_NAME", Attr.ConfName)
+	os.Setenv("GROUPS", Attr.Groups)
+	os.Setenv("RUN_ID", Attr.RunID)
 }
