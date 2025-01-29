@@ -22,7 +22,6 @@ func Run(conf *conf.Conf) (
 	runResult RunResult, err error,
 ) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
-	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	if env.Attr.Actor == "" ||
 		env.Attr.Repository == "" ||
 		strings.Count(env.Attr.Repository, "/") != 1 ||
