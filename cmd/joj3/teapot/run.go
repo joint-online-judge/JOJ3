@@ -21,6 +21,10 @@ type RunResult struct {
 func Run(conf *conf.Conf) (
 	runResult RunResult, err error,
 ) {
+	if conf.Teapot.Skip {
+		slog.Info("teapot skip")
+		return
+	}
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
 	if env.Attr.Actor == "" ||
 		env.Attr.Repository == "" ||

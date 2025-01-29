@@ -41,6 +41,7 @@ type Conf struct {
 		PostStages        []ConfStage
 	}
 	Teapot struct {
+		Skip                  bool   `default:"false"`
 		LogPath               string `default:"/home/tt/.cache/joint-teapot-debug.log"`
 		EnvFilePath           string `default:"/home/tt/.config/teapot/teapot.env"`
 		ScoreboardPath        string `default:"scoreboard.csv"`
