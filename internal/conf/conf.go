@@ -186,10 +186,22 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	seen := make(map[string]bool)
 	keywords := []string{}
 	loweredCommitGroup := strings.ToLower(conventionalCommit.Group)
-	for i, stage := range conf.Stage.Stages {
-		if loweredCommitGroup == "all" {
+	if loweredCommitGroup == "all" {
+		for i := range conf.Stage.PreStages {
+			conf.Stage.PreStages[i].Group = ""
+		}
+		for i := range conf.Stage.Stages {
 			conf.Stage.Stages[i].Group = ""
 		}
+		for i := range conf.Stage.PostStages {
+			conf.Stage.PostStages[i].Group = ""
+		}
+	}
+	confStages := []ConfStage{}
+	confStages = append(confStages, conf.Stage.PreStages...)
+	confStages = append(confStages, conf.Stage.Stages...)
+	confStages = append(confStages, conf.Stage.PostStages...)
+	for _, stage := range confStages {
 		if stage.Group == "" {
 			continue
 		}

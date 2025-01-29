@@ -36,7 +36,9 @@ type Conf struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
 		OutputPath        string `default:"joj3_result.json"`
+		PreStages         []ConfStage
 		Stages            []ConfStage
+		PostStages        []ConfStage
 	}
 	Teapot struct {
 		LogPath               string `default:"/home/tt/.cache/joint-teapot-debug.log"`

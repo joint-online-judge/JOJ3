@@ -15,10 +15,12 @@ import (
 
 type StageResult stage.StageResult
 
-func generateStages(conf *conf.Conf, groups []string) ([]stage.Stage, error) {
+func generateStages(confStages []conf.ConfStage, groups []string) (
+	[]stage.Stage, error,
+) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
-	for _, s := range conf.Stage.Stages {
+	for _, s := range confStages {
 		if s.Group != "" {
 			var ok bool
 			for _, group := range groups {
@@ -137,18 +139,41 @@ func Run(conf *conf.Conf, groups []string) (
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
 	)
-	stages, err := generateStages(conf, groups)
+	preStages, err := generateStages(conf.Stage.PreStages, groups)
+	if err != nil {
+		slog.Error("generate preStages", "error", err)
+		stageResults, forceQuitStageName = newErrorStageResults(err)
+		return
+	}
+	stages, err := generateStages(conf.Stage.Stages, groups)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return
 	}
+	postStages, err := generateStages(conf.Stage.PostStages, groups)
+	if err != nil {
+		slog.Error("generate postStages", "error", err)
+		stageResults, forceQuitStageName = newErrorStageResults(err)
+		return
+	}
 	defer stage.Cleanup()
+	// ignore force quit in preStages & postStages
+	slog.Info("run preStages")
+	_, _, err = stage.Run(preStages)
+	if err != nil {
+		slog.Error("run preStages", "error", err)
+	}
+	slog.Info("run stages")
 	stageResults, forceQuitStageName, err = stage.Run(stages)
 	if err != nil {
 		slog.Error("run stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
-		return
+	}
+	slog.Info("run postStages")
+	_, _, err = stage.Run(postStages)
+	if err != nil {
+		slog.Error("run postStages", "error", err)
 	}
 	return
 }
