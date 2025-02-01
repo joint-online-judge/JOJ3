@@ -33,10 +33,8 @@ func init() {
 func mainImpl() (err error) {
 	confObj := new(conf.Conf)
 
-	if err := setupSlog(confObj); err != nil { // before conf is loaded
-		slog.Error("setup slog", "error", err)
-		return err
-	}
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	slog.SetDefault(logger)
 
 	// parse flag & conf file
 	flag.Parse()
@@ -67,8 +65,8 @@ func mainImpl() (err error) {
 		return err
 	}
 	env.Attr.ConfName = confObj.Name
-	slog.Debug("conf loaded", "conf", confObj)
-	if err := setupSlog(confObj); err != nil { // after conf is loaded
+	slog.Debug("conf loaded", "conf", confObj, "joj3 version", Version)
+	if err := setupSlog(confObj); err != nil {
 		slog.Error("setup slog", "error", err)
 		return err
 	}
