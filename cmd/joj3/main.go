@@ -9,7 +9,6 @@ import (
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/teapot"
 	"github.com/joint-online-judge/JOJ3/internal/conf"
 	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
 )
@@ -33,36 +32,7 @@ func init() {
 
 func mainImpl() (err error) {
 	confObj := new(conf.Conf)
-	var stageResults []internalStage.StageResult
-	var forceQuitStageName string
-	var teapotRunResult teapot.RunResult
-	var commitMsg string
 
-	// summarize
-	defer func() {
-		totalScore := 0
-		for _, stageResult := range stageResults {
-			for _, result := range stageResult.Results {
-				totalScore += result.Score
-			}
-		}
-		cappedTotalScore := totalScore
-		if confObj.MaxTotalScore >= 0 {
-			cappedTotalScore = min(totalScore, confObj.MaxTotalScore)
-		}
-		slog.Info(
-			"joj3 summary",
-			"totalScore", totalScore,
-			"cappedTotalScore", cappedTotalScore,
-			"forceQuit", forceQuitStageName != "",
-			"forceQuitStageName", forceQuitStageName,
-			"issue", teapotRunResult.Issue,
-			"action", teapotRunResult.Action,
-			"sha", teapotRunResult.Sha,
-			"commitMsg", commitMsg,
-			"error", err,
-		)
-	}()
 	if err := setupSlog(confObj); err != nil { // before conf is loaded
 		slog.Error("setup slog", "error", err)
 		return err
@@ -78,11 +48,12 @@ func mainImpl() (err error) {
 		fallbackConfFileName = confFileName
 	}
 	slog.Info("start joj3", "version", Version)
-	commitMsg, err = conf.GetCommitMsg()
+	commitMsg, err := conf.GetCommitMsg()
 	if err != nil {
 		slog.Error("get commit msg", "error", err)
 		return err
 	}
+	env.Attr.CommitMsg = commitMsg
 	confPath, confStat, conventionalCommit, err := conf.GetConfPath(
 		confFileRoot, confFileName, fallbackConfFileName, commitMsg, tag)
 	if err != nil {
@@ -118,19 +89,19 @@ func mainImpl() (err error) {
 	// run stages
 	groups := conf.MatchGroups(confObj, conventionalCommit)
 	env.Attr.Groups = strings.Join(groups, ",")
-	env.Set()
-	stageResults, forceQuitStageName, err = stage.Run(
-		confObj, groups,
+	_, forceQuitStageName, err := stage.Run(
+		confObj,
+		groups,
+		func(
+			stageResults []internalStage.StageResult,
+			forceQuitStageName string,
+		) {
+			env.Attr.ForceQuitStageName = forceQuitStageName
+			env.Set()
+		},
 	)
 	if err != nil {
 		slog.Error("stage run", "error", err)
-	}
-
-	// run teapot
-	teapotRunResult, err = teapot.Run(confObj)
-	if err != nil {
-		slog.Error("teapot run", "error", err)
-		return err
 	}
 	if forceQuitStageName != "" {
 		slog.Info("stage force quit", "name", forceQuitStageName)

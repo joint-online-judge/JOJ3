@@ -7,23 +7,27 @@ import (
 )
 
 const (
-	ConfName = "JOJ3_CONF_NAME"
-	Groups   = "JOJ3_GROUPS"
-	RunID    = "JOJ3_RUN_ID"
+	ConfName           = "JOJ3_CONF_NAME"
+	Groups             = "JOJ3_GROUPS"
+	RunID              = "JOJ3_RUN_ID"
+	CommitMsg          = "JOJ3_COMMIT_MSG"
+	ForceQuitStageName = "JOJ3_FORCE_QUIT_STAGE_NAME"
 )
 
 type Attribute struct {
-	ConfName   string
-	Groups     string
-	RunID      string
-	Actor      string
-	Repository string
-	Sha        string
-	Ref        string
-	Workflow   string
-	RunNumber  string
-	ActorName  string
-	ActorID    string
+	ConfName           string
+	CommitMsg          string
+	Groups             string
+	RunID              string
+	Actor              string
+	Repository         string
+	Sha                string
+	Ref                string
+	Workflow           string
+	RunNumber          string
+	ActorName          string
+	ActorID            string
+	ForceQuitStageName string
 }
 
 var Attr Attribute
@@ -51,4 +55,6 @@ func Set() {
 	os.Setenv(ConfName, Attr.ConfName)
 	os.Setenv(Groups, Attr.Groups)
 	os.Setenv(RunID, Attr.RunID)
+	os.Setenv(CommitMsg, Attr.CommitMsg)
+	os.Setenv(ForceQuitStageName, Attr.ForceQuitStageName)
 }

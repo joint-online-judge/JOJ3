@@ -44,7 +44,6 @@ var (
 	checkFileNameList string
 	checkFileSumList  string
 	metaFile          []string
-	confPath          string
 	showVersion       *bool
 	Version           string
 )
@@ -56,7 +55,6 @@ func init() {
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
-	flag.StringVar(&confPath, "confPath", "", "path to conf file for teapot check") // TODO: remove me
 }
 
 func main() {

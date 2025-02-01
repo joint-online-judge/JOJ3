@@ -40,19 +40,6 @@ type Conf struct {
 		Stages            []ConfStage
 		PostStages        []ConfStage
 	}
-	Teapot struct {
-		Skip                  bool   `default:"false"`
-		LogPath               string `default:"/home/tt/.cache/joint-teapot-debug.log"`
-		EnvFilePath           string `default:"/home/tt/.config/teapot/teapot.env"`
-		ScoreboardPath        string `default:"scoreboard.csv"`
-		FailedTablePath       string `default:"failed-table.md"`
-		GradingRepoName       string `default:""`
-		SkipIssue             bool   `default:"false"`
-		SkipScoreboard        bool   `default:"false"`
-		SkipFailedTable       bool   `default:"false"`
-		SubmitterInIssueTitle bool   `default:"true"`
-		Groups                []ConfGroup
-	}
 }
 
 type OptionalCmd struct {

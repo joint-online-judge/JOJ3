@@ -95,12 +95,6 @@ These steps are executed in runner-images. We use `sudo -u tt` to elevate the pe
         - The parser can return a force quit, which means all the stages after it will be skipped, but the remaining parsers in the current stage will run.
     5. Generate results.
         - Once the running of stages is done, it will generate a result file where the path is specified in the configuration file.
-2. Run Joint-Teapot.
-    1. Generally speaking, it reads the JOJ3 results file and output results on Gitea.
-    2. With `joint-teapot joj3-all`, it will do the following things:
-        1. Create/Edit an issue in the submitter's repo to show the results.
-        2. Update the scoreboard file in grading repo.
-        3. Update the failed table file in grading repo.
 
 ## Components
 

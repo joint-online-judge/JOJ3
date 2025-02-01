@@ -132,7 +132,11 @@ func newErrorStageResults(err error) ([]stage.StageResult, string) {
 	}, "Internal Error"
 }
 
-func Run(conf *conf.Conf, groups []string) (
+func Run(
+	conf *conf.Conf,
+	groups []string,
+	onStagesComplete func([]stage.StageResult, string),
+) (
 	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
 	executors.InitWithConf(
