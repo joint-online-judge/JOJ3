@@ -28,7 +28,7 @@ func runTeapot(conf *conf.Conf) (checkResults []CheckResult, err error) {
 		formattedGroups = append(formattedGroups, groupConfig)
 	}
 	args := []string{
-		"joj3-check-env", conf.Teapot.EnvFilePath,
+		"joj3-check", conf.Teapot.EnvFilePath,
 		conf.Teapot.GradingRepoName,
 		conf.Teapot.ScoreboardPath,
 		"--group-config", strings.Join(formattedGroups, ","),
