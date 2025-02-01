@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+const (
+	ConfName = "JOJ3_CONF_NAME"
+	Groups   = "JOJ3_GROUPS"
+	RunID    = "JOJ3_RUN_ID"
+)
+
 type Attribute struct {
 	ConfName   string
 	Groups     string
@@ -42,7 +48,7 @@ func init() {
 }
 
 func Set() {
-	os.Setenv("JOJ3_CONF_NAME", Attr.ConfName)
-	os.Setenv("JOJ3_GROUPS", Attr.Groups)
-	os.Setenv("JOJ3_RUN_ID", Attr.RunID)
+	os.Setenv(ConfName, Attr.ConfName)
+	os.Setenv(Groups, Attr.Groups)
+	os.Setenv(RunID, Attr.RunID)
 }

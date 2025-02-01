@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/internal/conf"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
@@ -61,22 +63,12 @@ func init() {
 func prepareTeapotCheck() (
 	confObj *conf.Conf, groups []string, err error,
 ) {
-	commitMsg, err := conf.GetCommitMsg()
-	if err != nil {
-		slog.Error("get commit msg", "error", err)
-		return
-	}
-	conventionalCommit, err := conf.ParseConventionalCommit(commitMsg)
-	if err != nil {
-		slog.Error("parse commit msg", "error", err)
-		return
-	}
 	confObj, err = conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return
 	}
-	groups = conf.MatchGroups(confObj, conventionalCommit)
+	groups = strings.Split(os.Getenv(env.Groups), ",")
 	return
 }
 
