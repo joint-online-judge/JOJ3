@@ -33,6 +33,7 @@ func runTeapot(conf *conf.Conf) (checkResults []CheckResult, err error) {
 		conf.Teapot.ScoreboardPath,
 		"--group-config", strings.Join(formattedGroups, ","),
 	}
+	slog.Debug("teapot check args", "args", args)
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd := exec.Command("joint-teapot", args...) // #nosec G204
 	cmd.Stdout = &stdoutBuf
