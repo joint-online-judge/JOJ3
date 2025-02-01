@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
-	"github.com/joint-online-judge/JOJ3/internal/conf"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
@@ -57,19 +56,7 @@ func init() {
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
-	flag.StringVar(&confPath, "confPath", "", "path to conf file for teapot check")
-}
-
-func prepareTeapotCheck() (
-	confObj *conf.Conf, groups []string, err error,
-) {
-	confObj, err = conf.ParseConfFile(confPath)
-	if err != nil {
-		slog.Error("parse conf", "error", err)
-		return
-	}
-	groups = strings.Split(os.Getenv(env.Groups), ",")
-	return
+	flag.StringVar(&confPath, "confPath", "", "path to conf file for teapot check") // TODO: remove me
 }
 
 func main() {
@@ -86,14 +73,9 @@ func main() {
 		"checkFileSumList", checkFileSumList,
 		"meta", metaFile,
 	)
-	var err error
-	confObj, groups, err := prepareTeapotCheck()
-	if err != nil {
-		slog.Error("prepare teapot check", "error", err)
-		confObj = nil
-	}
+	groups := strings.Split(os.Getenv(env.Groups), ",")
 	res := healthcheck.All(
-		confObj, rootDir, checkFileNameList, checkFileSumList,
+		rootDir, checkFileNameList, checkFileSumList,
 		groups, metaFile, repoSize,
 	)
 	jsonRes, err := json.Marshal(res)

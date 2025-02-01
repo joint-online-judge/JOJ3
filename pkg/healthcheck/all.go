@@ -2,8 +2,6 @@ package healthcheck
 
 import (
 	"fmt"
-
-	"github.com/joint-online-judge/JOJ3/internal/conf"
 )
 
 type Result struct {
@@ -12,21 +10,11 @@ type Result struct {
 }
 
 func All(
-	confObj *conf.Conf,
 	rootDir, checkFileNameList, checkFileSumList string,
 	groups, metaFile []string,
 	repoSize float64,
 ) (res Result) {
 	var err error
-	if confObj != nil {
-		output, err := TeapotCheck(confObj, groups)
-		if err != nil {
-			res.Msg += fmt.Sprintf("### Teapot Check Failed:\n%s\n", output)
-			res.Failed = true
-		} else {
-			res.Msg += fmt.Sprintf("### Teapot Check Result:\n%s\n", output)
-		}
-	}
 	err = RepoSize(repoSize)
 	if err != nil {
 		res.Msg += fmt.Sprintf("### Repo Size Check Failed:\n%s\n", err.Error())
