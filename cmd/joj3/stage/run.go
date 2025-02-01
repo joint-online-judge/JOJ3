@@ -170,6 +170,10 @@ func Run(conf *conf.Conf, groups []string) (
 		slog.Error("run stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 	}
+	slog.Info("write stageResults")
+	if err = Write(conf.Stage.OutputPath, stageResults); err != nil {
+		slog.Error("write stageResults", "error", err)
+	}
 	slog.Info("run postStages")
 	_, _, err = stage.Run(postStages)
 	if err != nil {

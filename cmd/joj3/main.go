@@ -125,10 +125,6 @@ func mainImpl() (err error) {
 	if err != nil {
 		slog.Error("stage run", "error", err)
 	}
-	if err = stage.Write(confObj.Stage.OutputPath, stageResults); err != nil {
-		slog.Error("stage write", "error", err)
-		return err
-	}
 
 	// run teapot
 	teapotRunResult, err = teapot.Run(confObj)
