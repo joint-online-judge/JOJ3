@@ -13,13 +13,13 @@ type Result struct {
 
 func All(
 	confObj *conf.Conf,
-	actor, repoName, rootDir, checkFileNameList, checkFileSumList string,
+	rootDir, checkFileNameList, checkFileSumList string,
 	groups, metaFile []string,
 	repoSize float64,
 ) (res Result) {
 	var err error
 	if confObj != nil {
-		output, err := TeapotCheck(confObj, actor, repoName, groups)
+		output, err := TeapotCheck(confObj, groups)
 		if err != nil {
 			res.Msg += fmt.Sprintf("### Teapot Check Failed:\n%s\n", output)
 			res.Failed = true

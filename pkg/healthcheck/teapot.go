@@ -19,9 +19,8 @@ type CheckResult struct {
 	TimePeriod  int    `json:"time_period"`
 }
 
-func runTeapot(conf *conf.Conf, actor, repoName string) (checkResults []CheckResult, err error) {
+func runTeapot(conf *conf.Conf) (checkResults []CheckResult, err error) {
 	os.Setenv("LOG_FILE_PATH", conf.Teapot.LogPath)
-	os.Setenv("_TYPER_STANDARD_TRACEBACK", "1")
 	var formattedGroups []string
 	for _, group := range conf.Teapot.Groups {
 		groupConfig := fmt.Sprintf("%s=%d:%d",
@@ -29,9 +28,9 @@ func runTeapot(conf *conf.Conf, actor, repoName string) (checkResults []CheckRes
 		formattedGroups = append(formattedGroups, groupConfig)
 	}
 	args := []string{
-		"joj3-check", conf.Teapot.EnvFilePath,
-		actor, conf.Teapot.GradingRepoName, repoName,
-		conf.Teapot.ScoreboardPath, conf.Name,
+		"joj3-check-env", conf.Teapot.EnvFilePath,
+		conf.Teapot.GradingRepoName,
+		conf.Teapot.ScoreboardPath,
 		"--group-config", strings.Join(formattedGroups, ","),
 	}
 	var stdoutBuf, stderrBuf bytes.Buffer
@@ -90,10 +89,8 @@ func generateOutput(
 	return
 }
 
-func TeapotCheck(
-	conf *conf.Conf, actor, repoName string, groups []string,
-) (output string, err error) {
-	checkResults, err := runTeapot(conf, actor, repoName)
+func TeapotCheck(conf *conf.Conf, groups []string) (output string, err error) {
+	checkResults, err := runTeapot(conf)
 	if err != nil {
 		slog.Error("teapot check", "error", err)
 		return

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 
 	"github.com/joint-online-judge/JOJ3/internal/conf"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
@@ -60,20 +59,8 @@ func init() {
 }
 
 func prepareTeapotCheck() (
-	confObj *conf.Conf, groups []string, actor, repoName string, err error,
+	confObj *conf.Conf, groups []string, err error,
 ) {
-	actor = os.Getenv("GITHUB_ACTOR")
-	repository := os.Getenv("GITHUB_REPOSITORY")
-	if actor == "" ||
-		repository == "" ||
-		strings.Count(repository, "/") != 1 ||
-		confPath == "" {
-		slog.Error("teapot env not set", "actor", actor, "repository", repository, "confPath", confPath, "env", os.Environ())
-		err = fmt.Errorf("teapot env not set")
-		return
-	}
-	repoParts := strings.Split(repository, "/")
-	repoName = repoParts[1]
 	commitMsg, err := conf.GetCommitMsg()
 	if err != nil {
 		slog.Error("get commit msg", "error", err)
@@ -108,13 +95,13 @@ func main() {
 		"meta", metaFile,
 	)
 	var err error
-	confObj, groups, actor, repoName, err := prepareTeapotCheck()
+	confObj, groups, err := prepareTeapotCheck()
 	if err != nil {
 		slog.Error("prepare teapot check", "error", err)
 		confObj = nil
 	}
 	res := healthcheck.All(
-		confObj, actor, repoName, rootDir, checkFileNameList, checkFileSumList,
+		confObj, rootDir, checkFileNameList, checkFileSumList,
 		groups, metaFile, repoSize,
 	)
 	jsonRes, err := json.Marshal(res)
