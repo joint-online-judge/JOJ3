@@ -174,6 +174,7 @@ func Run(
 		slog.Error("run stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 	}
+	onStagesComplete(stageResults, forceQuitStageName)
 	slog.Info("write stageResults")
 	if err = Write(conf.Stage.OutputPath, stageResults); err != nil {
 		slog.Error("write stageResults", "error", err)
