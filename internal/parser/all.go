@@ -4,6 +4,7 @@ import (
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/clangtidy"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/cppcheck"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/cpplint"
+	_ "github.com/joint-online-judge/JOJ3/internal/parser/debug"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/diff"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/dummy"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/healthcheck"
