@@ -42,7 +42,7 @@ func init() {
 }
 
 func Set() {
-	os.Setenv("CONF_NAME", Attr.ConfName)
-	os.Setenv("GROUPS", Attr.Groups)
-	os.Setenv("RUN_ID", Attr.RunID)
+	os.Setenv("JOJ3_CONF_NAME", Attr.ConfName)
+	os.Setenv("JOJ3_GROUPS", Attr.Groups)
+	os.Setenv("JOJ3_RUN_ID", Attr.RunID)
 }
