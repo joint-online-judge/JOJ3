@@ -12,6 +12,7 @@ const (
 	RunID              = "JOJ3_RUN_ID"
 	CommitMsg          = "JOJ3_COMMIT_MSG"
 	ForceQuitStageName = "JOJ3_FORCE_QUIT_STAGE_NAME"
+	OutputPath         = "JOJ3_OUTPUT_PATH"
 )
 
 type Attribute struct {
@@ -28,6 +29,7 @@ type Attribute struct {
 	ActorName          string
 	ActorID            string
 	ForceQuitStageName string
+	OutputPath         string
 }
 
 var Attr Attribute
@@ -57,4 +59,5 @@ func Set() {
 	os.Setenv(RunID, Attr.RunID)
 	os.Setenv(CommitMsg, Attr.CommitMsg)
 	os.Setenv(ForceQuitStageName, Attr.ForceQuitStageName)
+	os.Setenv(OutputPath, Attr.OutputPath)
 }
