@@ -1,6 +1,7 @@
 package log
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -11,6 +12,7 @@ import (
 type Conf struct {
 	FileName string `default:"stdout"`
 	Msg      string `default:"log msg"`
+	Level    int    `default:"0"`
 }
 
 type Log struct{}
@@ -30,7 +32,12 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	for key, value := range data {
 		args = append(args, key, value)
 	}
-	slog.Info(conf.Msg, args...)
+	slog.Default().Log(
+		context.Background(),
+		slog.Level(conf.Level),
+		conf.Msg,
+		args...,
+	)
 	return stage.ParserResult{
 		Score:   0,
 		Comment: "",
