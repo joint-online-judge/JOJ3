@@ -147,6 +147,11 @@ func setupSlog(conf *conf.Conf) error {
 	if logPath != "" {
 		slog.Info("debug log", "path", logPath)
 	}
-	slog.LogAttrs(context.TODO(), slog.LevelInfo, "setup slog attrs", attrs...)
+	slog.LogAttrs(
+		context.Background(),
+		slog.LevelInfo,
+		"setup slog attrs",
+		attrs...,
+	)
 	return nil
 }
