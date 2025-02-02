@@ -53,7 +53,8 @@ func mainImpl() (err error) {
 	}
 	env.Attr.CommitMsg = commitMsg
 	confPath, confStat, conventionalCommit, err := internalConf.GetConfPath(
-		confFileRoot, confFileName, fallbackConfFileName, commitMsg, tag)
+		confFileRoot, confFileName, fallbackConfFileName, commitMsg, tag,
+	)
 	if err != nil {
 		slog.Error("get conf path", "error", err)
 		return err
@@ -88,6 +89,7 @@ func mainImpl() (err error) {
 	// run stages
 	groups := internalConf.MatchGroups(conf, conventionalCommit)
 	env.Attr.Groups = strings.Join(groups, ",")
+	env.Set()
 	_, forceQuitStageName, err := stage.Run(
 		conf,
 		groups,
