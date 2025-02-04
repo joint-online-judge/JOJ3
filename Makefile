@@ -11,7 +11,7 @@ FLAGS := "-s -w -X main.Version=$(VERSION)"
 all: build
 
 build:
-	$(foreach APP,$(APPS), go build -ldflags=$(FLAGS) -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
+	$(foreach APP,$(APPS), CGO_ENABLED=0 go build -ldflags=$(FLAGS) -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
 
 clean:
 	rm -rf $(BUILD_DIR)/*
