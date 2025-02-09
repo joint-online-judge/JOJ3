@@ -5,8 +5,7 @@ on:
       - master
 jobs:
   sync:
-    container:
-      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: https://gitea.com/BoYanZh/checkout@focs

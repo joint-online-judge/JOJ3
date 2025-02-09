@@ -4,8 +4,7 @@ on:
   - pull_request
 jobs:
   build:
-    container:
-      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:golang-ubuntu-latest
+    runs-on: golang-ubuntu-latest
     steps:
       - name: Check out repository code
         uses: https://gitea.com/BoYanZh/checkout@focs
@@ -33,8 +32,7 @@ jobs:
           make prepare-test
           make ci-test
   trigger-build-image:
-    container:
-      image: focs.ji.sjtu.edu.cn:5000/gitea/runner-images:ubuntu-latest
+    runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
     steps:
