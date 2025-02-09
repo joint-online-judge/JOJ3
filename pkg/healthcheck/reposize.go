@@ -16,7 +16,7 @@ func RepoSize(confSize float64) error {
 	cmd := exec.Command(
 		"git",
 		"-c",
-		"safe.directory='*'",
+		"safe.directory=*",
 		"count-objects",
 		"-v",
 	)
