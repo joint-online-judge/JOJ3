@@ -13,7 +13,13 @@ import (
 func RepoSize(confSize float64) error {
 	// TODO: reimplement here when go-git is available
 	// https://github.com/go-git/go-git/blob/master/COMPATIBILITY.md
-	cmd := exec.Command("git", "count-objects", "-v")
+	cmd := exec.Command(
+		"git",
+		"-c",
+		"safe.directory='*'",
+		"count-objects",
+		"-v",
+	)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		slog.Error("running git command:", "err", err, "output", output)
