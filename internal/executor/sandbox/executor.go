@@ -10,12 +10,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Sandbox struct {
-	execServer, token string
-	cachedMap         map[string]string
-	execClient        pb.ExecutorClient
-}
-
 func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var err error
 	if e.execClient == nil {

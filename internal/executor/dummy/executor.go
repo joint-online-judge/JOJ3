@@ -5,8 +5,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Dummy struct{}
-
 func (e *Dummy) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var res []stage.ExecutorResult
 	for range cmds {

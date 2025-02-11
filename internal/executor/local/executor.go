@@ -15,8 +15,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Local struct{}
-
 func generateResult(
 	err error,
 	processState *os.ProcessState,

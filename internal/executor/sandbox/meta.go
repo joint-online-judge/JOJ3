@@ -1,10 +1,17 @@
 package sandbox
 
 import (
+	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 var name = "sandbox"
+
+type Sandbox struct {
+	execServer, token string
+	cachedMap         map[string]string
+	execClient        pb.ExecutorClient
+}
 
 func init() {
 	stage.RegisterExecutor(name, &Sandbox{
