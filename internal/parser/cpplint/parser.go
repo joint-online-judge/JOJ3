@@ -9,21 +9,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Match struct {
-	Keywords []string
-	Score    int
-}
-
-type Conf struct {
-	Score             int
-	Matches           []Match
-	Stdout            string `default:"stdout"`
-	Stderr            string `default:"stderr"`
-	ForceQuitOnDeduct bool   `default:"false"`
-}
-
-type Cpplint struct{}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stderr := executorResult.Files[conf.Stderr]
 	pattern := `(.+):(\d+):  (.+)  \[(.+)\] \[(\d)]\n`

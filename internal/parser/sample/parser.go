@@ -8,15 +8,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/pkg/sample"
 )
 
-type Conf struct {
-	Score   int
-	Comment string
-	Stdout  string `default:"stdout"`
-	Stderr  string `default:"stderr"`
-}
-
-type Sample struct{}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
 	// stderr := executorResult.Files[conf.Stderr]

@@ -10,13 +10,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
-type Healthcheck struct{}
-
-type Conf struct {
-	Stdout string `default:"stdout"`
-	Stderr string `default:"stderr"`
-}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, bool) {
 	stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]

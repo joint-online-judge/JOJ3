@@ -19,26 +19,6 @@ const (
 	MOVE
 )
 
-type Conf struct {
-	PassComment       string `default:"🥳Passed!\n"`
-	FailComment       string `default:"🧐Failed...\n"`
-	FailOnNotAccepted bool   `default:"true"`
-	ForceQuitOnFailed bool   `default:"false"`
-	Cases             []struct {
-		Outputs []struct {
-			Score           int
-			FileName        string
-			AnswerPath      string
-			CompareSpace    bool
-			AlwaysHide      bool
-			ForceQuitOnDiff bool
-			MaxDiffLength   int `default:"2048"` // just for reference
-		}
-	}
-}
-
-type Diff struct{}
-
 func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {

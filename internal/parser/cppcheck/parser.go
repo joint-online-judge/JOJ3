@@ -8,19 +8,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Match struct {
-	Keywords []string
-	Score    int
-}
-
-type Conf struct {
-	Score             int
-	Matches           []Match
-	Stdout            string `default:"stdout"`
-	Stderr            string `default:"stderr"`
-	ForceQuitOnDeduct bool   `default:"false"`
-}
-
 type Record struct {
 	File     string `json:"file"`
 	Line     int    `json:"line"`
@@ -29,8 +16,6 @@ type Record struct {
 	Message  string `json:"message"`
 	Id       string `json:"id"`
 }
-
-type CppCheck struct{}
 
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]

@@ -9,14 +9,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Conf struct {
-	FileName string `default:"stdout"`
-	Msg      string `default:"log msg"`
-	Level    int    `default:"0"`
-}
-
-type Log struct{}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	content := executorResult.Files[conf.FileName]
 	var data map[string]any

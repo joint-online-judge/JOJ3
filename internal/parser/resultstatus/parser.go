@@ -7,14 +7,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Conf struct {
-	Score                  int
-	Comment                string
-	ForceQuitOnNotAccepted bool `default:"true"`
-}
-
-type ResultStatus struct{}
-
 func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {

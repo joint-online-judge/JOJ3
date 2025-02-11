@@ -6,21 +6,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Conf struct {
-	Score              int
-	ShowExecutorStatus bool `default:"true"`
-	ShowExitStatus     bool `default:"false"`
-	ShowError          bool `default:"false"`
-	ShowTime           bool `default:"true"`
-	ShowMemory         bool `default:"true"`
-	ShowRunTime        bool `default:"false"`
-	ShowFiles          []string
-	FilesInCodeBlock   bool `default:"true"`
-	MaxFileLength      int  `default:"65536"`
-}
-
-type ResultDetail struct{}
-
 func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {

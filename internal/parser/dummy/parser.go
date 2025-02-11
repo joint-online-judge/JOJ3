@@ -4,14 +4,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Conf struct {
-	Score     int
-	Comment   string
-	ForceQuit bool
-}
-
-type Dummy struct{}
-
 func (*Dummy) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {

@@ -6,22 +6,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Match struct {
-	Keywords []string
-	Score    int
-}
-
-type Conf struct {
-	Score             int
-	RootDir           string `default:"/w"`
-	Matches           []Match
-	Stdout            string `default:"stdout"`
-	Stderr            string `default:"stderr"`
-	ForceQuitOnDeduct bool   `default:"false"`
-}
-
-type ClangTidy struct{}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
 	// stderr := executorResult.Files[conf.Stderr]

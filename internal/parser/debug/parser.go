@@ -6,10 +6,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-type Conf struct{}
-
-type Debug struct{}
-
 func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	slog.Debug("debug parser", "executorResult", executorResult)
 	for name, content := range executorResult.Files {
