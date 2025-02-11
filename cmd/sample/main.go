@@ -1,3 +1,5 @@
+// Package main provides a sample executable that demonstrates how JOJ3 works.
+// Its output should be parsed by the sample parser.
 package main
 
 import (

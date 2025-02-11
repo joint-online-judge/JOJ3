@@ -1,3 +1,6 @@
+// Package main provides a repo-health-checker executable that checks the
+// health of a repository. Its output should be parsed by the healthcheck
+// parser.
 package main
 
 import (

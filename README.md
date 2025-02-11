@@ -96,26 +96,6 @@ These steps are executed in runner-images. We use `sudo -u tt` to elevate the pe
     5. Generate results.
         - Once the running of stages is done, it will generate a result file where the path is specified in the configuration file.
 
-## Components
-
-### Binaries (under `/cmd` and `/pkg`)
-
-#### JOJ3
-
-JOJ3 itself. Parsers and executors are compiled into the JOJ3 binary.
-
-#### Sample
-
-Just a sample on how to write an executable that can be called by the executor.
-
-#### HealthCheck
-
-The repohealth check will return a json list to for check result. The structure follows the score-comment pattern.
-
-HealthCheck currently includes, `reposize`, `forbidden file`, `Metafile existence`, `non-ascii character` in file and message, `release tag`, and `ci files invariance` check.
-
-The workflow is `joj3` pass cli args to healthcheck binary. See `./cmd/healthcheck/main.go` to view all flags.
-
 ## Models (for developers only)
 
 The program parses the configuration file to run multiple stages.

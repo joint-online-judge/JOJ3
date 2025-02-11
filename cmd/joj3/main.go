@@ -1,3 +1,5 @@
+// Package main provides a joj3 executable, which runs various stages based on
+// configuration files and commit message. The output is a JSON file.
 package main
 
 import (
