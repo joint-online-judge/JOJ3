@@ -1,3 +1,6 @@
+// Package clangtidy parses output of the cppcheck static analysis tool to
+// assign scores based on detected code issues.
+// Check examples on running cppcheck for parseable output.
 package cppcheck
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

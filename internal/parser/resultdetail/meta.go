@@ -1,3 +1,4 @@
+// Package resultdetail provides detailed execution result output.
 package resultdetail
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

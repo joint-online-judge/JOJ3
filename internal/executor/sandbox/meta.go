@@ -1,3 +1,7 @@
+// Package sandbox provides a sandboxed execution environment for running
+// untrusted code. It integrates with the go-judge execution service to provide
+// isolated and secure code execution. By default, it uses gRPC to communicate
+// with go-judge.
 package sandbox
 
 import (

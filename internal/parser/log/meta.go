@@ -1,3 +1,5 @@
+// Package log logs the json key-value pairs from given file. The log can be
+// used for Loki that contains run time status.
 package log
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

@@ -1,3 +1,4 @@
+// Package debug logs the executor result to help in troubleshooting.
 package debug
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

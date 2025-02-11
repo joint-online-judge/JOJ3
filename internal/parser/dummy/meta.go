@@ -1,3 +1,5 @@
+// Package dummy provides a simple parser implementation that serves as a
+// template for new parser development.
 package dummy
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

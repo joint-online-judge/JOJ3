@@ -1,3 +1,6 @@
+// Package diff implements string comparison functionality for the specific
+// output files, comparing then with expected answers and assigning scores based
+// on results.
 package diff
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

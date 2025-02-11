@@ -1,3 +1,5 @@
+// Package healthcheck parses the output of the repo-health-checker tool and
+// return forced quit status on error.
 package healthcheck
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

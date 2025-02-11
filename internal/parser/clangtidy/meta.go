@@ -1,3 +1,5 @@
+// Package clangtidy parses output of the clang-tidy C/C++ linter tool to assign
+// scores based on detected code issues.
 package clangtidy
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

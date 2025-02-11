@@ -1,3 +1,5 @@
+// Package sample provides functionality to parse and process sample outputs
+// from stdout and stderr of the sample program. Use this as a sample.
 package sample
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

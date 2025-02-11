@@ -1,3 +1,5 @@
+// Package keyword implements keyword-based output analysis functionality.
+// It evaluates output files by searching for specific keywords and assigns scores based on matches.
 package keyword
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

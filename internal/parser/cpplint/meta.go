@@ -1,3 +1,5 @@
+// Package clangtidy parses output of the cpplint style checker tool to assign
+// scores based on detected code issues.
 package cpplint
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"
