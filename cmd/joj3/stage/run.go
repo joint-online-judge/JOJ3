@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/joint-online-judge/JOJ3/internal/conf"
+	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	executors "github.com/joint-online-judge/JOJ3/internal/executor"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser"
 	"github.com/joint-online-judge/JOJ3/internal/stage"

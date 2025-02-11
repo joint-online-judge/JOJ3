@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
+	joj3Conf "github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
-	internalConf "github.com/joint-online-judge/JOJ3/internal/conf"
 	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -31,7 +31,7 @@ func init() {
 }
 
 func mainImpl() (err error) {
-	conf := new(internalConf.Conf)
+	conf := new(joj3Conf.Conf)
 
 	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	slog.SetDefault(logger)
@@ -46,13 +46,13 @@ func mainImpl() (err error) {
 		fallbackConfFileName = confFileName
 	}
 	slog.Info("start joj3", "version", Version)
-	commitMsg, err := internalConf.GetCommitMsg()
+	commitMsg, err := joj3Conf.GetCommitMsg()
 	if err != nil {
 		slog.Error("get commit msg", "error", err)
 		return err
 	}
 	env.Attr.CommitMsg = commitMsg
-	confPath, confStat, conventionalCommit, err := internalConf.GetConfPath(
+	confPath, confStat, conventionalCommit, err := joj3Conf.GetConfPath(
 		confFileRoot, confFileName, fallbackConfFileName, commitMsg, tag,
 	)
 	if err != nil {
@@ -60,7 +60,7 @@ func mainImpl() (err error) {
 		return err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	conf, err = internalConf.ParseConfFile(confPath)
+	conf, err = joj3Conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return err
@@ -74,20 +74,20 @@ func mainImpl() (err error) {
 	}
 
 	// log conf file info
-	confSHA256, err := internalConf.GetSHA256(confPath)
+	confSHA256, err := joj3Conf.GetSHA256(confPath)
 	if err != nil {
 		slog.Error("get sha256", "error", err)
 		return err
 	}
 	slog.Info("conf info", "sha256", confSHA256, "modTime", confStat.ModTime(),
 		"size", confStat.Size())
-	if err := internalConf.CheckExpire(conf); err != nil {
+	if err := joj3Conf.CheckExpire(conf); err != nil {
 		slog.Error("conf check expire", "error", err)
 		return err
 	}
 
 	// run stages
-	groups := internalConf.MatchGroups(conf, conventionalCommit)
+	groups := joj3Conf.MatchGroups(conf, conventionalCommit)
 	env.Attr.Groups = strings.Join(groups, ",")
 	env.Set()
 	_, forceQuitStageName, err := stage.Run(
