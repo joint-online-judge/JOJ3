@@ -83,8 +83,8 @@ func mainImpl() (err error) {
 	}
 	slog.Info("conf info", "sha256", confSHA256, "modTime", confStat.ModTime(),
 		"size", confStat.Size())
-	if err := joj3Conf.CheckExpire(conf); err != nil {
-		slog.Error("conf check expire", "error", err)
+	if err := joj3Conf.CheckValid(conf); err != nil {
+		slog.Error("conf not valid now", "error", err)
 		return err
 	}
 

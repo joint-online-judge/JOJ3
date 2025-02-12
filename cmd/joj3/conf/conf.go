@@ -173,10 +173,15 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 	return
 }
 
-func CheckExpire(conf *Conf) error {
+func CheckValid(conf *Conf) error {
+	now := time.Now().Unix()
+	if conf.EffectiveUnixTimestamp > 0 &&
+		conf.EffectiveUnixTimestamp > now {
+		return fmt.Errorf("config file not effective now: %d", now)
+	}
 	if conf.ExpireUnixTimestamp > 0 &&
-		conf.ExpireUnixTimestamp < time.Now().Unix() {
-		return fmt.Errorf("config file expired: %d", conf.ExpireUnixTimestamp)
+		conf.ExpireUnixTimestamp < now {
+		return fmt.Errorf("config file expired now: %d", now)
 	}
 	return nil
 }
