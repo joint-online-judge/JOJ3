@@ -4,9 +4,9 @@ go 1.23.1
 
 require (
 	github.com/criyle/go-judge v1.8.7
-	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
 	github.com/go-git/go-git/v5 v5.13.2
 	github.com/jinzhu/copier v0.4.0
+	github.com/joint-online-judge/go-gitignore v0.0.0-20250212104351-ad79a46f8dcc
 	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/mitchellh/mapstructure v1.5.0

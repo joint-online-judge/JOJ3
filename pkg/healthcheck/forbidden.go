@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/denormal/go-gitignore"
+	"github.com/joint-online-judge/go-gitignore"
 )
 
 // getForbiddens retrieves a list of forbidden files in the specified root directory.
