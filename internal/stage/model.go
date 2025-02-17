@@ -36,14 +36,14 @@ type Cmd struct {
 	Stdout *CmdFile `json:"stdout,omitempty"`
 	Stderr *CmdFile `json:"stderr,omitempty"`
 
-	CPULimit     uint64 `json:"cpuLimit"`
-	RealCPULimit uint64 `json:"realCpuLimit"`
-	ClockLimit   uint64 `json:"clockLimit"`
-	MemoryLimit  uint64 `json:"memoryLimit"`
-	StackLimit   uint64 `json:"stackLimit"`
+	CPULimit     uint64 `json:"cpuLimit"`     // ns
+	RealCPULimit uint64 `json:"realCpuLimit"` // deprecated: use clock limit instead (still working)
+	ClockLimit   uint64 `json:"clockLimit"`   // ns
+	MemoryLimit  uint64 `json:"memoryLimit"`  // byte
+	StackLimit   uint64 `json:"stackLimit"`   // byte
 	ProcLimit    uint64 `json:"procLimit"`
-	CPURateLimit uint64 `json:"cpuRateLimit"`
-	CPUSetLimit  string `json:"cpuSetLimit"`
+	CPURateLimit uint64 `json:"cpuRateLimit"` // limit cpu usage (1000 equals 1 cpu)
+	CPUSetLimit  string `json:"cpuSetLimit"`  // set the cpuSet for cgroup
 
 	CopyIn       map[string]CmdFile `json:"copyIn"`
 	CopyInCached map[string]string  `json:"copyInCached"`
@@ -111,9 +111,9 @@ type ExecutorResult struct {
 	Status     Status            `json:"status"`
 	ExitStatus int               `json:"exitStatus"`
 	Error      string            `json:"error,omitempty"`
-	Time       uint64            `json:"time"`
-	Memory     uint64            `json:"memory"`
-	RunTime    uint64            `json:"runTime"`
+	Time       uint64            `json:"time"`    // ns (cgroup recorded time)
+	Memory     uint64            `json:"memory"`  // byte
+	RunTime    uint64            `json:"runTime"` // ns (wall clock time)
 	Files      map[string]string `json:"files,omitempty"`
 	FileIDs    map[string]string `json:"fileIds,omitempty"`
 	FileError  []FileError       `json:"fileError,omitempty"`
@@ -125,9 +125,9 @@ type ExecutorResultSummary struct {
 	Status     Status            `json:"status"`
 	ExitStatus int               `json:"exitStatus"`
 	Error      string            `json:"error,omitempty"`
-	Time       uint64            `json:"time"`
-	Memory     uint64            `json:"memory"`
-	RunTime    uint64            `json:"runTime"`
+	Time       uint64            `json:"time"`    // ns (cgroup recorded time)
+	Memory     uint64            `json:"memory"`  // byte
+	RunTime    uint64            `json:"runTime"` // ns (wall clock time)
 	Files      map[string]string `json:"files,omitempty"`
 	FileIDs    map[string]string `json:"fileIds,omitempty"`
 	FileError  []FileError       `json:"fileError,omitempty"`
