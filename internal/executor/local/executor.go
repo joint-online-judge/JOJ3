@@ -15,7 +15,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func generateResult(
+func (e *Local) generateResult(
 	err error,
 	processState *os.ProcessState,
 	runTime time.Duration,
@@ -134,7 +134,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			case err := <-done:
 				endTime := time.Now()
 				runTime := endTime.Sub(startTime)
-				result := generateResult(
+				result := e.generateResult(
 					err,
 					execCmd.ProcessState,
 					runTime,
@@ -157,7 +157,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			err := <-done
 			endTime := time.Now()
 			runTime := endTime.Sub(startTime)
-			result := generateResult(
+			result := e.generateResult(
 				err,
 				execCmd.ProcessState,
 				runTime,

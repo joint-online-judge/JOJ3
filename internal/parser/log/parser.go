@@ -9,7 +9,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*Log) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	content := executorResult.Files[conf.FileName]
 	var data map[string]any
 	err := json.Unmarshal([]byte(content), &data)
@@ -36,7 +36,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*Log) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Log) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -45,7 +45,7 @@ func (*Log) Run(results []stage.ExecutorResult, confAny any) (
 	}
 	var res []stage.ParserResult
 	for _, result := range results {
-		res = append(res, Parse(result, *conf))
+		res = append(res, p.parse(result, *conf))
 	}
 	return res, false, nil
 }

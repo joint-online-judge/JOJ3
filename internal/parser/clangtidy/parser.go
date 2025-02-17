@@ -6,20 +6,20 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*ClangTidy) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
 	// stderr := executorResult.Files[conf.Stderr]
 	lines := strings.SplitAfter(stdout, "\n")
-	messages := ParseLines(lines, conf)
-	formattedMessages := Format(messages)
-	score, comment := GetResult(formattedMessages, conf)
+	messages := parseLines(lines, conf)
+	formattedMessages := format(messages)
+	score, comment := getResult(formattedMessages, conf)
 	return stage.ParserResult{
 		Score:   score,
 		Comment: comment,
 	}
 }
 
-func (*ClangTidy) Run(results []stage.ExecutorResult, confAny any) (
+func (p *ClangTidy) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -29,7 +29,7 @@ func (*ClangTidy) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parseRes := Parse(result, *conf)
+		parseRes := p.parse(result, *conf)
 		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}

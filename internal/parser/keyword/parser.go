@@ -8,7 +8,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*Keyword) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	score := conf.Score
 	comment := ""
 	matchCount := make(map[string]int)
@@ -59,7 +59,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
+func (k *Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -69,7 +69,7 @@ func (*Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parseRes := Parse(result, *conf)
+		parseRes := k.parse(result, *conf)
 		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}

@@ -129,7 +129,7 @@ func convertPathsToRelative(messages *[]ClangMessage, conf Conf) {
 	}
 }
 
-func ParseLines(lines []string, conf Conf) []ClangMessage {
+func parseLines(lines []string, conf Conf) []ClangMessage {
 	messages := make([]ClangMessage, 0)
 	for _, line := range lines {
 		if isIgnored(string(line)) {

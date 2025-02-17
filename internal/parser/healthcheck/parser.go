@@ -10,7 +10,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, bool) {
+func (*Healthcheck) parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, bool) {
 	stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
 	slog.Debug("healthcheck files", "stdout", stdout, "stderr", stderr)
@@ -43,7 +43,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) (stage.ParserResult, 
 	}, forceQuit
 }
 
-func (*Healthcheck) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Healthcheck) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -53,7 +53,7 @@ func (*Healthcheck) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parserResult, forceQuitResult := Parse(result, *conf)
+		parserResult, forceQuitResult := p.parse(result, *conf)
 		res = append(res, parserResult)
 		forceQuit = forceQuit || forceQuitResult
 	}

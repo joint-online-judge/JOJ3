@@ -8,7 +8,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/pkg/sample"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*Sample) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stdout := executorResult.Files[conf.Stdout]
 	// stderr := executorResult.Files[conf.Stderr]
 	var sampleResult sample.Result
@@ -25,7 +25,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*Sample) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Sample) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -34,7 +34,7 @@ func (*Sample) Run(results []stage.ExecutorResult, confAny any) (
 	}
 	var res []stage.ParserResult
 	for _, result := range results {
-		res = append(res, Parse(result, *conf))
+		res = append(res, p.parse(result, *conf))
 	}
 	return res, false, nil
 }

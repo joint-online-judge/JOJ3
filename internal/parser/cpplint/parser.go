@@ -9,7 +9,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*Cpplint) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	stderr := executorResult.Files[conf.Stderr]
 	pattern := `(.+):(\d+):  (.+)  \[(.+)\] \[(\d)]\n`
 	re := regexp.MustCompile(pattern)
@@ -72,7 +72,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*Cpplint) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Cpplint) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -82,7 +82,7 @@ func (*Cpplint) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parseRes := Parse(result, *conf)
+		parseRes := p.parse(result, *conf)
 		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}

@@ -19,7 +19,7 @@ const (
 	UNKNOWN
 )
 
-func GetResult(records []Record, conf Conf) (string, int, error) {
+func getResult(records []Record, conf Conf) (string, int, error) {
 	score := conf.Score
 	comment := "### Test results summary\n\n"
 	matchCount := make(map[string]int)

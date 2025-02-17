@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GetResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
+func getResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
 	score := conf.Score
 	comment := "### Test results summary\n\n"
 	matchCount := make(map[string]int)

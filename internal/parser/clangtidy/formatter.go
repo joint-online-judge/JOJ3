@@ -17,7 +17,7 @@ type JsonMessage struct {
 	Severity    string                 `json:"severity"`
 }
 
-func Format(messages []ClangMessage) []JsonMessage {
+func format(messages []ClangMessage) []JsonMessage {
 	formattedMessages := make([]JsonMessage, len(messages))
 	for i, message := range messages {
 		formattedMessages[i] = formatMessage(message)

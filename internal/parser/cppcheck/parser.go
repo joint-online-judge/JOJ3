@@ -17,7 +17,7 @@ type Record struct {
 	Id       string `json:"id"`
 }
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
 	records := make([]Record, 0)
@@ -39,7 +39,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 		}
 		records = append(records, record)
 	}
-	comment, score, err := GetResult(records, conf)
+	comment, score, err := getResult(records, conf)
 	if err != nil {
 		return stage.ParserResult{
 			Score: 0,
@@ -56,7 +56,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*CppCheck) Run(results []stage.ExecutorResult, confAny any) (
+func (p *CppCheck) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -66,7 +66,7 @@ func (*CppCheck) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parseRes := Parse(result, *conf)
+		parseRes := p.parse(result, *conf)
 		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}

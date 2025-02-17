@@ -6,7 +6,7 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+func (*Debug) parse(executorResult stage.ExecutorResult, _ Conf) stage.ParserResult {
 	slog.Debug("debug parser", "executorResult", executorResult)
 	for name, content := range executorResult.Files {
 		slog.Debug("debug parser file", "name", name, "content", content)
@@ -17,7 +17,7 @@ func Parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	}
 }
 
-func (*Debug) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Debug) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -26,7 +26,7 @@ func (*Debug) Run(results []stage.ExecutorResult, confAny any) (
 	}
 	var res []stage.ParserResult
 	for _, result := range results {
-		res = append(res, Parse(result, *conf))
+		res = append(res, p.parse(result, *conf))
 	}
 	return res, false, nil
 }
