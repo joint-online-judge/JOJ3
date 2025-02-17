@@ -59,7 +59,7 @@ func (*Keyword) parse(executorResult stage.ExecutorResult, conf Conf) stage.Pars
 	}
 }
 
-func (k *Keyword) Run(results []stage.ExecutorResult, confAny any) (
+func (p *Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
 	conf, err := stage.DecodeConf[Conf](confAny)
@@ -69,7 +69,7 @@ func (k *Keyword) Run(results []stage.ExecutorResult, confAny any) (
 	var res []stage.ParserResult
 	forceQuit := false
 	for _, result := range results {
-		parseRes := k.parse(result, *conf)
+		parseRes := p.parse(result, *conf)
 		if conf.ForceQuitOnDeduct && parseRes.Score < conf.Score {
 			forceQuit = true
 		}
