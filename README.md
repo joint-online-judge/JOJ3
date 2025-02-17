@@ -1,6 +1,7 @@
 # JOJ3
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/joint-online-judge/JOJ3)](https://goreportcard.com/report/github.com/joint-online-judge/JOJ3)
+[![Go Reference](https://pkg.go.dev/badge/github.com/joint-online-judge/JOJ3.svg)](https://pkg.go.dev/github.com/joint-online-judge/JOJ3)
 
 ## Quick Start
 
