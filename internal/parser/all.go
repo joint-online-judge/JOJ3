@@ -13,6 +13,7 @@ import (
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/resultdetail"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/resultstatus"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/sample"
+	_ "github.com/joint-online-judge/JOJ3/internal/parser/tierscore"
 )
 
 // this file does nothing but imports to ensure all the init() functions
