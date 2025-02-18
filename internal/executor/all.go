@@ -1,4 +1,5 @@
-package executors
+// Package executor contains all the executors.
+package executor
 
 import (
 	_ "github.com/joint-online-judge/JOJ3/internal/executor/dummy"

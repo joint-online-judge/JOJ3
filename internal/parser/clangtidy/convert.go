@@ -1,4 +1,3 @@
-// Referenced from https://github.com/yuriisk/clang-tidy-converter/blob/master/clang_tidy_converter/parser/clang_tidy_parser.py
 package clangtidy
 
 import (
@@ -9,6 +8,7 @@ import (
 	"strings"
 )
 
+// Referenced from https://github.com/yuriisk/clang-tidy-converter/blob/master/clang_tidy_converter/parser/clang_tidy_parser.py
 type Level int
 
 const (

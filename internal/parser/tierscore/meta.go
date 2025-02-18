@@ -1,6 +1,5 @@
 // Package tierscore provides a parser for tiered scoring based on
 // time and memory constraints. Leave the field empty or 0 to disable.
-
 package tierscore
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

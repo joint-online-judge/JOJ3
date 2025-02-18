@@ -1,3 +1,4 @@
+// Package sample provides a sample function that returns a Result.
 package sample
 
 import (

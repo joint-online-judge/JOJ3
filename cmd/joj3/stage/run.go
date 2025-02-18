@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
-	executors "github.com/joint-online-judge/JOJ3/internal/executor"
+	"github.com/joint-online-judge/JOJ3/internal/executor"
 	_ "github.com/joint-online-judge/JOJ3/internal/parser"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 
@@ -139,7 +139,7 @@ func Run(
 ) (
 	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
-	executors.InitWithConf(
+	executor.InitWithConf(
 		conf.Stage.SandboxExecServer,
 		conf.Stage.SandboxToken,
 	)

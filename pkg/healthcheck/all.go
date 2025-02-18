@@ -1,3 +1,4 @@
+// Package healthcheck provides a set of health checks for a repository.
 package healthcheck
 
 import (

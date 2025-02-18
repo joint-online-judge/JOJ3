@@ -2,7 +2,6 @@
 // dynamically. It is used for custom parsers.
 // The plugin needs to be located at `ModPath` and export a symbol with name
 // `SymName` that implements the stage.Parser interface.
-
 package plugin
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"

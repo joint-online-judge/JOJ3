@@ -1,4 +1,5 @@
-package parsers
+// Package parser contains all the parsers.
+package parser
 
 import (
 	_ "github.com/joint-online-judge/JOJ3/internal/parser/clangtidy"
