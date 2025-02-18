@@ -1,8 +1,10 @@
-package stage
+package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
@@ -132,7 +134,7 @@ func newErrorStageResults(err error) ([]stage.StageResult, string) {
 	}, "Internal Error"
 }
 
-func Run(
+func runStages(
 	conf *conf.Conf,
 	groups []string,
 	onStagesComplete func([]stage.StageResult, string),
@@ -175,8 +177,16 @@ func Run(
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 	}
 	onStagesComplete(stageResults, forceQuitStageName)
-	slog.Info("write stageResults")
-	if err = Write(conf.Stage.OutputPath, stageResults); err != nil {
+	slog.Info("output result start", "path", conf.Stage.OutputPath)
+	slog.Debug("output result start",
+		"path", conf.Stage.OutputPath, "results", stageResults)
+	content, err := json.Marshal(stageResults)
+	if err != nil {
+		slog.Error("marshal stageResults", "error", err)
+	}
+	err = os.WriteFile(conf.Stage.OutputPath,
+		append(content, []byte("\n")...), 0o600)
+	if err != nil {
 		slog.Error("write stageResults", "error", err)
 	}
 	slog.Info("run postStages")

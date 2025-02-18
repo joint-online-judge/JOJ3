@@ -11,8 +11,7 @@ import (
 
 	joj3Conf "github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/stage"
-	internalStage "github.com/joint-online-judge/JOJ3/internal/stage"
+	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
 var (
@@ -92,11 +91,11 @@ func mainImpl() (err error) {
 	groups := joj3Conf.MatchGroups(conf, conventionalCommit)
 	env.Attr.Groups = strings.Join(groups, ",")
 	env.Set()
-	_, forceQuitStageName, err := stage.Run(
+	_, forceQuitStageName, err := runStages(
 		conf,
 		groups,
 		func(
-			stageResults []internalStage.StageResult,
+			stageResults []stage.StageResult,
 			forceQuitStageName string,
 		) {
 			env.Attr.ForceQuitStageName = forceQuitStageName
