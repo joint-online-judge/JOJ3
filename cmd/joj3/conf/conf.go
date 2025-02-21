@@ -1,3 +1,5 @@
+// Package conf provides a configuration file parser for JOJ3.
+// The configuration file path is determined by the commit message.
 package conf
 
 import (

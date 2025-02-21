@@ -1,3 +1,4 @@
+// Package env stores the environment variables from actions environment.
 package env
 
 import (
