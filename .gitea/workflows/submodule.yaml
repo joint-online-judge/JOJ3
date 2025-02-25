@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: https://gitea.com/BoYanZh/checkout@focs
+        uses: actions/checkout@focs
         with:
           fetch-depth: 0
       - name: Set up SSH

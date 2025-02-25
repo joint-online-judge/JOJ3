@@ -7,7 +7,7 @@ jobs:
     runs-on: golang-ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: https://gitea.com/BoYanZh/checkout@focs
+        uses: actions/checkout@focs
       - name: Display Go version
         run: go version
       - name: Prepare
