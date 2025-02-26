@@ -50,7 +50,7 @@ func getMetas(rootDir string, fileList []string) ([]string, string, error) {
 	for i, wasFound := range matched {
 		if !wasFound {
 			unmatchedList = append(unmatchedList, fileList[i])
-			str := fmt.Sprintf("%d. No %s file found", i+1, fileList[i])
+			str := fmt.Sprintf("No %s file found", fileList[i])
 			if strings.Index(strings.ToLower(fileList[i]), "readme") == 0 {
 				str += ", please refer to https://www.makeareadme.com/ for more information"
 			} else if strings.Index(strings.ToLower(fileList[i]), "changelog") == 0 {
