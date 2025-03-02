@@ -64,9 +64,9 @@ func Run(stages []Stage) (
 			"summary", SummarizeExecutorResults(executorResults),
 		)
 		parserResults = []ParserResult{}
-		scoresMap := map[string][]int{}
+		parserScoresMap := map[string][]int{}
 		for _, stageParser := range stage.Parsers {
-			scoresMap[stageParser.Name] = make([]int, len(executorResults))
+			parserScoresMap[stageParser.Name] = make([]int, len(executorResults))
 		}
 		for _, stageParser := range stage.Parsers {
 			slog.Info(
@@ -104,7 +104,7 @@ func Run(stages []Stage) (
 				break
 			}
 			for i, parserResult := range tmpParserResults {
-				scoresMap[stageParser.Name][i] += parserResult.Score
+				parserScoresMap[stageParser.Name][i] += parserResult.Score
 			}
 			if parserForceQuit {
 				slog.Error(
@@ -134,7 +134,7 @@ func Run(stages []Stage) (
 			Results:   parserResults,
 			ForceQuit: forceQuitStageName != "",
 		})
-		slog.Debug("stage done", "name", stage.Name, "parser scores", scoresMap)
+		slog.Debug("stage done", "name", stage.Name, "parserScoresMap", parserScoresMap)
 		if forceQuitStageName != "" {
 			break
 		}
