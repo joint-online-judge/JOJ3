@@ -49,13 +49,22 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				if err != nil {
 					return nil, true, err
 				}
-				slog.Debug("compare", "filename", output.FileName,
-					"answer path", output.AnswerPath,
-					"actual length", len(result.Files[output.FileName]),
-					"answer length", len(string(answer)))
+				isSame := compareStrings(
+					string(answer),
+					result.Files[output.FileName],
+					output.CompareSpace,
+				)
+				slog.Debug(
+					"compare",
+					"filename", output.FileName,
+					"answerPath", output.AnswerPath,
+					"actualLength", len(result.Files[output.FileName]),
+					"answerLength", len(string(answer)),
+					"index", i,
+					"isSame", isSame,
+				)
 				// If no difference, assign score
-				if compareStrings(string(answer), result.Files[output.FileName],
-					output.CompareSpace) {
+				if isSame {
 					score += output.Score
 					comment += conf.PassComment
 				} else {
