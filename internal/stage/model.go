@@ -224,3 +224,14 @@ type StageResult struct {
 	Results   NonNullSlice[ParserResult] `json:"results"`
 	ForceQuit bool                       `json:"force_quit"`
 }
+
+type CaseDetail struct {
+	Index          int
+	ExecutorResult ExecutorResult
+	ParserScores   map[string]int
+}
+
+type StageDetail struct {
+	Name        string
+	CaseDetails []CaseDetail
+}
