@@ -76,37 +76,36 @@ func isIgnored(line string) bool {
 	return ignoreRegex.MatchString(line)
 }
 
-func parseMessage(line string) ClangMessage {
+func parseMessage(lineStr string) ClangMessage {
 	messageRegex := regexp.MustCompile(`^(?P<filepath>.+):(?P<line>\d+):(?P<column>\d+): (?P<level>\S+): (?P<message>.*?) \[(?P<diagnostic_name>[^\]]+)\]?\n$`)
-	regexRes := messageRegex.FindStringSubmatch(line)
+	regexRes := messageRegex.FindStringSubmatch(lineStr)
 	if len(regexRes) == 0 {
 		return *newClangMessage("", 0, 0, UNKNOWN, "", "", nil, nil)
-	} else {
-		filepath := regexRes[1]
-		line, err := strconv.Atoi(regexRes[2])
-		if err != nil {
-			line = 0
-			slog.Error("parse line", "error", err)
-		}
-		column, err := strconv.Atoi(regexRes[3])
-		if err != nil {
-			column = 0
-			slog.Error("parse column", "error", err)
-		}
-		level := levelFromString(regexRes[4])
-		message := regexRes[5]
-		diagnosticName := regexRes[6]
+	}
+	filepath := regexRes[1]
+	line, err := strconv.Atoi(regexRes[2])
+	if err != nil {
+		line = 0
+		slog.Error("parse line", "error", err)
+	}
+	column, err := strconv.Atoi(regexRes[3])
+	if err != nil {
+		column = 0
+		slog.Error("parse column", "error", err)
+	}
+	level := levelFromString(regexRes[4])
+	message := regexRes[5]
+	diagnosticName := regexRes[6]
 
-		return ClangMessage{
-			filepath:       filepath,
-			line:           line,
-			column:         column,
-			level:          level,
-			message:        message,
-			diagnosticName: diagnosticName,
-			detailsLines:   make([]string, 0),
-			children:       make([]ClangMessage, 0),
-		}
+	return ClangMessage{
+		filepath:       filepath,
+		line:           line,
+		column:         column,
+		level:          level,
+		message:        message,
+		diagnosticName: diagnosticName,
+		detailsLines:   make([]string, 0),
+		children:       make([]ClangMessage, 0),
 	}
 }
 

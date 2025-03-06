@@ -55,12 +55,12 @@ func isWhitespace(b byte) bool {
 func myersDiff(src, dst []string, compareSpace bool) []operation {
 	n := len(src)
 	m := len(dst)
-	max := n + m
+	maxLength := n + m
 	var trace []map[int]int
 	var x, y int
 
 loop:
-	for d := 0; d <= max; d += 1 {
+	for d := 0; d <= maxLength; d += 1 {
 		v := make(map[int]int, d+2)
 		trace = append(trace, v)
 

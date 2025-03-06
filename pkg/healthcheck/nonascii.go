@@ -45,9 +45,8 @@ func getNonAscii(root string) ([]string, error) {
 		if info.IsDir() {
 			if info.Name() == ".git" {
 				return filepath.SkipDir
-			} else {
-				return nil
 			}
+			return nil
 		}
 
 		if gitattrExist {
