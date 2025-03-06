@@ -6,17 +6,20 @@ APPS := $(notdir $(wildcard ./cmd/*))
 COMMIT_HASH := $(shell git rev-parse --short HEAD)
 DATE := $(shell date +"%Y%m%d-%H%M%S")
 VERSION := $(COMMIT_HASH)-$(DATE)
-FLAGS := "-s -w -X main.Version=$(VERSION)"
+LDFLAGS := -s -w -X main.Version=$(VERSION)
+GOFLAGS := -trimpath -mod=readonly -buildvcs=false
 
 all: build
 
 build:
-	$(foreach APP,$(APPS), CGO_ENABLED=0 go build -ldflags=$(FLAGS) -o $(BUILD_DIR)/$(APP) ./cmd/$(APP);)
+	$(foreach APP,$(APPS), \
+		CGO_ENABLED=0 \
+		go build $(GOFLAGS) -ldflags='$(LDFLAGS)' -o $(BUILD_DIR)/$(APP) ./cmd/$(APP) \
+		|| exit 1; \
+	)
 
 clean:
-	rm -rf $(BUILD_DIR)/*
-	rm -rf $(TMP_DIR)/*
-	rm -rf *.out
+	$(RM) -rv $(BUILD_DIR) $(TMP_DIR) *.out
 
 lint:
 	golangci-lint run -v
