@@ -36,7 +36,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		slog.Debug("sandbox execute", "i", i, "pbCmd size", proto.Size(pbCmd))
 	}
 	pbReq := &pb.Request{Cmd: pbCmds}
-	slog.Info("sandbox execute", "pbReq size", proto.Size(pbReq))
+	slog.Debug("sandbox execute", "pbReq size", proto.Size(pbReq))
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
