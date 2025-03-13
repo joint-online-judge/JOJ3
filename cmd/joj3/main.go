@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"strings"
@@ -31,73 +32,63 @@ func init() {
 	printVersion = flag.Bool("version", false, "print current version")
 }
 
-func mainImpl() (err error) {
-	conf := new(joj3Conf.Conf)
-
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-	slog.SetDefault(logger)
-
-	// parse flag & conf file
-	flag.Parse()
-	if *printVersion {
-		fmt.Println(Version)
-		return nil
-	}
-	if fallbackConfFileName == "" {
-		fallbackConfFileName = confFileName
-	}
-	slog.Info("start joj3", "version", Version)
+func getCommitMsg() (string, error) {
 	commitMsg, err := joj3Conf.GetCommitMsg()
 	if err != nil {
 		slog.Error("get commit msg", "error", err)
-		return err
+		return "", err
 	}
-	env.Attr.CommitMsg = commitMsg
+	return commitMsg, nil
+}
+
+func getConfPath(commitMsg string) (string, fs.FileInfo, *joj3Conf.ConventionalCommit, error) {
 	confPath, confStat, conventionalCommit, err := joj3Conf.GetConfPath(
 		confFileRoot, confFileName, fallbackConfFileName, commitMsg, tag,
 	)
 	if err != nil {
 		slog.Error("get conf path", "error", err)
-		return err
+		return "", nil, nil, err
 	}
 	slog.Info("try to load conf", "path", confPath)
-	conf, err = joj3Conf.ParseConfFile(confPath)
+	return confPath, confStat, conventionalCommit, nil
+}
+
+func loadConf(confPath string) (*joj3Conf.Conf, error) {
+	conf, err := joj3Conf.ParseConfFile(confPath)
 	if err != nil {
 		slog.Error("parse conf", "error", err)
-		return err
+		return nil, err
 	}
-	env.Attr.ConfName = conf.Name
-	env.Attr.OutputPath = conf.Stage.OutputPath
 	slog.Debug("conf loaded", "conf", conf, "joj3 version", Version)
-	if err := setupSlog(conf); err != nil {
-		slog.Error("setup slog", "error", err)
-		return err
-	}
+	return conf, nil
+}
 
-	// log conf file info
+func showConfStat(confPath string, confStat fs.FileInfo) error {
 	confSHA256, err := joj3Conf.GetSHA256(confPath)
 	if err != nil {
 		slog.Error("get sha256", "error", err)
 		return err
 	}
-	slog.Info("conf info", "sha256", confSHA256, "modTime", confStat.ModTime(),
-		"size", confStat.Size())
+	slog.Info("conf info", "sha256", confSHA256, "modTime", confStat.ModTime(), "size", confStat.Size())
+	return nil
+}
+
+func validateConf(conf *joj3Conf.Conf) error {
 	if err := joj3Conf.CheckValid(conf); err != nil {
 		slog.Error("conf not valid now", "error", err)
 		return err
 	}
+	return nil
+}
 
-	// run stages
+func run(conf *joj3Conf.Conf, conventionalCommit *joj3Conf.ConventionalCommit) error {
 	groups := joj3Conf.MatchGroups(conf, conventionalCommit)
 	env.Attr.Groups = strings.Join(groups, ",")
 	env.Set()
 	_, forceQuitStageName, err := runStages(
 		conf,
 		groups,
-		func(
-			stageResults []stage.StageResult,
-			forceQuitStageName string,
-		) {
+		func(stageResults []stage.StageResult, forceQuitStageName string) {
 			env.Attr.ForceQuitStageName = forceQuitStageName
 			env.Set()
 		},
@@ -108,6 +99,48 @@ func mainImpl() (err error) {
 	if forceQuitStageName != "" {
 		slog.Info("stage force quit", "name", forceQuitStageName)
 		return fmt.Errorf("stage force quit with name %s", forceQuitStageName)
+	}
+	return nil
+}
+
+func mainImpl() (err error) {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	slog.SetDefault(logger)
+	flag.Parse()
+	if *printVersion {
+		fmt.Println(Version)
+		return nil
+	}
+	if fallbackConfFileName == "" {
+		fallbackConfFileName = confFileName
+	}
+	slog.Info("start joj3", "version", Version)
+	commitMsg, err := getCommitMsg()
+	if err != nil {
+		return err
+	}
+	env.Attr.CommitMsg = commitMsg
+	confPath, confStat, conventionalCommit, err := getConfPath(commitMsg)
+	if err != nil {
+		return err
+	}
+	conf, err := loadConf(confPath)
+	if err != nil {
+		return err
+	}
+	env.Attr.ConfName = conf.Name
+	env.Attr.OutputPath = conf.Stage.OutputPath
+	if err := setupSlog(conf); err != nil {
+		return err
+	}
+	if err := showConfStat(confPath, confStat); err != nil {
+		return err
+	}
+	if err := validateConf(conf); err != nil {
+		return err
+	}
+	if err := run(conf, conventionalCommit); err != nil {
+		return err
 	}
 	return nil
 }

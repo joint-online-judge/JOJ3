@@ -72,21 +72,25 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 	return
 }
 
-func GetSHA256(filePath string) (string, error) {
+func GetSHA256(filePath string) (hashStr string, err error) {
 	// Open the file
 	file, err := os.Open(filePath)
 	if err != nil {
-		return "", err
+		return
 	}
-	defer file.Close()
+	defer func() {
+		if cerr := file.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 
 	// Calculate SHA-256
 	hash := sha256.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
+	if _, err = io.Copy(hash, file); err != nil {
+		return
 	}
-
-	return hex.EncodeToString(hash.Sum(nil)), nil
+	hashStr = hex.EncodeToString(hash.Sum(nil))
+	return hashStr, nil
 }
 
 func parseMsg(confRoot, confName, msg, tag string) (
@@ -104,7 +108,7 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	if err != nil {
 		return
 	}
-	if strings.HasPrefix(relPath, "..") {
+	if strings.HasPrefix(relPath, "..") || filepath.IsAbs(relPath) {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
 		return
 	}
@@ -119,14 +123,14 @@ func parseMsg(confRoot, confName, msg, tag string) (
 func hintValidScopes(confRoot, confName string) {
 	confRoot = filepath.Clean(confRoot)
 	validScopes := []string{}
-	_ = filepath.Walk(confRoot, func(
-		path string, info os.FileInfo, err error,
+	_ = filepath.WalkDir(confRoot, func(
+		path string, d fs.DirEntry, err error,
 	) error {
 		if err != nil {
 			slog.Error("list valid scopes", "error", err)
 			return err
 		}
-		if info.IsDir() {
+		if d.IsDir() {
 			confPath := filepath.Join(path, confName)
 			if _, err := os.Stat(confPath); err == nil {
 				relPath, err := filepath.Rel(confRoot, path)
