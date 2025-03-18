@@ -9,3 +9,8 @@ type Parser interface {
 func RegisterParser(name string, parser Parser) {
 	parserMap[name] = parser
 }
+
+type ParserResult struct {
+	Score   int    `json:"score"`
+	Comment string `json:"comment"`
+}

@@ -1,8 +1,6 @@
 package stage
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // copied from https://github.com/criyle/go-judge/blob/master/envexec/run_status.go
 // Status defines run task Status return status
