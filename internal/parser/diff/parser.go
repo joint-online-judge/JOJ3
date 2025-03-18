@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -37,7 +36,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		score := 0
 		comment := ""
 		if conf.FailOnNotAccepted &&
-			result.Status != stage.Status(envexec.StatusAccepted) {
+			result.Status != stage.StatusAccepted {
 			if conf.ForceQuitOnFailed {
 				forceQuit = true
 			}

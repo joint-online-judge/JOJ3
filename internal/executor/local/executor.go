@@ -11,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -23,7 +22,7 @@ func (e *Local) generateResult(
 	stdoutBuffer, stderrBuffer bytes.Buffer,
 ) stage.ExecutorResult {
 	result := stage.ExecutorResult{
-		Status:     stage.Status(envexec.StatusAccepted),
+		Status:     stage.StatusAccepted,
 		ExitStatus: processState.ExitCode(),
 		Error:      "",
 		Time: func() uint64 {
@@ -59,10 +58,10 @@ func (e *Local) generateResult(
 
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
-			result.Status = stage.Status(envexec.StatusNonzeroExitStatus)
+			result.Status = stage.StatusNonzeroExitStatus
 			result.Error = exitErr.Error()
 		} else {
-			result.Status = stage.Status(envexec.StatusInternalError)
+			result.Status = stage.StatusInternalError
 			result.Error = err.Error()
 		}
 	}
@@ -75,7 +74,7 @@ func (e *Local) generateResult(
 	}
 
 	if err := handleCopyOut(&result, cmd); err != nil {
-		result.Status = stage.Status(envexec.StatusFileError)
+		result.Status = stage.StatusFileError
 		result.Error = err.Error()
 	}
 
@@ -146,7 +145,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			case <-time.After(duration):
 				_ = execCmd.Process.Kill()
 				result := stage.ExecutorResult{
-					Status:  stage.Status(envexec.StatusTimeLimitExceeded),
+					Status:  stage.StatusTimeLimitExceeded,
 					Error:   "",
 					Files:   map[string]string{},
 					FileIDs: map[string]string{},

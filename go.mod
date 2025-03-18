@@ -5,7 +5,6 @@ go 1.24
 toolchain go1.24.1
 
 require (
-	github.com/criyle/go-judge v1.9.2
 	github.com/criyle/go-judge/pb v1.0.0
 	github.com/go-git/go-git/v5 v5.14.0
 	github.com/jinzhu/copier v0.4.0
@@ -23,8 +22,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/cloudflare/circl v1.6.0 // indirect
-	github.com/creack/pty v1.1.24 // indirect
-	github.com/criyle/go-sandbox v0.11.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -41,7 +38,6 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect

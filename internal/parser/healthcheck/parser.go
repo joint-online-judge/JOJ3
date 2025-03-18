@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/criyle/go-judge/envexec"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
@@ -14,7 +13,7 @@ func (*Healthcheck) parse(executorResult stage.ExecutorResult, conf Conf) (stage
 	stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
 	slog.Debug("healthcheck files", "stdout", stdout, "stderr", stderr)
-	if executorResult.Status != stage.Status(envexec.StatusAccepted) {
+	if executorResult.Status != stage.StatusAccepted {
 		return stage.ParserResult{
 			Score: 0,
 			Comment: fmt.Sprintf(

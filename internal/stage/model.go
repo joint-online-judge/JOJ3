@@ -4,17 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	"github.com/criyle/go-judge/envexec"
 )
 
 // copied from https://github.com/criyle/go-judge/blob/master/cmd/go-judge/model/model.go
-// FileError defines the location, file name and the detailed message for a failed file operation
-type FileError = envexec.FileError
-
-// FileErrorType defines the location that file operation fails
-type FileErrorType = envexec.FileErrorType
-
 // CmdFile defines file from multiple source including local / memory / cached or pipe collector
 type CmdFile struct {
 	Src       *string `json:"src"`
@@ -82,30 +74,6 @@ type Request struct {
 	PipeMapping []PipeMap `json:"pipeMapping"`
 }
 
-// Status offers JSON marshal for envexec.Status
-type Status envexec.Status
-
-// String converts status to string
-func (s Status) String() string {
-	return envexec.Status(s).String()
-}
-
-// MarshalJSON convert status into string
-func (s Status) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + envexec.Status(s).String() + "\""), nil
-}
-
-// UnmarshalJSON convert string into status
-func (s *Status) UnmarshalJSON(b []byte) error {
-	str := string(b)
-	v, err := envexec.StringToStatus(str)
-	if err != nil {
-		return err
-	}
-	*s = Status(v)
-	return nil
-}
-
 // ExecutorResult defines single command result
 type ExecutorResult struct {
 	Status     Status            `json:"status"`
@@ -171,10 +139,10 @@ func (r ExecutorResult) MarshalJSON() ([]byte, error) {
 
 func SummarizeExecutorResults(results []ExecutorResult) ExecutorResultSummary {
 	var summary ExecutorResultSummary
-	summary.Status = Status(envexec.StatusAccepted)
+	summary.Status = StatusAccepted
 	for _, result := range results {
-		if result.Status != Status(envexec.StatusAccepted) &&
-			summary.Status == Status(envexec.StatusAccepted) {
+		if result.Status != StatusAccepted &&
+			summary.Status == StatusAccepted {
 			summary.Status = result.Status
 		}
 		if result.ExitStatus != 0 && summary.ExitStatus == 0 {
