@@ -7,10 +7,11 @@ import (
 )
 
 func (*Debug) parse(executorResult stage.ExecutorResult, _ Conf) stage.ParserResult {
-	slog.Debug("debug parser", "executorResult", executorResult)
-	for name, content := range executorResult.Files {
-		slog.Debug("debug parser file", "name", name, "content", content)
-	}
+	slog.Debug(
+		"debug parser",
+		"executorResult", executorResult,
+		"files", executorResult.Files,
+	)
 	return stage.ParserResult{
 		Score:   0,
 		Comment: "",
