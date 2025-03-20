@@ -20,6 +20,7 @@ func (e *Local) generateResult(
 	runTime time.Duration,
 	cmd stage.Cmd,
 	stdoutBuffer, stderrBuffer bytes.Buffer,
+	isTimeout bool,
 ) stage.ExecutorResult {
 	result := stage.ExecutorResult{
 		Status:     stage.StatusAccepted,
@@ -64,6 +65,9 @@ func (e *Local) generateResult(
 			result.Status = stage.StatusInternalError
 			result.Error = err.Error()
 		}
+	}
+	if isTimeout {
+		result.Status = stage.StatusTimeLimitExceeded
 	}
 
 	if cmd.Stdout != nil && cmd.Stdout.Name != nil {
@@ -122,38 +126,14 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			done <- execCmd.Wait()
 		}()
 
-		if cmd.ClockLimit > 0 {
-			var duration time.Duration
-			if cmd.ClockLimit > uint64(math.MaxInt64) {
-				duration = time.Duration(math.MaxInt64)
-			} else {
-				duration = time.Duration(cmd.ClockLimit) * time.Nanosecond // #nosec G115
-			}
-			select {
-			case err := <-done:
-				endTime := time.Now()
-				runTime := endTime.Sub(startTime)
-				result := e.generateResult(
-					err,
-					execCmd.ProcessState,
-					runTime,
-					cmd,
-					stdoutBuffer,
-					stderrBuffer,
-				)
-				results = append(results, result)
-			case <-time.After(duration):
-				_ = execCmd.Process.Kill()
-				result := stage.ExecutorResult{
-					Status:  stage.StatusTimeLimitExceeded,
-					Error:   "",
-					Files:   map[string]string{},
-					FileIDs: map[string]string{},
-				}
-				results = append(results, result)
-			}
+		var duration time.Duration
+		if cmd.ClockLimit > uint64(math.MaxInt64) || cmd.ClockLimit <= 0 {
+			duration = time.Duration(math.MaxInt64)
 		} else {
-			err := <-done
+			duration = time.Duration(cmd.ClockLimit) * time.Nanosecond // #nosec G115
+		}
+		select {
+		case err := <-done:
 			endTime := time.Now()
 			runTime := endTime.Sub(startTime)
 			result := e.generateResult(
@@ -163,6 +143,19 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 				cmd,
 				stdoutBuffer,
 				stderrBuffer,
+				false,
+			)
+			results = append(results, result)
+		case <-time.After(duration):
+			_ = execCmd.Process.Kill()
+			result := e.generateResult(
+				nil,
+				execCmd.ProcessState,
+				duration,
+				cmd,
+				stdoutBuffer,
+				stderrBuffer,
+				true,
 			)
 			results = append(results, result)
 		}
