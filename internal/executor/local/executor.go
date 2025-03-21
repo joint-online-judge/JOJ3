@@ -27,6 +27,9 @@ func (e *Local) generateResult(
 		ExitStatus: processState.ExitCode(),
 		Error:      "",
 		Time: func() uint64 {
+			if isTimeout {
+				return 0
+			}
 			nanos := processState.UserTime().Nanoseconds()
 			if nanos < 0 {
 				return 0
@@ -148,8 +151,9 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			results = append(results, result)
 		case <-time.After(duration):
 			_ = execCmd.Process.Kill()
+			err := execCmd.Wait()
 			result := e.generateResult(
-				nil,
+				err,
 				execCmd.ProcessState,
 				duration,
 				cmd,
