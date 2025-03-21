@@ -101,6 +101,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 
 	for _, cmd := range cmds {
 		execCmd := exec.Command(cmd.Args[0], cmd.Args[1:]...) // #nosec G204
+		execCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 		if cmd.CPULimit > 0 && cmd.ClockLimit <= 0 {
 			cmd.ClockLimit = cmd.CPULimit * 2
 		}
@@ -158,8 +159,8 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			)
 			results = append(results, result)
 		case <-time.After(duration):
-			_ = execCmd.Process.Kill()
-			err := execCmd.Wait()
+			_ = syscall.Kill(-execCmd.Process.Pid, syscall.SIGKILL)
+			err := <-done
 			result := e.generateResult(
 				err,
 				execCmd.ProcessState,
