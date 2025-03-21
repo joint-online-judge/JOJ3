@@ -23,11 +23,16 @@ func (e *Local) generateResult(
 	isTimeout bool,
 ) stage.ExecutorResult {
 	result := stage.ExecutorResult{
-		Status:     stage.StatusAccepted,
-		ExitStatus: processState.ExitCode(),
-		Error:      "",
+		Status: stage.StatusAccepted,
+		ExitStatus: func() int {
+			if processState == nil {
+				return -1
+			}
+			return processState.ExitCode()
+		}(),
+		Error: "",
 		Time: func() uint64 {
-			if isTimeout {
+			if processState == nil {
 				return 0
 			}
 			nanos := processState.UserTime().Nanoseconds()
@@ -37,6 +42,9 @@ func (e *Local) generateResult(
 			return uint64(nanos)
 		}(),
 		Memory: func() uint64 {
+			if processState == nil {
+				return 0
+			}
 			usage := processState.SysUsage()
 			rusage, ok := usage.(*syscall.Rusage)
 			if !ok {
