@@ -70,7 +70,16 @@ func (e *Local) generateResult(
 
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
-			result.Status = stage.StatusNonzeroExitStatus
+			status := exitErr.Sys().(syscall.WaitStatus)
+			if status.Signaled() {
+				signal := status.Signal()
+				switch signal {
+				case syscall.SIGXCPU:
+					result.Status = stage.StatusTimeLimitExceeded
+				default:
+					result.Status = stage.StatusNonzeroExitStatus
+				}
+			}
 			result.Error = exitErr.Error()
 		} else {
 			result.Status = stage.StatusInternalError
@@ -96,6 +105,57 @@ func (e *Local) generateResult(
 	return result
 }
 
+func ToRlimit(cmd stage.Cmd) ([]syscall.Rlimit, []int, error) {
+	var rlimits []syscall.Rlimit
+	var resources []int
+	if cmd.CPULimit > 0 {
+		var current syscall.Rlimit
+		if err := syscall.Getrlimit(syscall.RLIMIT_CPU, &current); err != nil {
+			return nil, nil, fmt.Errorf("getrlimit RLIMIT_CPU failed: %w", err)
+		}
+		userTimeLimit := (uint64(cmd.CPULimit) + 1e9 - 1) / 1e9 // ns to s
+		if userTimeLimit > current.Max {
+			userTimeLimit = current.Max
+		}
+		rlimits = append(rlimits, syscall.Rlimit{
+			Cur: userTimeLimit,
+			Max: current.Max,
+		})
+		resources = append(resources, syscall.RLIMIT_CPU)
+	}
+	if cmd.MemoryLimit > 0 {
+		var current syscall.Rlimit
+		if err := syscall.Getrlimit(syscall.RLIMIT_DATA, &current); err != nil {
+			return nil, nil, fmt.Errorf("getrlimit RLIMIT_DATA failed: %w", err)
+		}
+		userMemLimit := cmd.MemoryLimit
+		if userMemLimit > current.Max {
+			userMemLimit = current.Max
+		}
+		rlimits = append(rlimits, syscall.Rlimit{
+			Cur: userMemLimit,
+			Max: current.Max,
+		})
+		resources = append(resources, syscall.RLIMIT_DATA)
+	}
+	if cmd.StackLimit > 0 {
+		var current syscall.Rlimit
+		if err := syscall.Getrlimit(syscall.RLIMIT_STACK, &current); err != nil {
+			return nil, nil, fmt.Errorf("getrlimit RLIMIT_STACK failed: %w", err)
+		}
+		userStackLimit := cmd.StackLimit
+		if userStackLimit > current.Max {
+			userStackLimit = current.Max
+		}
+		rlimits = append(rlimits, syscall.Rlimit{
+			Cur: userStackLimit,
+			Max: current.Max,
+		})
+		resources = append(resources, syscall.RLIMIT_STACK)
+	}
+	return rlimits, resources, nil
+}
+
 func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var results []stage.ExecutorResult
 
@@ -110,6 +170,17 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			env = append(env, cmd.Env...)
 		}
 		execCmd.Env = env
+
+		rlimits, resources, err := ToRlimit(cmd)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert rlimits: %v", err)
+		}
+		for i, resource := range resources {
+			limit := rlimits[i]
+			if err := syscall.Setrlimit(resource, &limit); err != nil {
+				return nil, fmt.Errorf("failed to set rlimit %d: %v", resource, err)
+			}
+		}
 
 		if cmd.Stdin != nil {
 			if cmd.Stdin.Content != nil {
@@ -128,7 +199,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		execCmd.Stderr = &stderrBuffer
 
 		startTime := time.Now()
-		err := execCmd.Start()
+		err = execCmd.Start()
 		if err != nil {
 			return nil, fmt.Errorf("failed to start command: %v", err)
 		}
