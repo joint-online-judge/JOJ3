@@ -142,7 +142,7 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		if cmd.ClockLimit > uint64(math.MaxInt64) || cmd.ClockLimit <= 0 {
 			duration = time.Duration(math.MaxInt64)
 		} else {
-			duration = time.Duration(cmd.ClockLimit) * time.Nanosecond // #nosec G115
+			duration = time.Duration(cmd.ClockLimit) * time.Nanosecond
 		}
 		select {
 		case err := <-done:
