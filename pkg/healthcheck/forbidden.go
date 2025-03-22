@@ -37,10 +37,6 @@ func getForbiddens(root string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		// TODO: remove this temporary fix for stdout and stderr
-		if relPath == "stdout" || relPath == "stderr" {
-			return nil
-		}
 		match := ignore.Relative(relPath, true)
 
 		// Check if the relative file path should be ignored based on the .gitignore rules
