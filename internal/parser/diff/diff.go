@@ -52,6 +52,7 @@ func isWhitespace(b byte) bool {
 
 // myersDiff computes the Myers' diff between two slices of strings.
 // src: https://github.com/cj1128/myers-diff/blob/master/main.go
+// TODO: it has O(n^2) time complexity
 func myersDiff(src, dst []string, compareSpace bool) []operation {
 	n := len(src)
 	m := len(dst)

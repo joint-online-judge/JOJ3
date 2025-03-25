@@ -74,20 +74,26 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					comment += fmt.Sprintf("Difference found in `%s`\n",
 						output.FileName)
 					if !output.AlwaysHide {
-						// Convert answer to string and split by lines
-						stdoutLines := strings.Split(string(answer), "\n")
-						resultLines := strings.Split(
-							result.Files[output.FileName], "\n")
-
-						// Generate Myers diff
-						diffOps := myersDiff(stdoutLines, resultLines,
-							output.CompareSpace)
 						if output.MaxDiffLength == 0 { // real default value
 							output.MaxDiffLength = 2048
 						}
+						// Convert answer to string and split by lines
+						answerStr := string(answer)
+						resultStr := result.Files[output.FileName]
+						if len(answerStr) > output.MaxDiffLength {
+							answerStr = answerStr[:output.MaxDiffLength]
+						}
+						if len(resultStr) > output.MaxDiffLength {
+							resultStr = resultStr[:output.MaxDiffLength]
+						}
+						answerLines := strings.Split(answerStr, "\n")
+						resultLines := strings.Split(resultStr, "\n")
+						// Generate Myers diff
+						diffOps := myersDiff(answerLines, resultLines,
+							output.CompareSpace)
 						// Generate diff block with surrounding context
 						diffOutput := generateDiffWithContext(
-							stdoutLines,
+							answerLines,
 							resultLines,
 							diffOps,
 							output.MaxDiffLength,
