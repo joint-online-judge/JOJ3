@@ -21,8 +21,8 @@ func (*CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.Par
 	// stdout := executorResult.Files[conf.Stdout]
 	stderr := executorResult.Files[conf.Stderr]
 	records := make([]Record, 0)
-	lines := strings.Split(stderr, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(stderr, "\n")
+	for line := range lines {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}

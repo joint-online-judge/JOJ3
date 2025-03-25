@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"maps"
 
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
@@ -46,9 +47,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	}
 	results := convertPBResult(pbRet.Results)
 	for _, result := range results {
-		for fileName, fileID := range result.FileIDs {
-			e.cachedMap[fileName] = fileID
-		}
+		maps.Copy(e.cachedMap, result.FileIDs)
 	}
 	return results, nil
 }

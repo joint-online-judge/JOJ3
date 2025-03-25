@@ -16,7 +16,7 @@ type ConfStage struct {
 	}
 	Parsers []struct {
 		Name string
-		With interface{}
+		With any
 	}
 }
 

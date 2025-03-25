@@ -113,10 +113,7 @@ func ToRlimit(cmd stage.Cmd) ([]syscall.Rlimit, []int, error) {
 		if err := syscall.Getrlimit(syscall.RLIMIT_CPU, &current); err != nil {
 			return nil, nil, fmt.Errorf("getrlimit RLIMIT_CPU failed: %w", err)
 		}
-		userTimeLimit := (uint64(cmd.CPULimit) + 1e9 - 1) / 1e9 // ns to s
-		if userTimeLimit > current.Max {
-			userTimeLimit = current.Max
-		}
+		userTimeLimit := min((uint64(cmd.CPULimit)+1e9-1)/1e9, current.Max) // ns to s
 		rlimits = append(rlimits, syscall.Rlimit{
 			Cur: userTimeLimit,
 			Max: current.Max,
@@ -128,10 +125,7 @@ func ToRlimit(cmd stage.Cmd) ([]syscall.Rlimit, []int, error) {
 		if err := syscall.Getrlimit(syscall.RLIMIT_DATA, &current); err != nil {
 			return nil, nil, fmt.Errorf("getrlimit RLIMIT_DATA failed: %w", err)
 		}
-		userMemLimit := cmd.MemoryLimit
-		if userMemLimit > current.Max {
-			userMemLimit = current.Max
-		}
+		userMemLimit := min(cmd.MemoryLimit, current.Max)
 		rlimits = append(rlimits, syscall.Rlimit{
 			Cur: userMemLimit,
 			Max: current.Max,
@@ -143,10 +137,7 @@ func ToRlimit(cmd stage.Cmd) ([]syscall.Rlimit, []int, error) {
 		if err := syscall.Getrlimit(syscall.RLIMIT_STACK, &current); err != nil {
 			return nil, nil, fmt.Errorf("getrlimit RLIMIT_STACK failed: %w", err)
 		}
-		userStackLimit := cmd.StackLimit
-		if userStackLimit > current.Max {
-			userStackLimit = current.Max
-		}
+		userStackLimit := min(cmd.StackLimit, current.Max)
 		rlimits = append(rlimits, syscall.Rlimit{
 			Cur: userStackLimit,
 			Max: current.Max,

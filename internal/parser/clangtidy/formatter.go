@@ -7,14 +7,14 @@ import (
 
 // Referenced from https://github.com/yuriisk/clang-tidy-converter/blob/master/clang_tidy_converter/parser/clang_tidy_parser.py
 type JsonMessage struct {
-	Type        string                 `json:"type"`
-	CheckName   string                 `json:"checkname"`
-	Description string                 `json:"description"`
-	Content     map[string]interface{} `json:"content"`
-	Categories  []string               `json:"categories"`
-	Location    map[string]interface{} `json:"location"`
-	Trace       map[string]interface{} `json:"trace"`
-	Severity    string                 `json:"severity"`
+	Type        string         `json:"type"`
+	CheckName   string         `json:"checkname"`
+	Description string         `json:"description"`
+	Content     map[string]any `json:"content"`
+	Categories  []string       `json:"categories"`
+	Location    map[string]any `json:"location"`
+	Trace       map[string]any `json:"trace"`
+	Severity    string         `json:"severity"`
 }
 
 func format(messages []ClangMessage) []JsonMessage {
@@ -49,7 +49,7 @@ func messagesToText(messages []ClangMessage) []string {
 	return textLines
 }
 
-func extractContent(message ClangMessage) map[string]interface{} {
+func extractContent(message ClangMessage) map[string]any {
 	detailLines := ""
 	for _, line := range message.detailsLines {
 		if line == "" {
@@ -63,7 +63,7 @@ func extractContent(message ClangMessage) map[string]interface{} {
 		}
 		detailLines += (line + "\n")
 	}
-	result := map[string]interface{}{
+	result := map[string]any{
 		"body": "```\n" + detailLines + "```",
 	}
 	return result
@@ -140,18 +140,18 @@ func extractCategories(message ClangMessage) []string {
 	return removeDuplicates(categories)
 }
 
-func extractLocation(message ClangMessage) map[string]interface{} {
-	location := map[string]interface{}{
+func extractLocation(message ClangMessage) map[string]any {
+	location := map[string]any{
 		"path": message.filepath,
-		"lines": map[string]interface{}{
+		"lines": map[string]any{
 			"begin": message.line,
 		},
 	}
 	return location
 }
 
-func extractOtherLocations(message ClangMessage) []map[string]interface{} {
-	locationList := []map[string]interface{}{}
+func extractOtherLocations(message ClangMessage) []map[string]any {
+	locationList := []map[string]any{}
 	for _, child := range message.children {
 		locationList = append(locationList, extractLocation(child))
 		locationList = append(locationList, extractOtherLocations(child)...)
@@ -159,8 +159,8 @@ func extractOtherLocations(message ClangMessage) []map[string]interface{} {
 	return locationList
 }
 
-func extractTrace(message ClangMessage) map[string]interface{} {
-	result := map[string]interface{}{
+func extractTrace(message ClangMessage) map[string]any {
+	result := map[string]any{
 		"locations": extractOtherLocations(message),
 	}
 	return result
