@@ -9,15 +9,6 @@ import (
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
-// operation represents the type of edit operation.
-type operation uint
-
-const (
-	INSERT operation = iota + 1
-	DELETE
-	MOVE
-)
-
 func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 	[]stage.ParserResult, bool, error,
 ) {
@@ -89,16 +80,15 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
 						// Generate Myers diff
-						diffOps := myersDiff(answerLines, resultLines,
+						diffOps := myersDiffStr(answerLines, resultLines,
 							output.CompareSpace)
 						// Generate diff block with surrounding context
-						diffOutput := generateDiffWithContext(
+						diffOutput := formatDiff(
 							answerLines,
 							resultLines,
 							diffOps,
-							output.MaxDiffLength,
 						)
-						diffOutput = strings.TrimSuffix(diffOutput, "\n  \n")
+						diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
 						comment += fmt.Sprintf(
 							"```diff\n%s\n```\n",
 							diffOutput,
