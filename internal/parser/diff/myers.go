@@ -11,21 +11,21 @@ const (
 	OpDelete
 )
 
-type Op struct {
+type Op[T any] struct {
 	OpType OpType // Insert or delete, as above
 	OldPos int    // Position in the old list of item to be inserted or deleted
 	NewPos int    // Position in the _new_ list of item to be inserted
-	Elem   any    // Actual value to be inserted or deleted
+	Elem   T      // Actual value to be inserted or deleted
 }
 
 // Returns a minimal list of differences between 2 lists e and f
 // requiring O(min(len(e),len(f))) space and O(min(len(e),len(f)) * D)
 // worst-case execution time where D is the number of differences.
-func myersDiff(e, f []any, equals func(any, any) bool) []Op {
+func myersDiff[T any](e, f []T, equals func(T, T) bool) []Op[T] {
 	return diffInternal(e, f, equals, 0, 0)
 }
 
-func diffInternal(e, f []any, equals func(any, any) bool, i, j int) []Op {
+func diffInternal[T any](e, f []T, equals func(T, T) bool, i, j int) []Op[T] {
 	N := len(e)
 	M := len(f)
 	L := N + M
@@ -88,26 +88,26 @@ func diffInternal(e, f []any, equals func(any, any) bool, i, j int) []Op {
 						case D > 1 || (x != u && y != v):
 							return append(diffInternal(e[0:x], f[0:y], equals, i, j), diffInternal(e[u:N], f[v:M], equals, i+u, j+v)...)
 						case M > N:
-							return diffInternal(make([]any, 0), f[N:M], equals, i+N, j+N)
+							return diffInternal(make([]T, 0), f[N:M], equals, i+N, j+N)
 						case M < N:
-							return diffInternal(e[M:N], make([]any, 0), equals, i+M, j+M)
+							return diffInternal(e[M:N], make([]T, 0), equals, i+M, j+M)
 						default:
-							return make([]Op, 0)
+							return make([]Op[T], 0)
 						}
 					}
 				}
 			}
 		}
 	case N > 0:
-		res := make([]Op, N)
+		res := make([]Op[T], N)
 		for n := range N {
-			res[n] = Op{OpDelete, i + n, -1, e[n]}
+			res[n] = Op[T]{OpDelete, i + n, -1, e[n]}
 		}
 		return res
 	default:
-		res := make([]Op, M)
+		res := make([]Op[T], M)
 		for n := range M {
-			res[n] = Op{OpInsert, i, j + n, f[n]}
+			res[n] = Op[T]{OpInsert, i, j + n, f[n]}
 		}
 		return res
 	}
@@ -127,15 +127,8 @@ func pyMod(x, y int) int {
 // Let us map element in same way as in
 
 // Convenient wrapper for string lists
-func myersDiffStr(e, f []string, compareSpace bool) []Op {
-	e1, f1 := make([]any, len(e)), make([]any, len(f))
-	for i, ee := range e {
-		e1[i] = ee
-	}
-	for i, fe := range f {
-		f1[i] = fe
-	}
-	return myersDiff(e1, f1, func(s1, s2 any) bool {
-		return compareStrings(s1.(string), s2.(string), compareSpace)
+func myersDiffStr(e, f []string, compareSpace bool) []Op[string] {
+	return myersDiff[string](e, f, func(s1, s2 string) bool {
+		return compareStrings(s1, s2, compareSpace)
 	})
 }

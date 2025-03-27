@@ -50,7 +50,7 @@ func isWhitespace(b byte) bool {
 		b == 0xA0
 }
 
-func formatDiff(oldList []string, newList []string, ops []Op) string {
+func formatDiff(oldList []string, newList []string, ops []Op[string]) string {
 	var result []string
 	i, j := 0, 0
 	for _, op := range ops {
