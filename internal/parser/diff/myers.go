@@ -121,11 +121,7 @@ func diffInternal(e, f []any, equals func(any, any) bool, i, j int) []Op {
  * See https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition
  */
 func pyMod(x, y int) int {
-	mod := x % y
-	if mod < 0 {
-		mod += y
-	}
-	return mod
+	return (x%y + y) % y
 }
 
 // Let us map element in same way as in
