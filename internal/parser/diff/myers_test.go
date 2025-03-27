@@ -18,6 +18,7 @@ func TestDiff(t *t.T) {
 	testCases := []TestCase{
 		{[]string{}, []string{}, []Op{}},
 		{[]string{}, []string{"foo"}, []Op{{OpInsert, 0, 0, "foo"}}},
+		{[]string{"foo"}, []string{}, []Op{{OpDelete, 0, -1, "foo"}}},
 		{[]string{"foo", "bar", "baz"}, []string{"foo", "bar", "baz"}, []Op{}},
 		{[]string{"foo", "bar", "baz"}, []string{"foo", "baz"}, []Op{{OpDelete, 1, -1, "bar"}}},
 		{[]string{"baz"}, []string{"foo", "baz"}, []Op{{OpInsert, 0, 0, "foo"}}},

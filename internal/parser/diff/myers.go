@@ -119,11 +119,13 @@ func diffInternal(e, f []any, equals func(any, any) bool, i, j int) []Op {
  * e.g -1%3 = 2.
  * In golang it matches the sign of the numerator.
  * See https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition
- * Since we always have a positive denominator here, we can emulate the
- * pyMod x%y as (x+y) % y
  */
 func pyMod(x, y int) int {
-	return (x + y) % y
+	mod := x % y
+	if mod < 0 {
+		mod += y
+	}
+	return mod
 }
 
 // Let us map element in same way as in
