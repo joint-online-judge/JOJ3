@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"github.com/peter-evans/patience"
 )
 
 func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
@@ -80,9 +81,10 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 							resultStr = resultStr[:output.MaxDiffLength]
 							truncated = true
 						}
-						diffOutput := patienceDiff(
-							answerStr, resultStr, output.CompareSpace,
-						)
+						answerLines := strings.Split(answerStr, "\n")
+						resultLines := strings.Split(resultStr, "\n")
+						diffs := patience.Diff(answerLines, resultLines)
+						diffOutput := DiffText(diffs)
 						diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
 						if truncated {
 							diffOutput += "\n\n(truncated)"
