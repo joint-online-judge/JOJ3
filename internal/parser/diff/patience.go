@@ -45,6 +45,12 @@ type pair struct{ x, y int }
 // to wait longer (to be patient) for the diff, meaning that it is a slower algorithm,
 // when in fact the algorithm is faster than the standard one.
 func patienceDiff(old, new string, compareSpace bool) string {
+	if len(old) != 0 && old[len(old)-1] != '\n' {
+		old += "\n"
+	}
+	if len(new) != 0 && new[len(new)-1] != '\n' {
+		new += "\n"
+	}
 	x := strings.SplitAfter(old, "\n")
 	y := strings.SplitAfter(new, "\n")
 
