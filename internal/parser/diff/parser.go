@@ -80,16 +80,8 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 							resultStr = resultStr[:output.MaxDiffLength]
 							truncated = true
 						}
-						answerLines := strings.Split(answerStr, "\n")
-						resultLines := strings.Split(resultStr, "\n")
-						// Generate Myers diff
-						diffOps := myersDiffStr(answerLines, resultLines,
-							output.CompareSpace)
-						// Generate diff block with surrounding context
-						diffOutput := formatDiff(
-							answerLines,
-							resultLines,
-							diffOps,
+						diffOutput := patienceDiff(
+							answerStr, resultStr, output.CompareSpace,
 						)
 						diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
 						if truncated {

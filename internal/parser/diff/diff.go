@@ -1,10 +1,5 @@
 package diff
 
-import (
-	"fmt"
-	"strings"
-)
-
 // compareStrings compares two strings character by character, optionally ignoring whitespace.
 func compareStrings(str1, str2 string, compareSpace bool) bool {
 	if compareSpace {
@@ -48,34 +43,4 @@ func isWhitespace(b byte) bool {
 		b == '\f' ||
 		b == 0x85 ||
 		b == 0xA0
-}
-
-func formatDiff(oldList []string, newList []string, ops []Op[string]) string {
-	var result []string
-	i, j := 0, 0
-	for _, op := range ops {
-		if op.OpType == OpDelete {
-			for i < op.OldPos {
-				result = append(result, "  "+oldList[i])
-				i++
-				j++
-			}
-			result = append(result, "- "+fmt.Sprint(op.Elem))
-			i++
-		} else if op.OpType == OpInsert {
-			for j < op.NewPos {
-				result = append(result, "  "+newList[j])
-				i++
-				j++
-			}
-			result = append(result, "+ "+fmt.Sprint(op.Elem))
-			j++
-		}
-	}
-	for i < len(oldList) && j < len(newList) {
-		result = append(result, "  "+oldList[i])
-		i++
-		j++
-	}
-	return strings.Join(result, "\n")
 }
