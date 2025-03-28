@@ -14,7 +14,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 		return nil, true, err
 	}
 	forceQuit := false
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	for _, result := range results {
 		comment := ""
 		if conf.ShowExecutorStatus {

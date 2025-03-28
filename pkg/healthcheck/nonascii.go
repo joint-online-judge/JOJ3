@@ -12,10 +12,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/format/gitattributes"
 )
 
-// getNonAscii retrieves a list of files in the specified root directory that contain non-ASCII characters.
+// getNonASCII retrieves a list of files in the specified root directory that contain non-ASCII characters.
 // It searches for non-ASCII characters in each file's content and returns a list of paths to files containing non-ASCII characters.
-func getNonAscii(root string) ([]string, error) {
-	var nonAscii []string
+func getNonASCII(root string) ([]string, error) {
+	var nonASCII []string
 	gitattrExist := true
 	var matcher gitattributes.Matcher
 	_, err := os.Stat(".gitattributes")
@@ -71,7 +71,7 @@ func getNonAscii(root string) ([]string, error) {
 			cont := true
 			for _, c := range scanner.Text() {
 				if c > unicode.MaxASCII {
-					nonAscii = append(nonAscii, "\t"+path)
+					nonASCII = append(nonASCII, "\t"+path)
 					cont = false
 					break
 				}
@@ -84,20 +84,20 @@ func getNonAscii(root string) ([]string, error) {
 		return nil
 	})
 
-	return nonAscii, err
+	return nonASCII, err
 }
 
-// nonAsciiFiles checks for non-ASCII characters in files within the specified root directory.
+// NonASCIIFiles checks for non-ASCII characters in files within the specified root directory.
 // It prints a message with the paths to files containing non-ASCII characters, if any.
-func NonAsciiFiles(root string) error {
-	nonAscii, err := getNonAscii(root)
+func NonASCIIFiles(root string) error {
+	nonASCII, err := getNonASCII(root)
 	if err != nil {
 		slog.Error("getting non-ascii", "err", err)
 		return fmt.Errorf("error getting non-ascii: %w", err)
 	}
-	if len(nonAscii) > 0 {
+	if len(nonASCII) > 0 {
 		return fmt.Errorf("Non-ASCII characters found in the following files:\n%s",
-			strings.Join(nonAscii, "\n"))
+			strings.Join(nonASCII, "\n"))
 	}
 	return nil
 }

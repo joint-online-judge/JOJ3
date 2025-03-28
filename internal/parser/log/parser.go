@@ -43,7 +43,7 @@ func (p *Log) Run(results []stage.ExecutorResult, confAny any) (
 	if err != nil {
 		return nil, true, err
 	}
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	for _, result := range results {
 		res = append(res, p.parse(result, *conf))
 	}

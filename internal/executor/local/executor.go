@@ -113,7 +113,7 @@ func ToRlimit(cmd stage.Cmd) ([]syscall.Rlimit, []int, error) {
 		if err := syscall.Getrlimit(syscall.RLIMIT_CPU, &current); err != nil {
 			return nil, nil, fmt.Errorf("getrlimit RLIMIT_CPU failed: %w", err)
 		}
-		userTimeLimit := min((uint64(cmd.CPULimit)+1e9-1)/1e9, current.Max) // ns to s
+		userTimeLimit := min((cmd.CPULimit+1e9-1)/1e9, current.Max) // ns to s
 		rlimits = append(rlimits, syscall.Rlimit{
 			Cur: userTimeLimit,
 			Max: current.Max,

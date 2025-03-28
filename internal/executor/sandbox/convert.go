@@ -12,7 +12,7 @@ import (
 
 // copied from https://github.com/criyle/go-judge/blob/master/cmd/go-judge-shell/grpc.go
 func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
-	var ret []*pb.Request_CmdType
+	ret := make([]*pb.Request_CmdType, 0, len(cmd))
 	for _, c := range cmd {
 		ret = append(ret, &pb.Request_CmdType{
 			Args:              c.Args,
@@ -140,7 +140,7 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 }
 
 func convertPBResult(res []*pb.Response_Result) []stage.ExecutorResult {
-	var ret []stage.ExecutorResult
+	ret := make([]stage.ExecutorResult, 0, len(res))
 	for _, r := range res {
 		ret = append(ret, stage.ExecutorResult{
 			Status:     stage.Status(r.Status),
@@ -167,7 +167,7 @@ func convertFiles(buf map[string][]byte) map[string]string {
 }
 
 func convertPBFileError(fe []*pb.Response_FileError) []stage.FileError {
-	var ret []stage.FileError
+	ret := make([]stage.FileError, 0, len(fe))
 	for _, v := range fe {
 		ret = append(ret, stage.FileError{
 			Name:    v.Name,

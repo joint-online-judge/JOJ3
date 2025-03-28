@@ -131,12 +131,12 @@ func convertPathsToRelative(messages *[]ClangMessage, conf Conf) {
 func parseLines(lines []string, conf Conf) []ClangMessage {
 	messages := make([]ClangMessage, 0)
 	for _, line := range lines {
-		if isIgnored(string(line)) {
+		if isIgnored(line) {
 			continue
 		}
-		message := parseMessage(string(line))
+		message := parseMessage(line)
 		if message.level == UNKNOWN && len(messages) > 0 {
-			messages[len(messages)-1].detailsLines = append(messages[len(messages)-1].detailsLines, string(line))
+			messages[len(messages)-1].detailsLines = append(messages[len(messages)-1].detailsLines, line)
 		} else if message.level != UNKNOWN {
 			messages = append(messages, message)
 		}

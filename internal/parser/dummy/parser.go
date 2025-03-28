@@ -11,7 +11,7 @@ func (*Dummy) Run(results []stage.ExecutorResult, confAny any) (
 	if err != nil {
 		return nil, true, err
 	}
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	for range results {
 		res = append(res, stage.ParserResult{Score: conf.Score, Comment: conf.Comment})
 	}

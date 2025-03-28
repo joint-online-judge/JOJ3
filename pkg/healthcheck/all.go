@@ -31,12 +31,12 @@ func All(
 		res.Msg += fmt.Sprintf("### Meta File Check Failed:\n%s\n", err.Error())
 		res.Failed = true
 	}
-	err = NonAsciiFiles(rootDir)
+	err = NonASCIIFiles(rootDir)
 	if err != nil {
 		res.Msg += fmt.Sprintf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
 		res.Failed = true
 	}
-	err = NonAsciiMsg(rootDir)
+	err = NonASCIIMsg(rootDir)
 	if err != nil {
 		res.Msg += fmt.Sprintf("### Non-ASCII Characters Commit Message Check Failed:\n%s\n", err.Error())
 		res.Failed = true
@@ -46,5 +46,5 @@ func All(
 		res.Msg += fmt.Sprintf("### Repo File Check Failed:\n%s\n", err.Error())
 		res.Failed = true
 	}
-	return
+	return res
 }

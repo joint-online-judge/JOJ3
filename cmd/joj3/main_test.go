@@ -88,20 +88,7 @@ func TestRun(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt, func(t *testing.T) {
-			origDir, err := os.Getwd()
-			if err != nil {
-				t.Fatal(err)
-			}
-			err = os.Chdir(fmt.Sprintf("%s%s", root, tt))
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer func() {
-				err := os.Chdir(origDir)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}()
+			t.Chdir(fmt.Sprintf("%s%s", root, tt))
 			os.Args = []string{"./joj3"}
 			outputFile := "joj3_result.json"
 			defer os.Remove(outputFile)

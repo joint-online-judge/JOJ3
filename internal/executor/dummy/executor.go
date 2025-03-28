@@ -3,7 +3,7 @@ package dummy
 import "github.com/joint-online-judge/JOJ3/internal/stage"
 
 func (e *Dummy) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
-	var res []stage.ExecutorResult
+	res := make([]stage.ExecutorResult, 0, len(cmds))
 	for range cmds {
 		res = append(res, stage.ExecutorResult{
 			Status:     stage.StatusAccepted,

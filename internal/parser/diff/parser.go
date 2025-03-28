@@ -20,7 +20,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 		return nil, true, fmt.Errorf("cases number not match")
 	}
 
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(conf.Cases))
 	forceQuit := false
 	for i, caseConf := range conf.Cases {
 		result := results[i]

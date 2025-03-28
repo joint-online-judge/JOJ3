@@ -36,7 +36,7 @@ func Run(stages []Stage) (
 				"name", stage.Executor.Name,
 			)
 			err = fmt.Errorf("executor not found: %s", stage.Executor.Name)
-			return
+			return stageResults, forceQuitStageName, err
 		}
 		executorResults, err = executor.Run(stage.Executor.Cmds)
 		if err != nil {
@@ -46,7 +46,7 @@ func Run(stages []Stage) (
 				"name", stage.Executor.Name,
 				"error", err,
 			)
-			return
+			return stageResults, forceQuitStageName, err
 		}
 		for i, executorResult := range executorResults {
 			slog.Debug(
@@ -92,7 +92,7 @@ func Run(stages []Stage) (
 					"name", stageParser.Name,
 				)
 				err = fmt.Errorf("parser not found: %s", stageParser.Name)
-				return
+				return stageResults, forceQuitStageName, err
 			}
 			var parserForceQuit bool
 			tmpParserResults, parserForceQuit, err = parser.Run(
@@ -154,7 +154,7 @@ func Run(stages []Stage) (
 			break
 		}
 	}
-	return
+	return stageResults, forceQuitStageName, err
 }
 
 func Cleanup() {

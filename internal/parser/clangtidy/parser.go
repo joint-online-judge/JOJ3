@@ -26,7 +26,7 @@ func (p *ClangTidy) Run(results []stage.ExecutorResult, confAny any) (
 	if err != nil {
 		return nil, true, err
 	}
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	forceQuit := false
 	for _, result := range results {
 		parseRes := p.parse(result, *conf)

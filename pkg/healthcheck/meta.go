@@ -11,7 +11,7 @@ import (
 // getMetas retrieves a list of metadata files that are expected to exist in the specified root directory.
 // It checks for the existence of each file in the fileList and provides instructions if any file is missing.
 func getMetas(rootDir string, fileList []string) ([]string, string, error) {
-	var regexList []*regexp.Regexp
+	regexList := make([]*regexp.Regexp, 0, len(fileList))
 	for _, file := range fileList {
 		pattern := "(?i)" + file
 		if !strings.Contains(pattern, "\\.") {

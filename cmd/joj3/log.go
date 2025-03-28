@@ -66,12 +66,12 @@ func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
 	}
 	// if csvPath is empty, just return
 	if csvPath == "" {
-		return
+		return attrs
 	}
 	file, err := os.Open(csvPath)
 	if err != nil {
 		slog.Error("open csv", "error", err)
-		return
+		return attrs
 	}
 	defer file.Close()
 	reader := csv.NewReader(file)
@@ -82,7 +82,7 @@ func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
 		}
 		if err != nil {
 			slog.Error("read csv", "error", err)
-			return
+			return attrs
 		}
 		if len(row) < 3 {
 			continue
@@ -103,7 +103,7 @@ func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
 			}
 		}
 	}
-	return
+	return attrs
 }
 
 func setupSlog(conf *conf.Conf) error {
@@ -121,14 +121,14 @@ func setupSlog(conf *conf.Conf) error {
 			&slog.HandlerOptions{Level: slog.LevelDebug})
 		handlers = append(handlers, debugTextHandler.WithAttrs(attrs))
 		// Json file handler for debug logs
-		debugJsonFile, err := os.OpenFile(logPath+".ndjson",
+		debugJSONFile, err := os.OpenFile(logPath+".ndjson",
 			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
 		if err != nil {
 			return err
 		}
-		debugJsonHandler := slog.NewJSONHandler(debugJsonFile,
+		debugJSONHandler := slog.NewJSONHandler(debugJSONFile,
 			&slog.HandlerOptions{Level: slog.LevelDebug})
-		handlers = append(handlers, debugJsonHandler.WithAttrs(attrs))
+		handlers = append(handlers, debugJSONHandler.WithAttrs(attrs))
 	}
 	stderrLogLevel := slog.LevelInfo
 	if runningTest {

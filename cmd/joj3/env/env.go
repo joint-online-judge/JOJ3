@@ -42,7 +42,7 @@ func init() {
 	low := timestamp & 0xFFFFFFFF
 	combined := high ^ low
 	combined ^= int64(pid)
-	combined ^= int64(timestamp >> 16)
+	combined ^= timestamp >> 16
 	combined ^= (combined >> 8)
 	combined ^= (combined << 16)
 	Attr.RunID = fmt.Sprintf("%08X", combined&0xFFFFFFFF)

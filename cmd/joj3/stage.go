@@ -149,19 +149,19 @@ func runStages(
 	if err != nil {
 		slog.Error("generate preStages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
-		return
+		return stageResults, forceQuitStageName, err
 	}
 	stages, err := generateStages(conf.Stage.Stages, groups)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
-		return
+		return stageResults, forceQuitStageName, err
 	}
 	postStages, err := generateStages(conf.Stage.PostStages, groups)
 	if err != nil {
 		slog.Error("generate postStages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
-		return
+		return stageResults, forceQuitStageName, err
 	}
 	defer stage.Cleanup()
 	// ignore force quit in preStages & postStages
@@ -194,5 +194,5 @@ func runStages(
 	if err != nil {
 		slog.Error("run postStages", "error", err)
 	}
-	return
+	return stageResults, forceQuitStageName, err
 }

@@ -15,7 +15,7 @@ func (*ResultStatus) Run(results []stage.ExecutorResult, confAny any) (
 	}
 	score := conf.Score
 	forceQuit := false
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	for _, result := range results {
 		comment := conf.Comment
 		if result.Status != stage.StatusAccepted {

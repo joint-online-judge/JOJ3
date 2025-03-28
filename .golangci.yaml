@@ -1,12 +1,28 @@
 linters:
   enable:
-    - gosec
+    - bidichk
+    - dupl
+    - errcheck
     - gocritic
-    - gofumpt
     - gofmt
+    - gofumpt
     - goimports
-issues:
-  exclude-rules:
-    - linters:
-        - gosec
-      text: G601 # false positive since go 1.22
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - nakedret
+    - nolintlint
+    - prealloc
+    - staticcheck
+    - stylecheck
+    - testifylint
+    - typecheck
+    - unconvert
+    - unused
+    - unparam
+    - usetesting
+    - wastedassign
+linters-settings:
+  stylecheck:
+    checks: ["all", "-ST1005"]

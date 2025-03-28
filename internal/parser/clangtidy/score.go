@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
+func getResult(jsonMessages []JSONMessage, conf Conf) (int, string) {
 	score := conf.Score
 	comment := "### Test results summary\n\n"
 	matchCount := make(map[string]int)
@@ -29,7 +29,7 @@ func getResult(jsonMessages []JsonMessage, conf Conf) (int, string) {
 		Count       int
 		ScoreChange int
 	}
-	var results []Result
+	results := make([]Result, 0, len(matchCount))
 	for keyword, count := range matchCount {
 		results = append(results, Result{
 			Keyword:     keyword,

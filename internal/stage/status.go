@@ -76,7 +76,7 @@ func StringToStatus(s string) (Status, error) {
 
 // MarshalJSON convert status into string
 func (s Status) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + Status(s).String() + "\""), nil
+	return []byte("\"" + s.String() + "\""), nil
 }
 
 // UnmarshalJSON convert string into status
@@ -86,7 +86,7 @@ func (s *Status) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	*s = Status(v)
+	*s = v
 	return nil
 }
 

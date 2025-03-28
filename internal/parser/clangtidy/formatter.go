@@ -6,7 +6,7 @@ import (
 )
 
 // Referenced from https://github.com/yuriisk/clang-tidy-converter/blob/master/clang_tidy_converter/parser/clang_tidy_parser.py
-type JsonMessage struct {
+type JSONMessage struct {
 	Type        string         `json:"type"`
 	CheckName   string         `json:"checkname"`
 	Description string         `json:"description"`
@@ -17,16 +17,16 @@ type JsonMessage struct {
 	Severity    string         `json:"severity"`
 }
 
-func format(messages []ClangMessage) []JsonMessage {
-	formattedMessages := make([]JsonMessage, len(messages))
+func format(messages []ClangMessage) []JSONMessage {
+	formattedMessages := make([]JSONMessage, len(messages))
 	for i, message := range messages {
 		formattedMessages[i] = formatMessage(message)
 	}
 	return formattedMessages
 }
 
-func formatMessage(message ClangMessage) JsonMessage {
-	result := JsonMessage{
+func formatMessage(message ClangMessage) JSONMessage {
+	result := JSONMessage{
 		Type:        "issue",
 		CheckName:   message.diagnosticName,
 		Description: message.message,

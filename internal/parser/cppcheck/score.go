@@ -19,7 +19,7 @@ const (
 	UNKNOWN
 )
 
-func getResult(records []Record, conf Conf) (string, int, error) {
+func getResult(records []Record, conf Conf) (string, int) {
 	score := conf.Score
 	comment := "### Test results summary\n\n"
 	matchCount := make(map[string]int)
@@ -27,7 +27,7 @@ func getResult(records []Record, conf Conf) (string, int, error) {
 	for _, record := range records {
 		for _, match := range conf.Matches {
 			for _, keyword := range match.Keywords {
-				if strings.Contains(record.Id, keyword) ||
+				if strings.Contains(record.ID, keyword) ||
 					strings.Contains(record.Severity, keyword) {
 					matchCount[keyword] += 1
 					scoreChange[keyword] += -match.Score
@@ -41,7 +41,7 @@ func getResult(records []Record, conf Conf) (string, int, error) {
 		Count       int
 		ScoreChange int
 	}
-	var results []Result
+	results := make([]Result, 0, len(matchCount))
 	for keyword, count := range matchCount {
 		results = append(results, Result{
 			Keyword:     keyword,
@@ -62,5 +62,5 @@ func getResult(records []Record, conf Conf) (string, int, error) {
 		comment += fmt.Sprintf("%d. `%s`: %d occurrence(s), %d point(s)\n",
 			i+1, result.Keyword, result.Count, result.ScoreChange)
 	}
-	return comment, score, nil
+	return comment, score
 }

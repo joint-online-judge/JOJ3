@@ -14,7 +14,7 @@ type Record struct {
 	Column   int    `json:"column"`
 	Severity string `json:"severity"`
 	Message  string `json:"message"`
-	Id       string `json:"id"`
+	ID       string `json:"id"`
 }
 
 func (*CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
@@ -39,16 +39,7 @@ func (*CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.Par
 		}
 		records = append(records, record)
 	}
-	comment, score, err := getResult(records, conf)
-	if err != nil {
-		return stage.ParserResult{
-			Score: 0,
-			Comment: fmt.Sprintf(
-				"Unexpected parser error: %s.",
-				err,
-			),
-		}
-	}
+	comment, score := getResult(records, conf)
 
 	return stage.ParserResult{
 		Score:   score,
@@ -63,7 +54,7 @@ func (p *CppCheck) Run(results []stage.ExecutorResult, confAny any) (
 	if err != nil {
 		return nil, true, err
 	}
-	var res []stage.ParserResult
+	res := make([]stage.ParserResult, 0, len(results))
 	forceQuit := false
 	for _, result := range results {
 		parseRes := p.parse(result, *conf)
