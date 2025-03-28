@@ -5,7 +5,43 @@ package diff
 import (
 	"fmt"
 	"strings"
+	"unicode"
 )
+
+// stringsEqual compares two strings character by character, optionally ignoring whitespace.
+func stringsEqual(str1, str2 string, compareSpace bool) bool {
+	if compareSpace {
+		return str1 == str2
+	}
+	runes1 := []rune(str1)
+	runes2 := []rune(str2)
+	var i, j, l1, l2 int
+	l1 = len(runes1)
+	l2 = len(runes2)
+	for i < l1 && j < l2 {
+		for i < l1 && unicode.IsSpace(runes1[i]) {
+			i++
+		}
+		for j < l2 && unicode.IsSpace(runes2[j]) {
+			j++
+		}
+		if i >= l1 || j >= l2 {
+			break
+		}
+		if runes1[i] != runes2[j] {
+			return false
+		}
+		i++
+		j++
+	}
+	for i < l1 && unicode.IsSpace(runes1[i]) {
+		i++
+	}
+	for j < l2 && unicode.IsSpace(runes2[j]) {
+		j++
+	}
+	return i == l1 && j == l2
+}
 
 // DiffType defines the type of a diff element.
 type DiffType int8
@@ -39,8 +75,8 @@ func typeSymbol(t DiffType) string {
 	}
 }
 
-// DiffText returns the source and destination texts (all equalities, insertions and deletions).
-func DiffText(diffs []DiffLine) string {
+// diffText returns the source and destination texts (all equalities, insertions and deletions).
+func diffText(diffs []DiffLine) string {
 	s := make([]string, len(diffs))
 	for i, l := range diffs {
 		s[i] = fmt.Sprintf("%s%s", typeSymbol(l.Type), l.Text)
@@ -120,8 +156,8 @@ func uniqueElements(a []string) ([]string, []int) {
 	return elements, indices
 }
 
-// PatienceDiff returns the patience diff of two slices of strings.
-func PatienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
+// patienceDiff returns the patience diff of two slices of strings.
+func patienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
 	switch {
 	case len(a) == 0 && len(b) == 0:
 		return nil
@@ -139,7 +175,7 @@ func PatienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
 	if i > 0 {
 		return append(
 			toDiffLines(a[:i], Equal),
-			PatienceDiff(a[i:], b[i:], equal)...,
+			patienceDiff(a[i:], b[i:], equal)...,
 		)
 	}
 
@@ -150,7 +186,7 @@ func PatienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
 	}
 	if j > 0 {
 		return append(
-			PatienceDiff(a[:len(a)-j], b[:len(b)-j], equal),
+			patienceDiff(a[:len(a)-j], b[:len(b)-j], equal),
 			toDiffLines(a[len(a)-j:], Equal)...,
 		)
 	}
@@ -175,14 +211,14 @@ func PatienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
 	ga, gb := 0, 0
 	for _, ip := range lcs {
 		// PatienceDiff the gaps between the lcs elements.
-		diffs = append(diffs, PatienceDiff(a[ga:ip[0]], b[gb:ip[1]], equal)...)
+		diffs = append(diffs, patienceDiff(a[ga:ip[0]], b[gb:ip[1]], equal)...)
 		// Append the LCS elements to the diff.
 		diffs = append(diffs, DiffLine{Type: Equal, Text: a[ip[0]]})
 		ga = ip[0] + 1
 		gb = ip[1] + 1
 	}
 	// PatienceDiff the remaining elements of a and b after the final LCS element.
-	diffs = append(diffs, PatienceDiff(a[ga:], b[gb:], equal)...)
+	diffs = append(diffs, patienceDiff(a[ga:], b[gb:], equal)...)
 
 	return diffs
 }

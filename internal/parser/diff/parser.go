@@ -39,7 +39,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				if err != nil {
 					return nil, true, err
 				}
-				isSame := compareStrings(
+				isSame := stringsEqual(
 					string(answer),
 					result.Files[output.FileName],
 					output.CompareSpace,
@@ -82,13 +82,13 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						}
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
-						diffs := PatienceDiff(
+						diffs := patienceDiff(
 							answerLines,
 							resultLines,
 							func(a, b string) bool {
-								return compareStrings(a, b, output.CompareSpace)
+								return stringsEqual(a, b, output.CompareSpace)
 							})
-						diffOutput := DiffText(diffs)
+						diffOutput := diffText(diffs)
 						diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
 						if truncated {
 							diffOutput += "\n\n(truncated)"
