@@ -68,10 +68,13 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						if output.MaxDiffLength == 0 { // real default value
 							output.MaxDiffLength = 2048
 						}
+						if output.MaxDiffLines == 0 { // real default value
+							output.MaxDiffLines = 50
+						}
 						// Convert answer to string and split by lines
+						truncated := false
 						answerStr := string(answer)
 						resultStr := result.Files[output.FileName]
-						truncated := false
 						if len(answerStr) > output.MaxDiffLength {
 							answerStr = answerStr[:output.MaxDiffLength]
 							truncated = true
@@ -82,6 +85,14 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						}
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
+						if len(answerLines) > output.MaxDiffLines {
+							answerLines = answerLines[:output.MaxDiffLines]
+							truncated = true
+						}
+						if len(resultLines) > output.MaxDiffLines {
+							resultLines = resultLines[:output.MaxDiffLines]
+							truncated = true
+						}
 						diffs := patienceDiff(
 							answerLines,
 							resultLines,

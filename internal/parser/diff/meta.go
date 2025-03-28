@@ -21,6 +21,7 @@ type Conf struct {
 			AlwaysHide      bool
 			ForceQuitOnDiff bool
 			MaxDiffLength   int `default:"2048"` // just for reference
+			MaxDiffLines    int `default:"50"`   // just for reference
 		}
 	}
 }
