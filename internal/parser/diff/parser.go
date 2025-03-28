@@ -71,11 +71,14 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						// Convert answer to string and split by lines
 						answerStr := string(answer)
 						resultStr := result.Files[output.FileName]
+						truncated := false
 						if len(answerStr) > output.MaxDiffLength {
 							answerStr = answerStr[:output.MaxDiffLength]
+							truncated = true
 						}
 						if len(resultStr) > output.MaxDiffLength {
 							resultStr = resultStr[:output.MaxDiffLength]
+							truncated = true
 						}
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
@@ -89,6 +92,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 							diffOps,
 						)
 						diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
+						if truncated {
+							diffOutput += "\n\n(truncated)"
+						}
 						comment += fmt.Sprintf(
 							"```diff\n%s\n```\n",
 							diffOutput,
