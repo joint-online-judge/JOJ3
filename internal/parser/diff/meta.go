@@ -14,14 +14,15 @@ type Conf struct {
 	ForceQuitOnFailed bool   `default:"false"`
 	Cases             []struct {
 		Outputs []struct {
-			Score           int
-			FileName        string
-			AnswerPath      string
-			CompareSpace    bool
-			AlwaysHide      bool
-			ForceQuitOnDiff bool
-			MaxDiffLength   int `default:"2048"` // just for reference
-			MaxDiffLines    int `default:"50"`   // just for reference
+			Score            int
+			FileName         string
+			AnswerPath       string
+			CompareSpace     bool
+			AlwaysHide       bool
+			ForceQuitOnDiff  bool
+			MaxDiffLength    int `default:"2048"` // just for reference
+			MaxDiffLines     int `default:"50"`   // just for reference
+			HideCommonPrefix bool
 		}
 	}
 }

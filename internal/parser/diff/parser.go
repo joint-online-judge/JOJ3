@@ -85,6 +85,23 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						}
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
+						commonPreixLineCount := 0
+						if output.HideCommonPrefix {
+							n := 0
+							for ; n < len(answerLines) &&
+								n < len(resultLines) &&
+								stringsEqual(
+									answerLines[n],
+									resultLines[n],
+									output.CompareSpace,
+								); n += 1 {
+							}
+							if n > 0 {
+								answerLines = answerLines[n:]
+								resultLines = resultLines[n:]
+								commonPreixLineCount = n
+							}
+						}
 						if len(answerLines) > output.MaxDiffLines {
 							answerLines = answerLines[:output.MaxDiffLines]
 							truncated = true
@@ -104,12 +121,18 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						if truncated {
 							diffOutput += "\n\n(truncated)"
 						}
+						if commonPreixLineCount > 0 {
+							diffOutput = fmt.Sprintf(
+								"(%d line(s) of common prefix hidden)\n\n",
+								commonPreixLineCount,
+							) + diffOutput
+						}
 						comment += fmt.Sprintf(
 							"```diff\n%s\n```\n",
 							diffOutput,
 						)
 					} else {
-						comment += "(Content hidden.)\n"
+						comment += "(content hidden)\n"
 					}
 				}
 			}
