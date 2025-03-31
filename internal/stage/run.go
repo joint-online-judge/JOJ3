@@ -20,7 +20,7 @@ func Run(stages []Stage) (
 			defer func() {
 				if r := recover(); r != nil {
 					slog.Error(
-						"stage panic recovered",
+						"panic recovered",
 						"stageName", stage.Name,
 						"panic", r,
 					)
