@@ -22,7 +22,10 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 ) {
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
-	for _, s := range confStages {
+	for i, s := range confStages {
+		if s.Name == "" {
+			s.Name = fmt.Sprintf("stage-%d", i)
+		}
 		if s.Group != "" {
 			var ok bool
 			for _, group := range groups {

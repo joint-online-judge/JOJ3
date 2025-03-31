@@ -146,8 +146,18 @@ func mainImpl() (err error) {
 }
 
 func main() {
-	if err := mainImpl(); err != nil {
-		slog.Error("main exit", "error", err)
-		os.Exit(1)
-	}
+	var err error
+	exitCode := 0
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("panic recovered", "panic", r)
+			exitCode = 2
+		}
+		if err != nil {
+			slog.Error("main exit", "error", err)
+			exitCode = 1
+		}
+		os.Exit(exitCode)
+	}()
+	err = mainImpl()
 }
