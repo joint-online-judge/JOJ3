@@ -15,7 +15,7 @@ type Conf struct {
 	ShowRunTime        bool `default:"false"`
 	ShowFiles          []string
 	FilesInCodeBlock   bool `default:"true"`
-	MaxFileLength      int  `default:"65536"`
+	MaxFileLength      int  `default:"2048"`
 }
 
 type ResultDetail struct{}
