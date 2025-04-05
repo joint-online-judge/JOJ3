@@ -32,16 +32,19 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 				cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
 			}
 		}
+		// NOTE: send all cmds at once may cause oom, no idea on why
 		pbCmd := convertPBCmd([]stage.Cmd{*cmd})
-		slog.Debug("sandbox execute", "i", i, "pbCmd size", proto.Size(pbCmd[0]))
 		pbReq := &pb.Request{Cmd: pbCmd}
-		slog.Debug("sandbox execute", "pbReq size", proto.Size(pbReq))
+		slog.Debug("sandbox execute", "i", i, "pbReq size", proto.Size(pbReq))
 		pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 		if err != nil {
 			return nil, err
 		}
 		if pbRet.Error != "" {
 			return nil, fmt.Errorf("sandbox execute error: %s", pbRet.Error)
+		}
+		if len(pbRet.Results) == 0 {
+			return nil, fmt.Errorf("sandbox execute error: no result")
 		}
 		result := convertPBResult(pbRet.Results)[0]
 		maps.Copy(e.cachedMap, result.FileIDs)
