@@ -39,17 +39,19 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				if err != nil {
 					return nil, true, err
 				}
+				answerStr := string(answer)
+				resultStr := result.Files[output.FileName]
 				isSame := stringsEqual(
-					string(answer),
-					result.Files[output.FileName],
+					answerStr,
+					resultStr,
 					output.CompareSpace,
 				)
-				slog.Debug(
+				slog.Info(
 					"compare",
 					"filename", output.FileName,
 					"answerPath", output.AnswerPath,
-					"actualLength", len(result.Files[output.FileName]),
-					"answerLength", len(string(answer)),
+					"actualLength", len(resultStr),
+					"answerLength", len(answerStr),
 					"index", i,
 					"isSame", isSame,
 				)
@@ -73,8 +75,6 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						}
 						// Convert answer to string and split by lines
 						truncated := false
-						answerStr := string(answer)
-						resultStr := result.Files[output.FileName]
 						if len(answerStr) > output.MaxDiffLength {
 							answerStr = answerStr[:output.MaxDiffLength]
 							truncated = true
