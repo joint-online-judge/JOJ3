@@ -46,7 +46,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					resultStr,
 					output.CompareSpace,
 				)
-				slog.Info(
+				slog.Debug(
 					"compare",
 					"filename", output.FileName,
 					"answerPath", output.AnswerPath,
