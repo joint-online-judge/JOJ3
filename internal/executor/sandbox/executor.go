@@ -47,6 +47,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			return nil, fmt.Errorf("sandbox execute error: no result")
 		}
 		result := convertPBResult(pbRet.Results)[0]
+		slog.Debug("sandbox execute", "i", i, "result", result)
 		maps.Copy(e.cachedMap, result.FileIDs)
 		results[i] = result
 	}
