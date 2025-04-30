@@ -40,6 +40,7 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		if err != nil {
 			return nil, err
 		}
+		slog.Debug("sandbox execute", "i", i, "pbRet size", proto.Size(pbRet))
 		if pbRet.Error != "" {
 			return nil, fmt.Errorf("sandbox execute error: %s", pbRet.Error)
 		}
