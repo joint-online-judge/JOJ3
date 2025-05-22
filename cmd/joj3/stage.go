@@ -46,8 +46,17 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 		var cmds []stage.Cmd
 		defaultCmd := s.Executor.With.Default
 		for _, optionalCmd := range s.Executor.With.Cases {
-			cmd := s.Executor.With.Default
+			var cmd stage.Cmd
 			err := copier.CopyWithOption(
+				&cmd,
+				&defaultCmd,
+				copier.Option{DeepCopy: true},
+			)
+			if err != nil {
+				slog.Error("generate stages", "error", err)
+				return stages, err
+			}
+			err = copier.CopyWithOption(
 				&cmd,
 				&optionalCmd,
 				copier.Option{DeepCopy: true},
@@ -118,7 +127,7 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 			Parsers: parsers,
 		})
 	}
-	slog.Debug("stages generated", "stages", stages)
+	slog.Info("stages generated", "stages", stages)
 	return stages, nil
 }
 
