@@ -127,7 +127,7 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 			Parsers: parsers,
 		})
 	}
-	slog.Info("stages generated", "stages", stages)
+	slog.Debug("stages generated", "stages", stages)
 	return stages, nil
 }
 
