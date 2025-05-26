@@ -14,8 +14,8 @@ type Match struct {
 
 type Conf struct {
 	Score             int
-	Files             []string
-	ForceQuitOnDeduct bool `default:"false"`
+	Files             []string `default:"[stdout,stderr]"`
+	ForceQuitOnDeduct bool     `default:"false"`
 	Matches           []Match
 }
 
