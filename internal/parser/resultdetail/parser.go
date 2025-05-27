@@ -47,7 +47,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 					content = content[:conf.MaxFileLength] + "\n\n(truncated)"
 				}
 				if conf.FilesInCodeBlock {
-					comment += fmt.Sprintf("```\n%s\n```\n", content)
+					comment += fmt.Sprintf("`````````\n%s\n`````````\n", content)
 				} else {
 					comment += fmt.Sprintf("%s\n", content)
 				}
