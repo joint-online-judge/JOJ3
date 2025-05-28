@@ -2,6 +2,16 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/joint-online-judge/JOJ3)](https://goreportcard.com/report/github.com/joint-online-judge/JOJ3)
 [![Go Reference](https://pkg.go.dev/badge/github.com/joint-online-judge/JOJ3.svg)](https://pkg.go.dev/github.com/joint-online-judge/JOJ3)
+[![DeepWiki](https://img.shields.io/badge/DeepWiki-joint--online--judge%2FJOJ3-blue.svg)](https://deepwiki.com/joint-online-judge/JOJ3)
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Workflow](#workflow)
+- [Models](#models)
+- [Project Structure](#project-structure)
+- [Further Documentation](#further-documentation)
+
 
 ## Quick Start
 
@@ -52,7 +62,7 @@ For now, the following checking tools are needed for test:
 2. `clang-tidy-18`
 3. `cmake`
 4. `make`
-4. `cpplint`
+5. `cpplint`
 
 ```bash
 $ make test
@@ -77,7 +87,11 @@ pre-commit installed at .git/hooks/pre-commit
 
 ## Workflow
 
-These steps are executed in runner-images. We use `sudo -E -u tt` to elevate the permission and run `joj3` with environment variables from gitea actions. All the secret files should be stored in the host machine with user `tt` and mounted into the runner (e.g. `/home/tt/.config`). Since the runner uses user `student`, we can keep the data safe.
+These steps are executed within [runner-images](https://focs.ji.sjtu.edu.cn/git/JOJ/runner-images), as specified in the YAML files under `.gitea/workflows` in student repositories. Our customized [`act_runner`](https://github.com/focs-gitea/act_runner) ensures that only labeled images controlled by administrators can be used. Furthermore, our private Docker registry requires authentication for pushing images, so only administrator-created images can be used to run `joj3`.
+
+Inside the container created by `act_runner`, we use `sudo -E -u tt` to elevate permissions and run `joj3` with environment variables provided by Gitea Actions. All sensitive files should be stored on the host machine under the `tt` user's directory and mounted into the runner (e.g., `/home/tt/.config`). Allowed mount directories are also limited in `act_runner` configuration. Since the default `student` user inside the container (created from runner-images) shares the same UID as the `student` user on the host, which does not have the permission to access `tt`'s files. This helps ensure data security.
+
+Here are the steps `joj3` will run.
 
 1. Parse the message.
     - It will use the git commit message from `HEAD`. The message should meet the [Conventional Commits specification](https://www.conventionalcommits.org/). We use `scope` and `description` here. Also, a suffix `[group]` will be used to decide which stages will be run later.
@@ -87,7 +101,7 @@ These steps are executed in runner-images. We use `sudo -E -u tt` to elevate the
     - If that configuration file does not exist, and `fallback-conf-name` is passed, it will try to read `<conf-root>/<fallback-conf-name>`.
 3. Generate stages.
     - We have an empty list of stages at the beginning.
-    - We check all the stages from the configuration file. Stages with empty `group` field will always be added. Stages with non-empty `group` field requires that value (case insensitive) appears in the commit group. e.g. with commit msg `feat(h5/e3): joj msan [joj]`, stages with the following `group` field will run: `""`, `"joj"`. If the group specified in the commit message is `[all]`, then all groups will run.
+    - We check all the stages from the configuration file. Stages with empty `group` field will always be added. Stages with non-empty `group` field requires that value (case insensitive) appears in the commit group. e.g. with commit msg `feat(h5/e3): joj msan [joj]`, stages with the following `group` field will run: `""`, `"joj"`. Currently, it does not support multiple groups within one commit. If the group specified in the commit message is `[all]`, then all groups will run.
     - Every stage needs to have an unique `name`, which means if two stages have the same name, only the first one will be added.
 4. Run stages.
     - By default, all the stages will run sequentially.
@@ -104,7 +118,7 @@ The program parses the configuration file to run multiple stages.
 
 Each stage contains an executor and multiple parsers. An executor takes a `Cmd` and returns an `ExecutorResult`, while a parser takes an `ExecutorResult` and its configuration and returns a `ParserResult` and `bool` to indicate whether we should skip the rest stages.
 
-### `Cmd`
+### `StageExecutor.Cmd` (executor config)
 
 Check `Cmd` at <https://github.com/criyle/go-judge#rest-api-interface>.
 Some difference:
@@ -113,11 +127,34 @@ Some difference:
 -   `CopyInCached map[string]string`: key: file name in the sandbox, value: file name used in `CopyOutCached`.
 -   `LocalFile`: now supports the relative path
 
-### `ExecutorResult`
+### `ExecutorResult` (executor result)
 
 Check the `Result` at <https://github.com/criyle/go-judge#rest-api-interface>.
 
-### `ParserResult`
+### `StageParser.Conf` (parser config)
+
+Check <https://pkg.go.dev/github.com/joint-online-judge/JOJ3/internal/parser>. `type Conf` in each package defines the accepted config for each kind of parser.
+
+### `ParserResult` (parser result)
 
 -   `Score int`: score of the executor result.
 -   `Comment string`: comment on the executor result.
+
+## Project Structure
+
+```
++---.gitea       # Gitea meta files
++---cmd          # Executable applications
++---examples     # Examples & testcases from submodules
++---internal     # Packages for internal use only
+|   +---executor # Executors
+|   +---parser   # Parsers
+|   \---stage    # Structure and logic for stages
++---pkg          # Packages intended for use by other applications
+\---scripts      # Various helper scripts
+```
+
+## Further Documentation
+
+<https://pkg.go.dev/github.com/joint-online-judge/JOJ3>
+<https://deepwiki.com/joint-online-judge/JOJ3>
