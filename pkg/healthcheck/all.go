@@ -12,8 +12,7 @@ type Result struct {
 
 func All(
 	rootDir, checkFileNameList, checkFileSumList string,
-	groups, metaFile []string,
-	repoSize float64,
+	metaFile []string, repoSize float64,
 ) (res Result) {
 	var err error
 	err = RepoSize(repoSize)

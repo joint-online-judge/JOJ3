@@ -9,6 +9,7 @@ var name = "healthcheck"
 type Healthcheck struct{}
 
 type Conf struct {
+	Score  int    `default:"0"`
 	Stdout string `default:"stdout"`
 	Stderr string `default:"stderr"`
 }

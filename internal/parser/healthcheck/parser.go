@@ -34,10 +34,14 @@ func (*Healthcheck) parse(executorResult stage.ExecutorResult, conf Conf) (stage
 		}, true
 	}
 	slog.Debug("healthcheck result", "res", res)
+	score := conf.Score
+	if res.Failed {
+		score = 0
+	}
 	comment := res.Msg
 	forceQuit := res.Failed
 	return stage.ParserResult{
-		Score:   0,
+		Score:   score,
 		Comment: comment,
 	}, forceQuit
 }

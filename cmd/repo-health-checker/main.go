@@ -9,9 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 
-	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
 	"github.com/joint-online-judge/JOJ3/pkg/healthcheck"
 )
 
@@ -74,10 +72,8 @@ func main() {
 		"checkFileSumList", checkFileSumList,
 		"meta", metaFile,
 	)
-	groups := strings.Split(os.Getenv(env.Groups), ",")
 	res := healthcheck.All(
-		rootDir, checkFileNameList, checkFileSumList,
-		groups, metaFile, repoSize,
+		rootDir, checkFileNameList, checkFileSumList, metaFile, repoSize,
 	)
 	jsonRes, err := json.Marshal(res)
 	if err != nil {
