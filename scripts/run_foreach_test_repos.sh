@@ -11,7 +11,9 @@ for submodule in $submodules; do
     repo_name=$(echo $url | rev | cut -d'/' -f 1 | rev | cut -d'.' -f 1)
     submodule_dir="$submodules_dir/$repo_name/$submodule"
     cd $submodule_dir
+    set +e
     eval "$command"
+    set -e
     if [[ $command == $JOJ3 ]]; then
         if [ -f "./expected.json" ]; then
             mv -f "joj3_result.json" "expected.json"
