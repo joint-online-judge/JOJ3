@@ -25,6 +25,7 @@ type ExecutorResult struct {
 	Time       uint64            `json:"time"`    // ns (cgroup recorded time)
 	Memory     uint64            `json:"memory"`  // byte
 	RunTime    uint64            `json:"runTime"` // ns (wall clock time)
+	ProcPeak   uint64            `json:"procPeak"`
 	Files      map[string]string `json:"files,omitempty"`
 	FileIDs    map[string]string `json:"fileIds,omitempty"`
 	FileError  []FileError       `json:"fileError,omitempty"`

@@ -39,6 +39,9 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 		if conf.ShowRunTime {
 			comment += fmt.Sprintf("RunTime: `%d ms`\n", result.RunTime/1e6)
 		}
+		if conf.ShowProcPeak {
+			comment += fmt.Sprintf("ProcPeak: `%d`\n", result.ProcPeak)
+		}
 		for _, file := range conf.ShowFiles {
 			content, ok := result.Files[file]
 			comment += fmt.Sprintf("File `%s`:\n", file)
