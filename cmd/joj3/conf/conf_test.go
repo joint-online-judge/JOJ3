@@ -88,7 +88,7 @@ func TestParseConventionalCommit(t *testing.T) {
 		{
 			name:    "Invalid commit format",
 			commit:  "This is not a valid conventional commit",
-			want:    nil,
+			want:    &ConventionalCommit{},
 			wantErr: true,
 		},
 		{
