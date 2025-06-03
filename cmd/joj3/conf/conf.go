@@ -40,7 +40,7 @@ func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
 	re := regexp.MustCompile(`(?s)^(\w+)(\(([^)]+)\))?!?: (.+?(\[([^\]]+)\])?)(\n\n(.+?))?(\n\n(.+))?$`)
 	matches := re.FindStringSubmatch(strings.TrimSpace(commit))
 	if matches == nil {
-		return nil, fmt.Errorf("invalid conventional commit format")
+		return &ConventionalCommit{}, fmt.Errorf("invalid conventional commit format")
 	}
 	cc := &ConventionalCommit{
 		Type:        matches[1],
