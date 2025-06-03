@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	joj3Conf "github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
@@ -150,12 +151,19 @@ func main() {
 	exitCode := 0
 	defer func() {
 		if r := recover(); r != nil {
-			slog.Error("panic recovered", "panic", r)
+			slog.Error(
+				"panic recovered",
+				"panic", r,
+				"stack", string(debug.Stack()),
+			)
 			exitCode = 2
 		}
 		if err != nil {
 			slog.Error("main exit", "error", err)
 			exitCode = 1
+		}
+		if exitCode == 0 {
+			slog.Info("main exit", "status", "success")
 		}
 		os.Exit(exitCode)
 	}()
