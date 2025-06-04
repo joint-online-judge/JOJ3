@@ -100,9 +100,15 @@ func AuthorEmailCheck(root string, allowedDomains []string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf(
-		"Author email %s is not in the allowed domains: %v",
+	return fmt.Errorf("Author email %s is not in the allowed domains: `%s`\n\n"+
+		"To fix it, please run the following commands:\n"+
+		"```bash\n"+
+		"git config user.email \"<your_email>\"\n"+
+		"git commit --amend --no-edit --reset-author\n"+
+		"git push --force\n"+
+		"```\n"+
+		"Replace `<your_email>` with your actual email address\n",
 		email,
-		allowedDomains,
+		strings.Join(allowedDomains, "`, `"),
 	)
 }
