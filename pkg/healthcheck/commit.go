@@ -74,3 +74,35 @@ func NonASCIIMsg(root string) error {
 	}
 	return nil
 }
+
+func AuthorEmailCheck(root string, allowedDomains []string) error {
+	repo, err := git.PlainOpen(root)
+	if err != nil {
+		slog.Error("opening git repo", "err", err)
+		return fmt.Errorf("error opening git repo: %v", err)
+	}
+
+	ref, err := repo.Head()
+	if err != nil {
+		slog.Error("getting reference", "err", err)
+		return fmt.Errorf("error getting reference: %v", err)
+	}
+
+	commit, err := repo.CommitObject(ref.Hash())
+	if err != nil {
+		slog.Error("getting latest commit", "err", err)
+		return fmt.Errorf("error getting latest commit: %v", err)
+	}
+
+	email := commit.Author.Email
+	for _, domain := range allowedDomains {
+		if strings.HasSuffix(email, "@"+domain) {
+			return nil
+		}
+	}
+	return fmt.Errorf(
+		"Author email %s is not in the allowed domains: %v",
+		email,
+		allowedDomains,
+	)
+}

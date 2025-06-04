@@ -45,6 +45,7 @@ var (
 	checkFileNameList string
 	checkFileSumList  string
 	metaFile          []string
+	allowedDomainList string
 	showVersion       *bool
 	Version           string
 )
@@ -55,6 +56,7 @@ func init() {
 	flag.Float64Var(&repoSize, "repoSize", 2, "maximum size of the repo in MiB")
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
+	flag.StringVar(&allowedDomainList, "allowedDomainList", "sjtu.edu.cn", "comma-separated list of allowed domains for commit author email")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
 }
 
@@ -73,7 +75,12 @@ func main() {
 		"meta", metaFile,
 	)
 	res := healthcheck.All(
-		rootDir, checkFileNameList, checkFileSumList, metaFile, repoSize,
+		rootDir,
+		checkFileNameList,
+		checkFileSumList,
+		allowedDomainList,
+		metaFile,
+		repoSize,
 	)
 	jsonRes, err := json.Marshal(res)
 	if err != nil {

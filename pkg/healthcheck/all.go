@@ -3,6 +3,7 @@ package healthcheck
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Result struct {
@@ -11,7 +12,7 @@ type Result struct {
 }
 
 func All(
-	rootDir, checkFileNameList, checkFileSumList string,
+	rootDir, checkFileNameList, checkFileSumList, allowedDomainList string,
 	metaFile []string, repoSize float64,
 ) (res Result) {
 	var err error
@@ -56,6 +57,13 @@ func All(
 		res.Failed = true
 	} else {
 		res.Msg += "### Repo File Check Passed\n"
+	}
+	err = AuthorEmailCheck(rootDir, strings.Split(allowedDomainList, ","))
+	if err != nil {
+		res.Msg += fmt.Sprintf("### Author Email Check Failed:\n%s\n", err.Error())
+		res.Failed = true
+	} else {
+		res.Msg += "### Author Email Check Passed\n"
 	}
 	return res
 }
