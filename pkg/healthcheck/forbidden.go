@@ -32,12 +32,7 @@ func getForbiddens(root string) ([]string, error) {
 				return nil
 			}
 		}
-		// Get the relative path to the git repo root
-		relPath, err := filepath.Rel(root, path)
-		if err != nil {
-			return err
-		}
-		match := ignore.Relative(relPath, true)
+		match := ignore.Match(path)
 
 		// Check if the relative file path should be ignored based on the .gitignore rules
 		if match != nil && match.Ignore() {
