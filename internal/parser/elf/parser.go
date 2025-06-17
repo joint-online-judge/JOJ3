@@ -48,7 +48,7 @@ func (p *Elf) parse(executorResult stage.ExecutorResult, conf Conf) stage.Parser
 					// "<binders>:\n<context> below reaches a parentheses depths of <depths>:\n<code>"
 					comment += fmt.Sprintf(
 						"%s:\n%s below reaches a parentheses depths of %d:\n"+
-							"```%s\n```\n",
+							"%s\n",
 						caseObj.Binders,
 						caseObj.Context,
 						caseObj.Depths,
@@ -59,7 +59,7 @@ func (p *Elf) parse(executorResult stage.ExecutorResult, conf Conf) stage.Parser
 					comment += fmt.Sprintf(
 						"%s:\n%s below excceeds a code length "+
 							"upper bound with %d (weighed: %f):\n"+
-							"```%s\n```\n",
+							"%s\n",
 						caseObj.Binders,
 						caseObj.Context,
 						caseObj.Plain,
@@ -69,7 +69,7 @@ func (p *Elf) parse(executorResult stage.ExecutorResult, conf Conf) stage.Parser
 				case "OverArity":
 					// "<binders>:\n<context> below hits <detail>:\n<code>"
 					comment += fmt.Sprintf(
-						"%s:\n%s below hits %s:\n```%s\n```\n",
+						"%s:\n%s below hits %s:\n%s\n",
 						caseObj.Binders,
 						caseObj.Context,
 						caseObj.Detail,
@@ -86,8 +86,8 @@ func (p *Elf) parse(executorResult stage.ExecutorResult, conf Conf) stage.Parser
 					// "The code below has a similarity rate of <similarity_rate>:\n- <context1>:\n\t<code1>\n- <context2>:\n\t<code2>"
 					comment += fmt.Sprintf(
 						"The code below has a similarity rate of %f:\n"+
-							"- %s:\n```%s\n```\n"+
-							"- %s:\n```%s\n```\n",
+							"- %s:\n%s\n"+
+							"- %s:\n%s\n",
 						caseObj.SimilarityRate,
 						context0,
 						code0,
