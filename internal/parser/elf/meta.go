@@ -1,6 +1,5 @@
 // Package elf parses output of the elf static analysis tool to
 // assign scores based on detected code issues.
-
 package elf
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"
