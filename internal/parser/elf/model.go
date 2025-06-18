@@ -41,7 +41,7 @@ type Binder struct {
 }
 
 func (b Binder) String() string {
-	return fmt.Sprintf("In the definition of %s (at %s)", b.Binder, b.Pos)
+	return fmt.Sprintf("in the definition of %s (at %s)", b.Binder, b.Pos)
 }
 
 type Binders []Binder
@@ -51,7 +51,12 @@ func (bs Binders) String() string {
 	for _, b := range bs {
 		s = append(s, b.String())
 	}
-	return strings.Join(s, "; ")
+	combinedStr := strings.Join(s, "; ")
+	if len(combinedStr) > 0 && combinedStr[0] == 'i' {
+		return "I" + combinedStr[1:]
+	}
+
+	return combinedStr
 }
 
 type Source struct {
