@@ -35,14 +35,19 @@ func (p *Elf) parse(executorResult stage.ExecutorResult, conf Conf) stage.Parser
 				slog.Error("elf parse", "mapstructure decode err", err)
 			}
 			comment += fmt.Sprintf("### [%s] %s\n", report.File, report.Name)
-			for _, caseObj := range report.Cases {
+			caseScore := 0
+			for range report.Cases {
 				for _, match := range conf.Matches {
 					for _, keyword := range match.Keywords {
 						if strings.Contains(kind, keyword) {
-							score += -match.Score
+							caseScore += -match.Score
 						}
 					}
 				}
+			}
+			score += caseScore
+			comment += fmt.Sprintf("%d point(s)\n", caseScore)
+			for _, caseObj := range report.Cases {
 				switch kind {
 				case "ParenDep":
 					// "<binders>:\n<context> below reaches a parentheses depths of <depths>:\n<code>"
