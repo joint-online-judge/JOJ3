@@ -160,7 +160,7 @@ func uniqueElements(a []string) ([]string, []int) {
 func patienceDiff(a, b []string, equal func(a, b string) bool) []DiffLine {
 	switch {
 	case len(a) == 0 && len(b) == 0:
-		return nil
+		return []DiffLine{}
 	case len(a) == 0:
 		return toDiffLines(b, Insert)
 	case len(b) == 0:
