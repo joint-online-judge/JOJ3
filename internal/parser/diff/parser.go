@@ -31,7 +31,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 			if conf.ForceQuitOnFailed {
 				forceQuit = true
 			}
-			comment += conf.FailComment
+			comment += conf.FailComment + "\n"
 			comment += "Executor status not `Accepted`\n"
 		} else {
 			for _, output := range caseConf.Outputs {
@@ -58,12 +58,12 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				// If no difference, assign score
 				if isSame {
 					score += output.Score
-					comment += conf.PassComment
+					comment += conf.PassComment + "\n"
 				} else {
 					if output.ForceQuitOnDiff || conf.ForceQuitOnFailed {
 						forceQuit = true
 					}
-					comment += conf.FailComment
+					comment += conf.FailComment + "\n"
 					comment += fmt.Sprintf("Difference found in `%s`\n",
 						output.FileName)
 					if !output.AlwaysHide {

@@ -8,8 +8,8 @@ import "github.com/joint-online-judge/JOJ3/internal/stage"
 var name = "diff"
 
 type Conf struct {
-	PassComment       string `default:"🥳Passed!\n"`
-	FailComment       string `default:"🧐Failed...\n"`
+	PassComment       string `default:"🥳Passed!"`
+	FailComment       string `default:"🧐Failed..."`
 	FailOnNotAccepted bool   `default:"true"`
 	ForceQuitOnFailed bool   `default:"false"`
 	Cases             []struct {
