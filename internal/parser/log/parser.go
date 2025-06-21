@@ -10,7 +10,7 @@ import (
 )
 
 func (*Log) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
-	content := executorResult.Files[conf.FileName]
+	content := executorResult.Files[conf.Filename]
 	var data map[string]any
 	err := json.Unmarshal([]byte(content), &data)
 	if err != nil {

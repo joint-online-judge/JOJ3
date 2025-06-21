@@ -40,7 +40,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					return nil, true, err
 				}
 				answerStr := string(answer)
-				resultStr := result.Files[output.FileName]
+				resultStr := result.Files[output.Filename]
 				isSame := stringsEqual(
 					answerStr,
 					resultStr,
@@ -48,7 +48,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 				)
 				slog.Debug(
 					"compare",
-					"filename", output.FileName,
+					"filename", output.Filename,
 					"answerPath", output.AnswerPath,
 					"actualLength", len(resultStr),
 					"answerLength", len(answerStr),
@@ -65,7 +65,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 					}
 					comment += conf.FailComment + "\n"
 					comment += fmt.Sprintf("Difference found in `%s`\n",
-						output.FileName)
+						output.Filename)
 					if !output.AlwaysHide {
 						if output.MaxDiffLength == 0 { // real default value
 							output.MaxDiffLength = 2048

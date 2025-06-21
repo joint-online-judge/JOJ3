@@ -15,7 +15,7 @@ type Conf struct {
 	Cases             []struct {
 		Outputs []struct {
 			Score            int
-			FileName         string
+			Filename         string
 			AnswerPath       string
 			CompareSpace     bool
 			AlwaysHide       bool
