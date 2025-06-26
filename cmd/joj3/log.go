@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/conf"
 	"github.com/joint-online-judge/JOJ3/cmd/joj3/env"
@@ -111,6 +112,10 @@ func setupSlog(conf *conf.Conf) error {
 	attrs := newSlogAttrs(conf.ActorCsvPath)
 	handlers := []slog.Handler{}
 	if logPath != "" {
+		logDir := filepath.Dir(logPath)
+		if err := os.MkdirAll(logDir, 0o750); err != nil {
+			return err
+		}
 		// Text file handler for debug logs
 		debugTextFile, err := os.OpenFile(logPath,
 			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
