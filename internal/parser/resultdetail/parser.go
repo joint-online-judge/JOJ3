@@ -37,7 +37,7 @@ func (*ResultDetail) Run(results []stage.ExecutorResult, confAny any) (
 				float64(result.Memory)/(1024*1024))
 		}
 		if conf.ShowRunTime {
-			comment += fmt.Sprintf("Clock Time: `%d ms`\n", result.RunTime/1e6)
+			comment += fmt.Sprintf("Wall-clock Time: `%d ms`\n", result.RunTime/1e6)
 		}
 		if conf.ShowProcPeak {
 			comment += fmt.Sprintf("ProcPeak: `%d`\n", result.ProcPeak)
