@@ -10,7 +10,7 @@ import (
 
 // RepoSize checks the size of the repository to determine if it is oversized.
 // It executes the 'git count-objects -v' command to obtain the size information,
-func RepoSize(confSize float64) error {
+func RepoSize(rootDir string, confSize float64) error {
 	// TODO: reimplement here when go-git is available
 	// https://github.com/go-git/go-git/blob/master/COMPATIBILITY.md
 	cmd := exec.Command(
@@ -20,6 +20,7 @@ func RepoSize(confSize float64) error {
 		"count-objects",
 		"-v",
 	)
+	cmd.Dir = rootDir
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		slog.Error("running git command:", "err", err, "output", output)
