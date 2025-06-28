@@ -162,7 +162,7 @@ func main() {
 			slog.Error("main exit", "error", err)
 			exitCode = 1
 		}
-		if exitCode == 0 {
+		if !*printVersion && exitCode == 0 {
 			slog.Info("main exit", "status", "success")
 		}
 		os.Exit(exitCode)
