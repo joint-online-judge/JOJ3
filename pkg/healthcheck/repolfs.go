@@ -1,15 +1,27 @@
 package healthcheck
 
+import (
+	"fmt"
+	"os/exec"
+)
+
 func RepoLFS(rootDir string) error {
-	// cmd := exec.Command("git", "lfs", "fsck", "--pointers")
-	// cmd.Dir = rootDir
-	// output, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	return fmt.Errorf(
-	// 		"error running `git lfs fsck --pointers`: %w, output: %s",
-	// 		err,
-	// 		output,
-	// 	)
-	// }
+	cmd := exec.Command(
+		"git",
+		"-c",
+		"safe.directory=*",
+		"lfs",
+		"fsck",
+		"--pointers",
+	)
+	cmd.Dir = rootDir
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf(
+			"error running `git lfs fsck --pointers`: %w, output: %s",
+			err,
+			output,
+		)
+	}
 	return nil
 }
