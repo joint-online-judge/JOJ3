@@ -18,7 +18,7 @@ func RepoLFS(rootDir string) error {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf(
-			"error running `git lfs fsck --pointers`: %w, output: %s",
+			"error running `git lfs fsck --pointers`: %w, output:\n%s",
 			err,
 			output,
 		)
