@@ -17,6 +17,27 @@ import (
 
 type StageResult stage.StageResult
 
+func newStageCmd(defaultCmd stage.Cmd, optionalCmd conf.OptionalCmd) (stage.Cmd, error) {
+	var cmd stage.Cmd
+	err := copier.CopyWithOption(
+		&cmd,
+		&defaultCmd,
+		copier.Option{DeepCopy: true},
+	)
+	if err != nil {
+		return cmd, err
+	}
+	err = copier.CopyWithOption(
+		&cmd,
+		&optionalCmd,
+		copier.Option{DeepCopy: true, IgnoreEmpty: true},
+	)
+	if err != nil {
+		return cmd, err
+	}
+	return cmd, nil
+}
+
 func generateStages(confStages []conf.ConfStage, groups []string) (
 	[]stage.Stage, error,
 ) {
@@ -45,71 +66,17 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 		existNames[s.Name] = true
 		var cmds []stage.Cmd
 		defaultCmd := s.Executor.With.Default
-		for _, optionalCmd := range s.Executor.With.Cases {
-			var cmd stage.Cmd
-			err := copier.CopyWithOption(
-				&cmd,
-				&defaultCmd,
-				copier.Option{DeepCopy: true},
-			)
-			if err != nil {
-				slog.Error("generate stages", "error", err)
-				return stages, err
-			}
-			err = copier.CopyWithOption(
-				&cmd,
-				&optionalCmd,
-				copier.Option{DeepCopy: true},
-			)
-			if err != nil {
-				slog.Error("generate stages", "error", err)
-				return stages, err
-			}
-			// since these 3 values are pointers, copier will always copy
-			// them, so we need to check them manually
-			if defaultCmd.Stdin != nil && optionalCmd.Stdin == nil {
-				var stdin stage.CmdFile
-				err := copier.CopyWithOption(
-					&stdin,
-					defaultCmd.Stdin,
-					copier.Option{DeepCopy: true},
-				)
-				if err != nil {
-					slog.Error("generate stages", "error", err)
-					return stages, err
-				}
-				cmd.Stdin = &stdin
-			}
-			if defaultCmd.Stdout != nil && optionalCmd.Stdout == nil {
-				var stdout stage.CmdFile
-				err := copier.CopyWithOption(
-					&stdout,
-					defaultCmd.Stdout,
-					copier.Option{DeepCopy: true},
-				)
-				if err != nil {
-					slog.Error("generate stages", "error", err)
-					return stages, err
-				}
-				cmd.Stdout = &stdout
-			}
-			if defaultCmd.Stderr != nil && optionalCmd.Stderr == nil {
-				var stderr stage.CmdFile
-				err := copier.CopyWithOption(
-					&stderr,
-					defaultCmd.Stderr,
-					copier.Option{DeepCopy: true},
-				)
-				if err != nil {
-					slog.Error("generate stages", "error", err)
-					return stages, err
-				}
-				cmd.Stderr = &stderr
-			}
-			cmds = append(cmds, cmd)
-		}
 		if len(s.Executor.With.Cases) == 0 {
 			cmds = []stage.Cmd{defaultCmd}
+		} else {
+			for _, optionalCmd := range s.Executor.With.Cases {
+				cmd, err := newStageCmd(defaultCmd, optionalCmd)
+				if err != nil {
+					slog.Error("generate stages", "error", err)
+					return stages, err
+				}
+				cmds = append(cmds, cmd)
+			}
 		}
 		parsers := []stage.StageParser{}
 		for _, p := range s.Parsers {

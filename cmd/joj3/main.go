@@ -39,7 +39,25 @@ func getCommitMsg() (string, error) {
 		slog.Error("get commit msg", "error", err)
 		return "", err
 	}
+	env.Attr.CommitMsg = commitMsg
 	return commitMsg, nil
+}
+
+func getConf(commitMsg string) (*joj3Conf.Conf, *joj3Conf.ConventionalCommit, error) {
+	confPath, confStat, conventionalCommit, err := getConfPath(commitMsg)
+	if err != nil {
+		return nil, nil, err
+	}
+	conf, err := loadConf(confPath)
+	if err != nil {
+		return nil, nil, err
+	}
+	env.Attr.ConfName = conf.Name
+	env.Attr.OutputPath = conf.Stage.OutputPath
+	if err := showConfStat(confPath, confStat); err != nil {
+		return nil, nil, err
+	}
+	return conf, conventionalCommit, nil
 }
 
 func getConfPath(commitMsg string) (string, fs.FileInfo, *joj3Conf.ConventionalCommit, error) {
@@ -120,21 +138,11 @@ func mainImpl() (err error) {
 	if err != nil {
 		return err
 	}
-	env.Attr.CommitMsg = commitMsg
-	confPath, confStat, conventionalCommit, err := getConfPath(commitMsg)
+	conf, conventionalCommit, err := getConf(commitMsg)
 	if err != nil {
 		return err
 	}
-	conf, err := loadConf(confPath)
-	if err != nil {
-		return err
-	}
-	env.Attr.ConfName = conf.Name
-	env.Attr.OutputPath = conf.Stage.OutputPath
 	if err := setupSlog(conf); err != nil {
-		return err
-	}
-	if err := showConfStat(confPath, confStat); err != nil {
 		return err
 	}
 	if err := validateConf(conf); err != nil {
