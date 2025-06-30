@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -55,6 +56,8 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 }
 
 func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
+	env.Attr.ActorName = fmt.Sprintf("Name(%s)", env.Attr.Actor)
+	env.Attr.ActorID = fmt.Sprintf("ID(%s)", env.Attr.Actor)
 	attrs = []slog.Attr{
 		slog.String("runID", env.Attr.RunID),
 		slog.String("confName", env.Attr.ConfName),
