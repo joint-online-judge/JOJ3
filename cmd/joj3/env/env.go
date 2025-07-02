@@ -39,6 +39,7 @@ func generateRunID() string {
 
 func init() {
 	runID = generateRunID()
+	SetRunID(runID)
 }
 
 func GetRunID() string              { return runID }
@@ -48,6 +49,7 @@ func GetCommitMsg() string          { return os.Getenv(CommitMsg) }
 func GetForceQuitStageName() string { return os.Getenv(ForceQuitStageName) }
 func GetOutputPath() string         { return os.Getenv(OutputPath) }
 
+func SetRunID(val string)              { os.Setenv(RunID, val) }
 func SetConfName(val string)           { os.Setenv(ConfName, val) }
 func SetGroups(val string)             { os.Setenv(Groups, val) }
 func SetCommitMsg(val string)          { os.Setenv(CommitMsg, val) }
