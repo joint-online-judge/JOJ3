@@ -57,7 +57,7 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 
 func newSlogAttrs(csvPath string) []slog.Attr {
 	actor := env.GetActor()
-	actorName := fmt.Sprintf("Name(%s)", actor)
+	actorName := fmt.Sprintf("NAME(%s)", actor)
 	actorID := fmt.Sprintf("ID(%s)", actor)
 
 	if csvPath != "" {
