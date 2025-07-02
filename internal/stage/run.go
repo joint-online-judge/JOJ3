@@ -30,7 +30,7 @@ func Run(stages []Stage) (
 							{
 								Score: 0,
 								Comment: "JOJ3 internal error. " +
-									"Please contact the administrator.\n",
+									"Please contact the administrator.\n\n",
 							},
 						},
 						ForceQuit: true,
@@ -152,7 +152,7 @@ func Run(stages []Stage) (
 				} else {
 					for i := range len(parserResults) {
 						parserResults[i].Score += tmpParserResults[i].Score
-						parserResults[i].Comment += tmpParserResults[i].Comment
+						parserResults[i].Comment += tmpParserResults[i].Comment + "\n\n"
 					}
 				}
 			}
