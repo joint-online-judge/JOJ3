@@ -3,7 +3,6 @@ package env
 import (
 	"fmt"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -23,10 +22,7 @@ const (
 	GitHubRunNumber  = "GITHUB_RUN_NUMBER"
 )
 
-var (
-	runIDOnce sync.Once
-	runID     string
-)
+var runID string
 
 func generateRunID() string {
 	timestamp := time.Now().UnixNano()
@@ -41,22 +37,17 @@ func generateRunID() string {
 	return fmt.Sprintf("%08X", combined&0xFFFFFFFF)
 }
 
-func GetRunID() string {
-	if val := os.Getenv(RunID); val != "" {
-		return val
-	}
-	runIDOnce.Do(func() {
-		runID = generateRunID()
-	})
-	return runID
+func init() {
+	runID = generateRunID()
 }
+
+func GetRunID() string              { return runID }
 func GetConfName() string           { return os.Getenv(ConfName) }
 func GetGroups() string             { return os.Getenv(Groups) }
 func GetCommitMsg() string          { return os.Getenv(CommitMsg) }
 func GetForceQuitStageName() string { return os.Getenv(ForceQuitStageName) }
 func GetOutputPath() string         { return os.Getenv(OutputPath) }
 
-func SetRunID(val string)              { os.Setenv(RunID, val) }
 func SetConfName(val string)           { os.Setenv(ConfName, val) }
 func SetGroups(val string)             { os.Setenv(Groups, val) }
 func SetCommitMsg(val string)          { os.Setenv(CommitMsg, val) }
