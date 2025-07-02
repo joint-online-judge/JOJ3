@@ -39,7 +39,7 @@ func getCommitMsg() (string, error) {
 		slog.Error("get commit msg", "error", err)
 		return "", err
 	}
-	env.Attr.CommitMsg = commitMsg
+	env.SetCommitMsg(commitMsg)
 	return commitMsg, nil
 }
 
@@ -52,8 +52,8 @@ func getConf(commitMsg string) (*joj3Conf.Conf, *joj3Conf.ConventionalCommit, er
 	if err != nil {
 		return nil, nil, err
 	}
-	env.Attr.ConfName = conf.Name
-	env.Attr.OutputPath = conf.Stage.OutputPath
+	env.SetConfName(conf.Name)
+	env.SetOutputPath(conf.Stage.OutputPath)
 	if err := showConfStat(confPath, confStat); err != nil {
 		return nil, nil, err
 	}
@@ -102,14 +102,12 @@ func validateConf(conf *joj3Conf.Conf) error {
 
 func run(conf *joj3Conf.Conf, conventionalCommit *joj3Conf.ConventionalCommit) error {
 	groups := joj3Conf.MatchGroups(conf, conventionalCommit)
-	env.Attr.Groups = strings.Join(groups, ",")
-	env.Set()
+	env.SetGroups(strings.Join(groups, ","))
 	_, forceQuitStageName, err := runStages(
 		conf,
 		groups,
 		func(stageResults []stage.StageResult, forceQuitStageName string) {
-			env.Attr.ForceQuitStageName = forceQuitStageName
-			env.Set()
+			env.SetForceQuitStageName(forceQuitStageName)
 		},
 	)
 	if err != nil {

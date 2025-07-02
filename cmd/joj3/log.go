@@ -55,59 +55,46 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 	return &multiHandler{handlers: handlers}
 }
 
-func newSlogAttrs(csvPath string) (attrs []slog.Attr) {
-	env.Attr.ActorName = fmt.Sprintf("Name(%s)", env.Attr.Actor)
-	env.Attr.ActorID = fmt.Sprintf("ID(%s)", env.Attr.Actor)
-	attrs = []slog.Attr{
-		slog.String("runID", env.Attr.RunID),
-		slog.String("confName", env.Attr.ConfName),
-		slog.String("actor", env.Attr.Actor),
-		slog.String("actorName", env.Attr.ActorName),
-		slog.String("actorID", env.Attr.ActorID),
-		slog.String("repository", env.Attr.Repository),
-		slog.String("sha", env.Attr.Sha),
-		slog.String("ref", env.Attr.Ref),
-	}
-	// if csvPath is empty, just return
-	if csvPath == "" {
-		return attrs
-	}
-	file, err := os.Open(csvPath)
-	if err != nil {
-		slog.Error("open csv", "error", err)
-		return attrs
-	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	for {
-		row, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
+func newSlogAttrs(csvPath string) []slog.Attr {
+	actor := env.GetActor()
+	actorName := fmt.Sprintf("Name(%s)", actor)
+	actorID := fmt.Sprintf("ID(%s)", actor)
+
+	if csvPath != "" {
+		file, err := os.Open(csvPath)
 		if err != nil {
-			slog.Error("read csv", "error", err)
-			return attrs
-		}
-		if len(row) < 3 {
-			continue
-		}
-		actor := row[2]
-		if actor == env.Attr.Actor {
-			env.Attr.ActorName = row[0]
-			env.Attr.ActorID = row[1]
-			return []slog.Attr{
-				slog.String("runID", env.Attr.RunID),
-				slog.String("confName", env.Attr.ConfName),
-				slog.String("actor", env.Attr.Actor),
-				slog.String("actorName", env.Attr.ActorName),
-				slog.String("actorID", env.Attr.ActorID),
-				slog.String("repository", env.Attr.Repository),
-				slog.String("sha", env.Attr.Sha),
-				slog.String("ref", env.Attr.Ref),
+			slog.Error("open csv", "error", err)
+		} else {
+			defer file.Close()
+			reader := csv.NewReader(file)
+			for {
+				row, err := reader.Read()
+				if err == io.EOF {
+					break
+				}
+				if err != nil {
+					slog.Error("read csv", "error", err)
+					break
+				}
+				if len(row) >= 3 && row[2] == actor {
+					actorName = row[0]
+					actorID = row[1]
+					break
+				}
 			}
 		}
 	}
-	return attrs
+
+	return []slog.Attr{
+		slog.String("runID", env.GetRunID()),
+		slog.String("confName", env.GetConfName()),
+		slog.String("actor", actor),
+		slog.String("actorName", actorName),
+		slog.String("actorID", actorID),
+		slog.String("repository", env.GetRepository()),
+		slog.String("sha", env.GetSha()),
+		slog.String("ref", env.GetRef()),
+	}
 }
 
 func setupSlog(conf *conf.Conf) error {

@@ -1,9 +1,9 @@
-// Package env stores the environment variables from actions environment.
 package env
 
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -14,28 +14,21 @@ const (
 	CommitMsg          = "JOJ3_COMMIT_MSG"
 	ForceQuitStageName = "JOJ3_FORCE_QUIT_STAGE_NAME"
 	OutputPath         = "JOJ3_OUTPUT_PATH"
+
+	GitHubActor      = "GITHUB_ACTOR"
+	GitHubRepository = "GITHUB_REPOSITORY"
+	GitHubSha        = "GITHUB_SHA"
+	GitHubRef        = "GITHUB_REF"
+	GitHubWorkflow   = "GITHUB_WORKFLOW"
+	GitHubRunNumber  = "GITHUB_RUN_NUMBER"
 )
 
-type Attribute struct {
-	ConfName           string
-	CommitMsg          string
-	Groups             string
-	RunID              string
-	Actor              string
-	Repository         string
-	Sha                string
-	Ref                string
-	Workflow           string
-	RunNumber          string
-	ActorName          string
-	ActorID            string
-	ForceQuitStageName string
-	OutputPath         string
-}
+var (
+	runIDOnce sync.Once
+	runID     string
+)
 
-var Attr Attribute
-
-func init() {
+func generateRunID() string {
 	timestamp := time.Now().UnixNano()
 	pid := os.Getpid()
 	high := timestamp >> 32
@@ -45,20 +38,34 @@ func init() {
 	combined ^= timestamp >> 16
 	combined ^= (combined >> 8)
 	combined ^= (combined << 16)
-	Attr.RunID = fmt.Sprintf("%08X", combined&0xFFFFFFFF)
-	Attr.Actor = os.Getenv("GITHUB_ACTOR")
-	Attr.Repository = os.Getenv("GITHUB_REPOSITORY")
-	Attr.Sha = os.Getenv("GITHUB_SHA")
-	Attr.Ref = os.Getenv("GITHUB_REF")
-	Attr.Workflow = os.Getenv("GITHUB_WORKFLOW")
-	Attr.RunNumber = os.Getenv("GITHUB_RUN_NUMBER")
+	return fmt.Sprintf("%08X", combined&0xFFFFFFFF)
 }
 
-func Set() {
-	os.Setenv(ConfName, Attr.ConfName)
-	os.Setenv(Groups, Attr.Groups)
-	os.Setenv(RunID, Attr.RunID)
-	os.Setenv(CommitMsg, Attr.CommitMsg)
-	os.Setenv(ForceQuitStageName, Attr.ForceQuitStageName)
-	os.Setenv(OutputPath, Attr.OutputPath)
+func GetRunID() string {
+	if val := os.Getenv(RunID); val != "" {
+		return val
+	}
+	runIDOnce.Do(func() {
+		runID = generateRunID()
+	})
+	return runID
 }
+func GetConfName() string           { return os.Getenv(ConfName) }
+func GetGroups() string             { return os.Getenv(Groups) }
+func GetCommitMsg() string          { return os.Getenv(CommitMsg) }
+func GetForceQuitStageName() string { return os.Getenv(ForceQuitStageName) }
+func GetOutputPath() string         { return os.Getenv(OutputPath) }
+
+func SetRunID(val string)              { os.Setenv(RunID, val) }
+func SetConfName(val string)           { os.Setenv(ConfName, val) }
+func SetGroups(val string)             { os.Setenv(Groups, val) }
+func SetCommitMsg(val string)          { os.Setenv(CommitMsg, val) }
+func SetForceQuitStageName(val string) { os.Setenv(ForceQuitStageName, val) }
+func SetOutputPath(val string)         { os.Setenv(OutputPath, val) }
+
+func GetActor() string      { return os.Getenv(GitHubActor) }
+func GetRepository() string { return os.Getenv(GitHubRepository) }
+func GetSha() string        { return os.Getenv(GitHubSha) }
+func GetRef() string        { return os.Getenv(GitHubRef) }
+func GetWorkflow() string   { return os.Getenv(GitHubWorkflow) }
+func GetRunNumber() string  { return os.Getenv(GitHubRunNumber) }
