@@ -46,6 +46,7 @@ var (
 	checkFileSumList  string
 	metaFile          []string
 	allowedDomainList string
+	actorCsvPath      string
 	showVersion       *bool
 	Version           string
 )
@@ -57,6 +58,7 @@ func init() {
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
 	flag.StringVar(&allowedDomainList, "allowedDomainList", "sjtu.edu.cn", "comma-separated list of allowed domains for commit author email")
+	flag.StringVar(&actorCsvPath, "actorCsvPath", "/home/tt/.config/joj/students.csv", "path to actor csv file")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
 }
 
@@ -79,6 +81,7 @@ func main() {
 		checkFileNameList,
 		checkFileSumList,
 		allowedDomainList,
+		actorCsvPath,
 		metaFile,
 		repoSize,
 	)

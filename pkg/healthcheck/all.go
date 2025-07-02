@@ -12,7 +12,7 @@ type Result struct {
 }
 
 func All(
-	rootDir, checkFileNameList, checkFileSumList, allowedDomainList string,
+	rootDir, checkFileNameList, checkFileSumList, allowedDomainList, actorCsvPath string,
 	metaFile []string, repoSize float64,
 ) (res Result) {
 	var err error
@@ -65,7 +65,7 @@ func All(
 	} else {
 		res.Msg += "### Repo File Check Passed\n"
 	}
-	err = AuthorEmailCheck(rootDir, strings.Split(allowedDomainList, ","))
+	err = AuthorEmailCheck(rootDir, strings.Split(allowedDomainList, ","), actorCsvPath)
 	if err != nil {
 		res.Msg += fmt.Sprintf("### Author Email Check Failed:\n%s\n", err.Error())
 		res.Failed = true

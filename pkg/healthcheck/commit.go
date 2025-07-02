@@ -1,8 +1,11 @@
 package healthcheck
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"log/slog"
+	"os"
 	"strings"
 	"unicode"
 
@@ -75,7 +78,7 @@ func NonASCIIMsg(root string) error {
 	return nil
 }
 
-func AuthorEmailCheck(root string, allowedDomains []string) error {
+func AuthorEmailCheck(root string, allowedDomains []string, actorCsvPath string) error {
 	repo, err := git.PlainOpen(root)
 	if err != nil {
 		slog.Error("opening git repo", "err", err)
@@ -94,13 +97,60 @@ func AuthorEmailCheck(root string, allowedDomains []string) error {
 		return fmt.Errorf("error getting latest commit: %v", err)
 	}
 
-	email := commit.Author.Email
-	for _, domain := range allowedDomains {
-		if strings.HasSuffix(email, "@"+domain) {
-			return nil
+	email := strings.ToLower(commit.Author.Email)
+
+	checkDomains := true
+	if _, err := os.Stat(actorCsvPath); err != nil {
+		slog.Error("checking actor CSV file stat", "err", err, "path", actorCsvPath)
+	} else {
+		f, err := os.Open(actorCsvPath)
+		if err != nil {
+			slog.Error("opening actor CSV file", "err", err, "path", actorCsvPath)
+		} else {
+			defer f.Close()
+			reader := csv.NewReader(f)
+			for {
+				row, err := reader.Read()
+				if err == io.EOF {
+					checkDomains = false
+					break
+				}
+				if err != nil {
+					slog.Error("reading actor CSV file", "err", err, "path", actorCsvPath)
+					break
+				}
+				if len(row) >= 3 {
+					actor := row[2]
+					for _, domain := range allowedDomains {
+						if email == actor+"@"+domain {
+							return nil
+						}
+					}
+				}
+			}
 		}
 	}
-	return fmt.Errorf("Author email %s is not in the allowed domains: `%s`\n\n"+
+	var msgPrefix string
+	if checkDomains {
+		for _, domain := range allowedDomains {
+			if strings.HasSuffix(email, "@"+domain) {
+				return nil
+			}
+		}
+		msgPrefix = fmt.Sprintf(
+			"Author email %s is not in the allowed domains: `%s`",
+			email,
+			strings.Join(allowedDomains, "`, `"),
+		)
+	} else {
+		msgPrefix = fmt.Sprintf(
+			"Author email %s is not stored in `%s`",
+			email,
+			actorCsvPath,
+		)
+	}
+
+	return fmt.Errorf("%s\n\n"+
 		"To fix it, please run the following commands:\n"+
 		"```bash\n"+
 		"git config user.email \"<your_email>\"\n"+
@@ -108,7 +158,6 @@ func AuthorEmailCheck(root string, allowedDomains []string) error {
 		"git push --force\n"+
 		"```\n"+
 		"Replace `<your_email>` with your actual email address\n",
-		email,
-		strings.Join(allowedDomains, "`, `"),
+		msgPrefix,
 	)
 }
