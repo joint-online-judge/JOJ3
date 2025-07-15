@@ -85,7 +85,7 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						}
 						answerLines := strings.Split(answerStr, "\n")
 						resultLines := strings.Split(resultStr, "\n")
-						commonPreixLineCount := 0
+						commonPrefixLineCount := 0
 						if output.HideCommonPrefix {
 							n := 0
 							for ; n < len(answerLines) &&
@@ -97,9 +97,9 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 								); n += 1 {
 							}
 							if n > 0 {
-								answerLines = answerLines[n:]
-								resultLines = resultLines[n:]
-								commonPreixLineCount = n
+								answerLines = answerLines[n-1:]
+								resultLines = resultLines[n-1:]
+								commonPrefixLineCount = n
 							}
 						}
 						if len(answerLines) > output.MaxDiffLines {
@@ -121,10 +121,10 @@ func (*Diff) Run(results []stage.ExecutorResult, confAny any) (
 						if truncated {
 							diffOutput += "\n\n(truncated)"
 						}
-						if commonPreixLineCount > 0 {
+						if commonPrefixLineCount > 0 {
 							diffOutput = fmt.Sprintf(
 								"(%d line(s) of common prefix hidden)\n\n",
-								commonPreixLineCount,
+								commonPrefixLineCount,
 							) + diffOutput
 						}
 						comment += fmt.Sprintf(
