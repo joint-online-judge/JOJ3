@@ -124,16 +124,7 @@ func (d *Diff) generateDiffComment(answerStr, resultStr string, output Output) s
 	if output.MaxDiffLines == 0 { // real default value
 		output.MaxDiffLines = 50
 	}
-
 	truncated := false
-	if len(answerStr) > output.MaxDiffLength {
-		answerStr = answerStr[:output.MaxDiffLength]
-		truncated = true
-	}
-	if len(resultStr) > output.MaxDiffLength {
-		resultStr = resultStr[:output.MaxDiffLength]
-		truncated = true
-	}
 
 	answerLines := strings.Split(answerStr, "\n")
 	resultLines := strings.Split(resultStr, "\n")
@@ -150,8 +141,8 @@ func (d *Diff) generateDiffComment(answerStr, resultStr string, output Output) s
 			); n += 1 {
 		}
 		if n > 0 {
-			answerLines = answerLines[n-1:]
-			resultLines = resultLines[n-1:]
+			answerLines = answerLines[n:]
+			resultLines = resultLines[n:]
 			commonPrefixLineCount = n
 		}
 	}
@@ -173,7 +164,10 @@ func (d *Diff) generateDiffComment(answerStr, resultStr string, output Output) s
 		})
 	diffOutput := diffText(diffs)
 	diffOutput = strings.TrimSuffix(diffOutput, "\n  ")
-
+	if len(diffOutput) > output.MaxDiffLength {
+		diffOutput = diffOutput[:output.MaxDiffLength]
+		truncated = true
+	}
 	if truncated {
 		diffOutput += "\n\n(truncated)"
 	}
