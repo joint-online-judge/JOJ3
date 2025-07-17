@@ -7,24 +7,28 @@ import "github.com/joint-online-judge/JOJ3/internal/stage"
 
 var name = "diff"
 
+type Output struct {
+	Score            int
+	Filename         string
+	AnswerPath       string
+	CompareSpace     bool
+	AlwaysHide       bool
+	ForceQuitOnDiff  bool
+	MaxDiffLength    int `default:"2048"` // just for reference
+	MaxDiffLines     int `default:"50"`   // just for reference
+	HideCommonPrefix bool
+}
+
+type Case struct {
+	Outputs []Output
+}
+
 type Conf struct {
 	PassComment       string `default:"🥳Passed!"`
 	FailComment       string `default:"🧐Failed..."`
 	FailOnNotAccepted bool   `default:"true"`
 	ForceQuitOnFailed bool   `default:"false"`
-	Cases             []struct {
-		Outputs []struct {
-			Score            int
-			Filename         string
-			AnswerPath       string
-			CompareSpace     bool
-			AlwaysHide       bool
-			ForceQuitOnDiff  bool
-			MaxDiffLength    int `default:"2048"` // just for reference
-			MaxDiffLines     int `default:"50"`   // just for reference
-			HideCommonPrefix bool
-		}
-	}
+	Cases             []Case
 }
 
 type Diff struct{}
