@@ -2,8 +2,6 @@ package diff
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateDiffComment(t *testing.T) {
@@ -17,7 +15,9 @@ func TestGenerateDiffComment(t *testing.T) {
 		}
 		comment := d.generateDiffComment(answerStr, resultStr, output)
 		expected := "```diff\n(2 line(s) of common prefix hidden)\n\n- line3\n- line4\n+ lineA\n+ lineB\n```\n"
-		assert.Equal(t, expected, comment)
+		if comment != expected {
+			t.Errorf("expected %q, got %q", expected, comment)
+		}
 	})
 
 	t.Run("HideCommonPrefix with no common prefix", func(t *testing.T) {
@@ -28,7 +28,9 @@ func TestGenerateDiffComment(t *testing.T) {
 		}
 		comment := d.generateDiffComment(answerStr, resultStr, output)
 		expected := "```diff\n- line1\n- line2\n+ lineA\n+ lineB\n```\n"
-		assert.Equal(t, expected, comment)
+		if comment != expected {
+			t.Errorf("expected %q, got %q", expected, comment)
+		}
 	})
 
 	t.Run("HideCommonPrefix with identical content", func(t *testing.T) {
@@ -39,7 +41,9 @@ func TestGenerateDiffComment(t *testing.T) {
 		}
 		comment := d.generateDiffComment(answerStr, resultStr, output)
 		expected := "```diff\n(2 line(s) of common prefix hidden)\n\n\n```\n"
-		assert.Equal(t, expected, comment)
+		if comment != expected {
+			t.Errorf("expected %q, got %q", expected, comment)
+		}
 	})
 
 	t.Run("HideCommonPrefix with only common prefix", func(t *testing.T) {
@@ -50,7 +54,9 @@ func TestGenerateDiffComment(t *testing.T) {
 		}
 		comment := d.generateDiffComment(answerStr, resultStr, output)
 		expected := "```diff\n(2 line(s) of common prefix hidden)\n\n+ lineA\n```\n"
-		assert.Equal(t, expected, comment)
+		if comment != expected {
+			t.Errorf("expected %q, got %q", expected, comment)
+		}
 	})
 
 	t.Run("MaxDiffLines truncation", func(t *testing.T) {
@@ -62,6 +68,8 @@ func TestGenerateDiffComment(t *testing.T) {
 		}
 		comment := d.generateDiffComment(answerStr, resultStr, output)
 		expected := "```diff\n(3 line(s) of common prefix hidden)\n\n- line4\n- line5\n- line6\n+ lineA\n+ lineB\n+ lineC\n\n(truncated)\n```\n"
-		assert.Equal(t, expected, comment)
+		if comment != expected {
+			t.Errorf("expected %q, got %q", expected, comment)
+		}
 	})
 }
