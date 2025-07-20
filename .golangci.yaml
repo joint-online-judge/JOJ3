@@ -1,28 +1,43 @@
+version: "2"
 linters:
   enable:
     - bidichk
     - dupl
-    - errcheck
     - gocritic
-    - gofmt
-    - gofumpt
-    - goimports
     - gosec
-    - gosimple
-    - govet
-    - ineffassign
     - nakedret
     - nolintlint
     - prealloc
     - staticcheck
-    - stylecheck
     - testifylint
-    - typecheck
     - unconvert
-    - unused
     - unparam
     - usetesting
     - wastedassign
-linters-settings:
-  stylecheck:
-    checks: ["all", "-ST1005"]
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - -ST1005
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

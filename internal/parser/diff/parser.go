@@ -99,10 +99,7 @@ func (d *Diff) processOutput(output Output, result stage.ExecutorResult, conf *C
 	}
 
 	// They are different.
-	forceQuit := false
-	if output.ForceQuitOnDiff || conf.ForceQuitOnFailed {
-		forceQuit = true
-	}
+	forceQuit := output.ForceQuitOnDiff
 	comment := conf.FailComment + "\n"
 	comment += fmt.Sprintf("Difference found in `%s`\n", output.Filename)
 
