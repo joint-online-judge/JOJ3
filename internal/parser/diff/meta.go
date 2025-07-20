@@ -14,7 +14,7 @@ type Output struct {
 	CompareSpace     bool
 	AlwaysHide       bool
 	ForceQuitOnDiff  bool
-	MaxDiffLength    int `default:"2048"` // just for reference
+	MaxDiffLength    int `default:"4096"` // just for reference
 	MaxDiffLines     int `default:"50"`   // just for reference
 	HideCommonPrefix bool
 }

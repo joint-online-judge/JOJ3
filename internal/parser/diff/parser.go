@@ -119,7 +119,7 @@ func (d *Diff) processOutput(output Output, result stage.ExecutorResult, conf *C
 // generateDiffComment generates a diff comment for the given strings.
 func (d *Diff) generateDiffComment(answerStr, resultStr string, output Output) string {
 	if output.MaxDiffLength == 0 { // real default value
-		output.MaxDiffLength = 2048
+		output.MaxDiffLength = 4096
 	}
 	if output.MaxDiffLines == 0 { // real default value
 		output.MaxDiffLines = 50
