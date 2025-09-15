@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/koding/multiconfig"
@@ -177,19 +176,6 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 		}
 	}
 	return
-}
-
-func CheckValid(conf *Conf) error {
-	now := time.Now().Unix()
-	if conf.EffectiveUnixTimestamp > 0 &&
-		conf.EffectiveUnixTimestamp > now {
-		return fmt.Errorf("config file not effective now: %d", now)
-	}
-	if conf.ExpireUnixTimestamp > 0 &&
-		conf.ExpireUnixTimestamp < now {
-		return fmt.Errorf("config file expired now: %d", now)
-	}
-	return nil
 }
 
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {

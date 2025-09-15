@@ -92,14 +92,6 @@ func showConfStat(confPath string, confStat fs.FileInfo) error {
 	return nil
 }
 
-func validateConf(conf *joj3Conf.Conf) error {
-	if err := joj3Conf.CheckValid(conf); err != nil {
-		slog.Error("conf not valid now", "error", err)
-		return err
-	}
-	return nil
-}
-
 func run(conf *joj3Conf.Conf, conventionalCommit *joj3Conf.ConventionalCommit) error {
 	groups := joj3Conf.MatchGroups(conf, conventionalCommit)
 	env.SetGroups(strings.Join(groups, ","))
@@ -141,9 +133,6 @@ func mainImpl() (err error) {
 		return err
 	}
 	if err := setupSlog(conf); err != nil {
-		return err
-	}
-	if err := validateConf(conf); err != nil {
 		return err
 	}
 	if err := run(conf, conventionalCommit); err != nil {

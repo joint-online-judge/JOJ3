@@ -21,13 +21,11 @@ type ConfStage struct {
 }
 
 type Conf struct {
-	Name                   string `default:"unknown"`
-	LogPath                string `default:""`
-	ActorCsvPath           string `default:""`
-	EffectiveUnixTimestamp int64  `default:"-1"`
-	ExpireUnixTimestamp    int64  `default:"-1"`
-	MaxTotalScore          int    `default:"-1"`
-	Stage                  struct {
+	Name          string `default:"unknown"`
+	LogPath       string `default:""`
+	ActorCsvPath  string `default:""`
+	MaxTotalScore int    `default:"-1"`
+	Stage         struct {
 		SandboxExecServer string `default:"localhost:5051"`
 		SandboxToken      string `default:""`
 		OutputPath        string `default:"joj3_result.json"`
