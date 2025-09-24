@@ -6,12 +6,11 @@
 
 ## Table of Contents
 
-- [Quick Start](#quick-start)
-- [Workflow](#workflow)
-- [Models](#models)
-- [Project Structure](#project-structure)
-- [Further Documentation](#further-documentation)
-
+-   [Quick Start](#quick-start)
+-   [Workflow](#workflow)
+-   [Models](#models)
+-   [Project Structure](#project-structure)
+-   [Further Documentation](#further-documentation)
 
 ## Quick Start
 
@@ -59,10 +58,9 @@ $ make
 For now, the following checking tools are needed for test:
 
 1. `clang`/`clang++`
-2. `clang-tidy-18`
-3. `cmake`
-4. `make`
-5. `cpplint`
+2. `cmake`
+3. `make`
+4. `cpplint`
 
 ```bash
 $ make test
