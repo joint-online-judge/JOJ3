@@ -6,7 +6,8 @@ import (
 
 type ConfStage struct {
 	Name     string
-	Group    string
+	Group    string // TODO: remove Group in the future
+	Groups   []string
 	Executor struct {
 		Name string
 		With struct {
