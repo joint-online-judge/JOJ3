@@ -29,8 +29,7 @@ prepare-test:
 
 test:
 	./scripts/prepare_test_repos.sh $(TMP_DIR)
-	# no students.csv & clang-tidy-18 locally
-	rm -rf $(TMP_DIR)/submodules/JOJ3-examples/examples/healthcheck
+	# no clang-tidy-18 locally
 	rm -rf $(TMP_DIR)/submodules/JOJ3-examples/examples/keyword/clangtidy
 	go test -count=1 -v ./...
 
