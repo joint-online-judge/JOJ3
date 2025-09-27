@@ -22,14 +22,21 @@ type ConfStage struct {
 }
 
 type Conf struct {
-	Name          string `default:"unknown"`
-	LogPath       string `default:""`
-	ActorCsvPath  string `default:""`
-	MaxTotalScore int    `default:"-1"`
-	Stage         struct {
-		SandboxExecServer string `default:"localhost:5051"`
-		SandboxToken      string `default:""`
-		OutputPath        string `default:"joj3_result.json"`
+	Name              string `default:"unknown"`
+	LogPath           string `default:""`
+	ActorCsvPath      string `default:""`
+	MaxTotalScore     int    `default:"-1"`
+	SandboxExecServer string `default:"localhost:5051"`
+	SandboxToken      string `default:""`
+	OutputPath        string `default:"joj3_result.json"`
+	PreStages         []ConfStage
+	Stages            []ConfStage
+	PostStages        []ConfStage
+	// TODO: remove this nested struct
+	Stage struct {
+		SandboxExecServer string
+		SandboxToken      string
+		OutputPath        string
 		PreStages         []ConfStage
 		Stages            []ConfStage
 		PostStages        []ConfStage

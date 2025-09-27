@@ -137,22 +137,22 @@ func runStages(
 	stageResults []stage.StageResult, forceQuitStageName string, err error,
 ) {
 	executor.InitWithConf(
-		conf.Stage.SandboxExecServer,
-		conf.Stage.SandboxToken,
+		conf.SandboxExecServer,
+		conf.SandboxToken,
 	)
-	preStages, err := generateStages(conf.Stage.PreStages, groups)
+	preStages, err := generateStages(conf.PreStages, groups)
 	if err != nil {
 		slog.Error("generate preStages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return stageResults, forceQuitStageName, err
 	}
-	stages, err := generateStages(conf.Stage.Stages, groups)
+	stages, err := generateStages(conf.Stages, groups)
 	if err != nil {
 		slog.Error("generate stages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return stageResults, forceQuitStageName, err
 	}
-	postStages, err := generateStages(conf.Stage.PostStages, groups)
+	postStages, err := generateStages(conf.PostStages, groups)
 	if err != nil {
 		slog.Error("generate postStages", "error", err)
 		stageResults, forceQuitStageName = newErrorStageResults(err)
@@ -172,14 +172,14 @@ func runStages(
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 	}
 	onStagesComplete(stageResults, forceQuitStageName)
-	slog.Info("output result start", "path", conf.Stage.OutputPath)
+	slog.Info("output result start", "path", conf.OutputPath)
 	slog.Debug("output result start",
-		"path", conf.Stage.OutputPath, "results", stageResults)
+		"path", conf.OutputPath, "results", stageResults)
 	content, err := json.Marshal(stageResults)
 	if err != nil {
 		slog.Error("marshal stageResults", "error", err)
 	}
-	err = os.WriteFile(conf.Stage.OutputPath,
+	err = os.WriteFile(conf.OutputPath,
 		append(content, []byte("\n")...), 0o600)
 	if err != nil {
 		slog.Error("write stageResults", "error", err)

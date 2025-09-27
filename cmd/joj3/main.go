@@ -53,7 +53,7 @@ func getConf(commitMsg string) (*joj3Conf.Conf, *joj3Conf.ConventionalCommit, er
 		return nil, nil, err
 	}
 	env.SetConfName(conf.Name)
-	env.SetOutputPath(conf.Stage.OutputPath)
+	env.SetOutputPath(conf.OutputPath)
 	if err := showConfStat(confPath, confStat); err != nil {
 		return nil, nil, err
 	}
@@ -77,6 +77,31 @@ func loadConf(confPath string) (*joj3Conf.Conf, error) {
 	if err != nil {
 		slog.Error("parse conf", "error", err)
 		return nil, err
+	}
+	// TODO: remove this compatible code for nested struct
+	if conf.Stage.SandboxExecServer != "" {
+		conf.SandboxExecServer = conf.Stage.SandboxExecServer
+		conf.Stage.SandboxExecServer = ""
+	}
+	if conf.Stage.SandboxToken != "" {
+		conf.SandboxToken = conf.Stage.SandboxToken
+		conf.Stage.SandboxToken = ""
+	}
+	if conf.Stage.OutputPath != "" {
+		conf.OutputPath = conf.Stage.OutputPath
+		conf.Stage.OutputPath = ""
+	}
+	if len(conf.Stage.PreStages) > 0 {
+		conf.PreStages = conf.Stage.PreStages
+		conf.Stage.PreStages = nil
+	}
+	if len(conf.Stage.Stages) > 0 {
+		conf.Stages = conf.Stage.Stages
+		conf.Stage.Stages = nil
+	}
+	if len(conf.Stage.PostStages) > 0 {
+		conf.PostStages = conf.Stage.PostStages
+		conf.Stage.PostStages = nil
 	}
 	slog.Debug("conf loaded", "conf", conf, "joj3 version", Version)
 	return conf, nil
