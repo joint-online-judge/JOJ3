@@ -29,7 +29,7 @@ func init() {
 	flag.StringVar(&confFileRoot, "conf-root", ".", "root path for all config files")
 	flag.StringVar(&confFileName, "conf-name", "conf.json", "filename for config files")
 	flag.StringVar(&fallbackConfFileName, "fallback-conf-name", "", "filename for the fallback config file in conf-root, leave empty to use conf-name")
-	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, should equal to the scope in msg")
+	flag.StringVar(&tag, "tag", "", "tag to trigger the running, when non-empty, fallback will be disabled")
 	printVersion = flag.Bool("version", false, "print current version")
 }
 

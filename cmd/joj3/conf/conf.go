@@ -96,9 +96,14 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	confPath string, conventionalCommit *ConventionalCommit, err error,
 ) {
 	slog.Info("parse msg", "msg", msg)
-	conventionalCommit, err = parseConventionalCommit(msg)
-	if err != nil {
-		return
+	if tag == "" {
+		conventionalCommit, err = parseConventionalCommit(msg)
+		if err != nil {
+			return
+		}
+	} else {
+		conventionalCommit = new(ConventionalCommit)
+		conventionalCommit.Scope = tag
 	}
 	slog.Info("conventional commit", "commit", conventionalCommit)
 	confRoot = filepath.Clean(confRoot)
@@ -109,11 +114,6 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	}
 	if strings.HasPrefix(relPath, "..") || filepath.IsAbs(relPath) {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
-		return
-	}
-	if tag != "" && conventionalCommit.Scope != tag {
-		err = fmt.Errorf("tag does not match scope: %s != %s", tag,
-			conventionalCommit.Scope)
 		return
 	}
 	return
@@ -156,6 +156,12 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 	confPath, conventionalCommit, err = parseMsg(confRoot, confName, msg, tag)
 	if err != nil {
 		slog.Error("parse msg", "error", err)
+		// no fallback when tag is specified, it is triggered by release.yaml
+		if os.IsNotExist(err) {
+			slog.Info("tag is not empty, no fallback conf")
+			hintValidScopes(confRoot, confName)
+			return confPath, confStat, conventionalCommit, err
+		}
 		// fallback to conf file in conf root on parse error
 		confPath = filepath.Join(confRoot, fallbackConfName)
 		slog.Info("fallback to conf", "path", confPath)
@@ -172,10 +178,10 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 		confStat, err = os.Stat(confPath)
 		if err != nil {
 			slog.Error("stat fallback conf", "error", err)
-			return
+			return confPath, confStat, conventionalCommit, err
 		}
 	}
-	return
+	return confPath, confStat, conventionalCommit, err
 }
 
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
