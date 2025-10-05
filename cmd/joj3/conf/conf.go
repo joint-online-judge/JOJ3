@@ -102,8 +102,10 @@ func parseMsg(confRoot, confName, msg, tag string) (
 			return
 		}
 	} else {
-		conventionalCommit = new(ConventionalCommit)
-		conventionalCommit.Scope = tag
+		conventionalCommit = &ConventionalCommit{
+			Scope: tag,
+			Group: "all",
+		}
 	}
 	slog.Info("conventional commit", "commit", conventionalCommit)
 	confRoot = filepath.Clean(confRoot)
