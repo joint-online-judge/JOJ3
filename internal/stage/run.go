@@ -172,7 +172,11 @@ func Run(stages []Stage) (
 				Results:   parserResults,
 				ForceQuit: forceQuitStageName != "",
 			})
-			slog.Debug("stage done", "name", stage.Name, "stageDetail", stageDetail)
+			stageScore := 0
+			for _, result := range parserResults {
+				stageScore += result.Score
+			}
+			slog.Debug("stage done", "name", stage.Name, "stageScore", stageScore, "stageDetail", stageDetail)
 		}()
 		if forceQuitStageName != "" {
 			break
