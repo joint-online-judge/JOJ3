@@ -18,29 +18,29 @@ type Record struct {
 }
 
 // monkey patch for not escaped " in cppcheck message
-func (*CppCheck) fixStderr(stderr string) string {
+func (*CppCheck) fixLine(line string) string {
 	const prefixMarker = `"message":"`
-	const suffixMarker = `","id":"`
-	prefixIndex := strings.Index(stderr, prefixMarker)
+	const suffixMarker = `", "id":"`
+	prefixIndex := strings.Index(line, prefixMarker)
 	if prefixIndex == -1 {
-		return stderr
+		return line
 	}
 	contentStartIndex := prefixIndex + len(prefixMarker)
-	suffixIndex := strings.LastIndex(stderr, suffixMarker)
+	suffixIndex := strings.LastIndex(line, suffixMarker)
 	if suffixIndex == -1 || suffixIndex < contentStartIndex {
-		return stderr
+		return line
 	}
 	contentEndIndex := suffixIndex
-	prefix := stderr[:contentStartIndex]
-	messageContent := stderr[contentStartIndex:contentEndIndex]
-	suffix := stderr[contentEndIndex:]
+	prefix := line[:contentStartIndex]
+	messageContent := line[contentStartIndex:contentEndIndex]
+	suffix := line[contentEndIndex:]
 	cleanedMessageContent := strings.ReplaceAll(messageContent, `"`, `\"`)
 	return prefix + cleanedMessageContent + suffix
 }
 
 func (p *CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]
-	stderr := p.fixStderr(executorResult.Files[conf.Stderr])
+	stderr := executorResult.Files[conf.Stderr]
 	records := make([]Record, 0)
 	lines := strings.SplitSeq(stderr, "\n")
 	for line := range lines {
@@ -48,7 +48,7 @@ func (p *CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.P
 			continue
 		}
 		var record Record
-		err := json.Unmarshal([]byte(line), &record)
+		err := json.Unmarshal([]byte(p.fixLine(line)), &record)
 		if err != nil {
 			return stage.ParserResult{
 				Score: 0,
