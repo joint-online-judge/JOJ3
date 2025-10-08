@@ -17,9 +17,30 @@ type Record struct {
 	ID       string `json:"id"`
 }
 
-func (*CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
+// monkey patch for not escaped " in cppcheck message
+func (*CppCheck) fixStderr(stderr string) string {
+	const prefixMarker = `"message":"`
+	const suffixMarker = `","id":"`
+	prefixIndex := strings.Index(stderr, prefixMarker)
+	if prefixIndex == -1 {
+		return stderr
+	}
+	contentStartIndex := prefixIndex + len(prefixMarker)
+	suffixIndex := strings.LastIndex(stderr, suffixMarker)
+	if suffixIndex == -1 || suffixIndex < contentStartIndex {
+		return stderr
+	}
+	contentEndIndex := suffixIndex
+	prefix := stderr[:contentStartIndex]
+	messageContent := stderr[contentStartIndex:contentEndIndex]
+	suffix := stderr[contentEndIndex:]
+	cleanedMessageContent := strings.ReplaceAll(messageContent, `"`, `\"`)
+	return prefix + cleanedMessageContent + suffix
+}
+
+func (p *CppCheck) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	// stdout := executorResult.Files[conf.Stdout]
-	stderr := executorResult.Files[conf.Stderr]
+	stderr := p.fixStderr(executorResult.Files[conf.Stderr])
 	records := make([]Record, 0)
 	lines := strings.SplitSeq(stderr, "\n")
 	for line := range lines {
