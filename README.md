@@ -154,5 +154,5 @@ Check <https://pkg.go.dev/github.com/joint-online-judge/JOJ3/internal/parser>. `
 
 ## Further Documentation
 
-<https://pkg.go.dev/github.com/joint-online-judge/JOJ3>
-<https://deepwiki.com/joint-online-judge/JOJ3>
+- <https://pkg.go.dev/github.com/joint-online-judge/JOJ3>
+- <https://deepwiki.com/joint-online-judge/JOJ3>
