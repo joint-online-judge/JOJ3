@@ -25,7 +25,6 @@ type Conf struct {
 	Name              string `default:"unknown"`
 	LogPath           string `default:""`
 	ActorCsvPath      string `default:""`
-	MaxTotalScore     int    `default:"-1"`
 	SandboxExecServer string `default:"localhost:5051"`
 	SandboxToken      string `default:""`
 	OutputPath        string `default:"joj3_result.json"`
