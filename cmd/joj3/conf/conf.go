@@ -21,18 +21,18 @@ import (
 func GetCommitMsg() (msg string, err error) {
 	r, err := git.PlainOpen(".")
 	if err != nil {
-		return
+		return msg, err
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return
+		return msg, err
 	}
 	commit, err := r.CommitObject(ref.Hash())
 	if err != nil {
-		return
+		return msg, err
 	}
 	msg = commit.Message
-	return
+	return msg, err
 }
 
 func parseConventionalCommit(commit string) (*ConventionalCommit, error) {
@@ -62,20 +62,20 @@ func ParseConfFile(path string) (conf *Conf, err error) {
 	d.Validator = multiconfig.MultiValidator(&multiconfig.RequiredValidator{})
 	if err = d.Load(conf); err != nil {
 		slog.Error("parse stages conf", "error", err)
-		return
+		return conf, err
 	}
 	if err = d.Validate(conf); err != nil {
 		slog.Error("validate stages conf", "error", err)
-		return
+		return conf, err
 	}
-	return
+	return conf, err
 }
 
 func GetSHA256(filePath string) (hashStr string, err error) {
 	// Open the file
 	file, err := os.Open(filePath)
 	if err != nil {
-		return
+		return hashStr, err
 	}
 	defer func() {
 		if cerr := file.Close(); cerr != nil && err == nil {
@@ -86,7 +86,7 @@ func GetSHA256(filePath string) (hashStr string, err error) {
 	// Calculate SHA-256
 	hash := sha256.New()
 	if _, err = io.Copy(hash, file); err != nil {
-		return
+		return hashStr, err
 	}
 	hashStr = hex.EncodeToString(hash.Sum(nil))
 	return hashStr, nil
@@ -99,7 +99,7 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	if tag == "" {
 		conventionalCommit, err = parseConventionalCommit(msg)
 		if err != nil {
-			return
+			return confPath, conventionalCommit, err
 		}
 	} else {
 		conventionalCommit = &ConventionalCommit{
@@ -112,13 +112,13 @@ func parseMsg(confRoot, confName, msg, tag string) (
 	confPath = filepath.Join(confRoot, conventionalCommit.Scope, confName)
 	relPath, err := filepath.Rel(confRoot, confPath)
 	if err != nil {
-		return
+		return confPath, conventionalCommit, err
 	}
 	if strings.HasPrefix(relPath, "..") || filepath.IsAbs(relPath) {
 		err = fmt.Errorf("invalid scope as path: %s", conventionalCommit.Scope)
-		return
+		return confPath, conventionalCommit, err
 	}
-	return
+	return confPath, conventionalCommit, err
 }
 
 func hintValidScopes(confRoot, confName string) {

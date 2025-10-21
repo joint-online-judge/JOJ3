@@ -21,9 +21,9 @@ func Run(conf Conf) (res Result, err error) {
 		// If there are more kinds of errors need to be handled separately, add
 		// more fields in the Result struct, don't mess everything up in Stderr.
 		err = fmt.Errorf("sample negative score: %d", conf.Score)
-		return
+		return res, err
 	}
 	res.Score = conf.Score
 	res.Comment = "sample comment"
-	return
+	return res, err
 }

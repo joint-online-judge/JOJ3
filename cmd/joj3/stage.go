@@ -44,8 +44,8 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
 	for i, s := range confStages {
-		if s.Name == "" {
-			s.Name = fmt.Sprintf("stage-%d", i)
+		if len(groups) == 0 && (len(s.Groups) != 0 || s.Group != "") {
+			continue
 		}
 		ok := false
 		if s.Group == "" && len(s.Groups) == 0 {
@@ -74,6 +74,9 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 		}
 		if !ok && len(groups) > 0 {
 			continue
+		}
+		if s.Name == "" {
+			s.Name = fmt.Sprintf("stage-%d", i)
 		}
 		_, ok = existNames[s.Name] // check for existence
 		if ok {
