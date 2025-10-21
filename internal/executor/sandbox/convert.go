@@ -56,7 +56,8 @@ func convertPBCopyIn(
 				if err != nil {
 					return nil
 				}
-				if !info.IsDir() {
+				_, exists := copyIn[relPath]
+				if !info.IsDir() && !exists {
 					copyIn[relPath] = stage.CmdFile{Src: &absPath}
 				}
 				return nil
