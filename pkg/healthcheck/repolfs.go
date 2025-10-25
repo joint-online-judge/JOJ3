@@ -7,7 +7,7 @@ import (
 
 func RepoLFS(rootDir string) error {
 	cmd := exec.Command(
-		"git",
+		"/usr/bin/git",
 		"-c",
 		"safe.directory=*",
 		"lfs",

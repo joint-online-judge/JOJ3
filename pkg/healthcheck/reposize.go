@@ -14,7 +14,7 @@ func RepoSize(rootDir string, confSize float64) error {
 	// TODO: reimplement here when go-git is available
 	// https://github.com/go-git/go-git/blob/master/COMPATIBILITY.md
 	cmd := exec.Command(
-		"git",
+		"/usr/bin/git",
 		"-c",
 		"safe.directory=*",
 		"count-objects",
