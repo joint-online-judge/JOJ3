@@ -12,24 +12,35 @@ import (
 func (*Log) parse(executorResult stage.ExecutorResult, conf Conf) stage.ParserResult {
 	content := executorResult.Files[conf.Filename]
 	var data map[string]any
-	err := json.Unmarshal([]byte(content), &data)
-	if err != nil {
-		slog.Error(conf.Msg, "error", err)
-		return stage.ParserResult{
-			Score:   0,
-			Comment: fmt.Sprintf("Failed to parse content: %s", err),
+	contentBytes := []byte(content)
+	if json.Valid(contentBytes) {
+		err := json.Unmarshal(contentBytes, &data)
+		if err != nil {
+			slog.Error(conf.Msg, "error", err)
+			return stage.ParserResult{
+				Score:   0,
+				Comment: fmt.Sprintf("Failed to parse content: %s", err),
+			}
 		}
+		args := make([]any, 0, len(data)*2)
+		for key, value := range data {
+			args = append(args, key, value)
+		}
+		slog.Default().Log(
+			context.Background(),
+			slog.Level(conf.Level),
+			conf.Msg,
+			args...,
+		)
+	} else {
+		slog.Default().Log(
+			context.Background(),
+			slog.Level(conf.Level),
+			conf.Msg,
+			"content",
+			content,
+		)
 	}
-	args := make([]any, 0, len(data)*2)
-	for key, value := range data {
-		args = append(args, key, value)
-	}
-	slog.Default().Log(
-		context.Background(),
-		slog.Level(conf.Level),
-		conf.Msg,
-		args...,
-	)
 	return stage.ParserResult{
 		Score:   0,
 		Comment: "",
