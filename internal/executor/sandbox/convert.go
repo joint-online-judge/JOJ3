@@ -8,33 +8,34 @@ import (
 
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // copied from https://github.com/criyle/go-judge/blob/master/cmd/go-judge-shell/grpc.go
 func convertPBCmd(cmd []stage.Cmd) []*pb.Request_CmdType {
 	ret := make([]*pb.Request_CmdType, 0, len(cmd))
 	for _, c := range cmd {
-		ret = append(ret, &pb.Request_CmdType{
-			Args:              c.Args,
-			Env:               c.Env,
-			Tty:               c.TTY,
-			Files:             convertPBFiles([]*stage.CmdFile{c.Stdin, c.Stdout, c.Stderr}),
-			CpuTimeLimit:      c.CPULimit,
-			ClockTimeLimit:    c.ClockLimit,
-			MemoryLimit:       c.MemoryLimit,
-			StackLimit:        c.StackLimit,
-			ProcLimit:         c.ProcLimit,
-			CpuRateLimit:      c.CPURateLimit,
-			CpuSetLimit:       c.CPUSetLimit,
-			DataSegmentLimit:  c.DataSegmentLimit,
-			AddressSpaceLimit: c.AddressSpaceLimit,
-			CopyIn:            convertPBCopyIn(c.CopyIn, c.CopyInDir),
-			CopyOut:           convertPBCopyOut(c.CopyOut),
-			CopyOutCached:     convertPBCopyOut(c.CopyOutCached),
-			CopyOutMax:        c.CopyOutMax,
-			CopyOutDir:        c.CopyOutDir,
-			Symlinks:          convertSymlink(c.CopyIn),
-		})
+		req := &pb.Request_CmdType{}
+		req.SetArgs(c.Args)
+		req.SetEnv(c.Env)
+		req.SetTty(c.TTY)
+		req.SetFiles(convertPBFiles([]*stage.CmdFile{c.Stdin, c.Stdout, c.Stderr}))
+		req.SetCpuTimeLimit(c.CPULimit)
+		req.SetClockTimeLimit(c.ClockLimit)
+		req.SetMemoryLimit(c.MemoryLimit)
+		req.SetStackLimit(c.StackLimit)
+		req.SetProcLimit(c.ProcLimit)
+		req.SetCpuRateLimit(c.CPURateLimit)
+		req.SetCpuSetLimit(c.CPUSetLimit)
+		req.SetDataSegmentLimit(c.DataSegmentLimit)
+		req.SetAddressSpaceLimit(c.AddressSpaceLimit)
+		req.SetCopyIn(convertPBCopyIn(c.CopyIn, c.CopyInDir))
+		req.SetCopyOut(convertPBCopyOut(c.CopyOut))
+		req.SetCopyOutCached(convertPBCopyOut(c.CopyOutCached))
+		req.SetCopyOutMax(c.CopyOutMax)
+		req.SetCopyOutDir(c.CopyOutDir)
+		req.SetSymlinks(convertSymlink(c.CopyIn))
+		ret = append(ret, req)
 	}
 	return ret
 }
@@ -81,10 +82,10 @@ func convertPBCopyOut(copyOut []string) []*pb.Request_CmdCopyOutFile {
 			optional = true
 			n = strings.TrimSuffix(n, "?")
 		}
-		rt = append(rt, &pb.Request_CmdCopyOutFile{
-			Name:     n,
-			Optional: optional,
-		})
+		elem := &pb.Request_CmdCopyOutFile{}
+		elem.SetName(n)
+		elem.SetOptional(optional)
+		rt = append(rt, elem)
 	}
 	return rt
 }
@@ -113,6 +114,7 @@ func convertPBFiles(files []*stage.CmdFile) []*pb.Request_File {
 }
 
 func convertPBFile(i stage.CmdFile) *pb.Request_File {
+	req := &pb.Request_File{}
 	switch {
 	case i.Src != nil:
 		if !filepath.IsAbs(*i.Src) {
@@ -128,18 +130,34 @@ func convertPBFile(i stage.CmdFile) *pb.Request_File {
 			s = []byte{}
 			slog.Error("convert pb file read file", "path", *i.Src, "error", err)
 		}
-		return &pb.Request_File{File: &pb.Request_File_Memory{Memory: &pb.Request_MemoryFile{Content: s}}}
+		m := &pb.Request_MemoryFile{}
+		m.SetContent(s)
+		req.SetMemory(m)
+		return req
 	case i.Content != nil:
 		s := strToBytes(*i.Content)
-		return &pb.Request_File{File: &pb.Request_File_Memory{Memory: &pb.Request_MemoryFile{Content: s}}}
+		m := &pb.Request_MemoryFile{}
+		m.SetContent(s)
+		req.SetMemory(m)
+		return req
 	case i.FileID != nil:
-		return &pb.Request_File{File: &pb.Request_File_Cached{Cached: &pb.Request_CachedFile{FileID: *i.FileID}}}
+		c := &pb.Request_CachedFile{}
+		c.SetFileID(*i.FileID)
+		req.SetCached(c)
+		return req
 	case i.Name != nil && i.Max != nil:
-		return &pb.Request_File{File: &pb.Request_File_Pipe{Pipe: &pb.Request_PipeCollector{Name: *i.Name, Max: *i.Max, Pipe: i.Pipe}}}
+		p := &pb.Request_PipeCollector{}
+		p.SetName(*i.Name)
+		p.SetMax(*i.Max)
+		p.SetPipe(i.Pipe)
+		req.SetPipe(p)
+		return req
 	case i.StreamIn:
-		return &pb.Request_File{File: &pb.Request_File_StreamIn{}}
+		req.SetStreamIn(&emptypb.Empty{})
+		return req
 	case i.StreamOut:
-		return &pb.Request_File{File: &pb.Request_File_StreamOut{}}
+		req.SetStreamOut(&emptypb.Empty{})
+		return req
 	}
 	return nil
 }
@@ -148,17 +166,17 @@ func convertPBResult(res []*pb.Response_Result) []stage.ExecutorResult {
 	ret := make([]stage.ExecutorResult, 0, len(res))
 	for _, r := range res {
 		ret = append(ret, stage.ExecutorResult{
-			Status:     stage.Status(r.Status),
-			ExitStatus: int(r.ExitStatus),
-			Error:      r.Error,
-			Time:       r.Time,
-			Memory:     r.Memory,
-			RunTime:    r.RunTime,
-			ProcPeak:   r.ProcPeak,
-			Files:      convertFiles(r.Files),
-			Buffs:      r.Files,
-			FileIDs:    r.FileIDs,
-			FileError:  convertPBFileError(r.FileError),
+			Status:     stage.Status(r.GetStatus()),
+			ExitStatus: int(r.GetExitStatus()),
+			Error:      r.GetError(),
+			Time:       r.GetTime(),
+			Memory:     r.GetMemory(),
+			RunTime:    r.GetRunTime(),
+			ProcPeak:   r.GetProcPeak(),
+			Files:      convertFiles(r.GetFiles()),
+			Buffs:      r.GetFiles(),
+			FileIDs:    r.GetFileIDs(),
+			FileError:  convertPBFileError(r.GetFileError()),
 		})
 	}
 	return ret
@@ -176,9 +194,9 @@ func convertPBFileError(fe []*pb.Response_FileError) []stage.FileError {
 	ret := make([]stage.FileError, 0, len(fe))
 	for _, v := range fe {
 		ret = append(ret, stage.FileError{
-			Name:    v.Name,
-			Type:    stage.FileErrorType(v.Type),
-			Message: v.Message,
+			Name:    v.GetName(),
+			Type:    stage.FileErrorType(v.GetType()),
+			Message: v.GetMessage(),
 		})
 	}
 	return ret

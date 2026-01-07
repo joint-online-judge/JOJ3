@@ -36,16 +36,17 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	for i, pbCmd := range pbCmds {
 		slog.Debug("sandbox execute", "i", i, "pbCmd size", proto.Size(pbCmd))
 	}
-	pbReq := &pb.Request{Cmd: pbCmds}
+	pbReq := &pb.Request{}
+	pbReq.SetCmd(pbCmds)
 	slog.Debug("sandbox execute", "pbReq size", proto.Size(pbReq))
 	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
 	if err != nil {
 		return nil, err
 	}
-	if pbRet.Error != "" {
-		return nil, fmt.Errorf("sandbox execute error: %s", pbRet.Error)
+	if pbRet.GetError() != "" {
+		return nil, fmt.Errorf("sandbox execute error: %s", pbRet.GetError())
 	}
-	results := convertPBResult(pbRet.Results)
+	results := convertPBResult(pbRet.GetResults())
 	for _, result := range results {
 		maps.Copy(e.cachedMap, result.FileIDs)
 	}
@@ -54,9 +55,9 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 
 func (e *Sandbox) Cleanup() error {
 	for k, fileID := range e.cachedMap {
-		_, err := e.execClient.FileDelete(context.TODO(), &pb.FileID{
-			FileID: fileID,
-		})
+		req := &pb.FileID{}
+		req.SetFileID(fileID)
+		_, err := e.execClient.FileDelete(context.TODO(), req)
 		if err != nil {
 			slog.Error("sandbox cleanup", "error", err)
 		}
