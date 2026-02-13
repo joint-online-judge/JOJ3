@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/criyle/go-judge/pb v1.3.2
-	github.com/go-git/go-git/v5 v5.16.2
+	github.com/go-git/go-git/v5 v5.16.5
 	github.com/jinzhu/copier v0.4.0
 	github.com/joint-online-judge/go-gitignore v0.0.0-20250212104351-ad79a46f8dcc
 	github.com/koding/multiconfig v0.0.0-20171124222453-69c27309b2d7
