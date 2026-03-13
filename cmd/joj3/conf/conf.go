@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/koding/multiconfig"
@@ -183,6 +184,17 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 			return confPath, confStat, conventionalCommit, err
 		}
 	}
+	// Check file ownership
+	if stat, ok := confStat.Sys().(*syscall.Stat_t); ok {
+		uid := int(stat.Uid)
+		currentUID := os.Getuid()
+		if uid != currentUID {
+			err = fmt.Errorf("insecure configuration file: owned by uid %d, expected %d", uid, currentUID)
+			slog.Error("insecure conf file", "path", confPath, "uid", uid, "currentUID", currentUID)
+			return confPath, confStat, conventionalCommit, err
+		}
+	}
+
 	return confPath, confStat, conventionalCommit, err
 }
 
