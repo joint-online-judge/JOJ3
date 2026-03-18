@@ -202,20 +202,7 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	seen := make(map[string]bool)
 	keywords := []string{}
 	loweredCommitGroup := strings.ToLower(conventionalCommit.Group)
-	if loweredCommitGroup == "all" {
-		for i := range conf.PreStages {
-			conf.PreStages[i].Group = ""
-			conf.PreStages[i].Groups = nil
-		}
-		for i := range conf.Stages {
-			conf.Stages[i].Group = ""
-			conf.Stages[i].Groups = nil
-		}
-		for i := range conf.PostStages {
-			conf.PostStages[i].Group = ""
-			conf.PostStages[i].Groups = nil
-		}
-	}
+	matchAllGroups := loweredCommitGroup == "all"
 	confStages := []ConfStage{}
 	confStages = append(confStages, conf.PreStages...)
 	confStages = append(confStages, conf.Stages...)
@@ -241,10 +228,24 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	slog.Info("group keywords from stages", "keywords", keywords)
 	groups := []string{}
 	for _, keyword := range keywords {
-		if strings.Contains(loweredCommitGroup, keyword) {
+		if matchAllGroups || strings.Contains(loweredCommitGroup, keyword) {
 			groups = append(groups, keyword)
 		}
 	}
 	slog.Info("matched groups", "groups", groups)
+	if matchAllGroups {
+		for i := range conf.PreStages {
+			conf.PreStages[i].Group = ""
+			conf.PreStages[i].Groups = nil
+		}
+		for i := range conf.Stages {
+			conf.Stages[i].Group = ""
+			conf.Stages[i].Groups = nil
+		}
+		for i := range conf.PostStages {
+			conf.PostStages[i].Group = ""
+			conf.PostStages[i].Groups = nil
+		}
+	}
 	return groups
 }
