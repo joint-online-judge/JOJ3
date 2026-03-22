@@ -44,20 +44,12 @@ func generateStages(confStages []conf.ConfStage, groups []string) (
 	stages := []stage.Stage{}
 	existNames := map[string]bool{}
 	for i, s := range confStages {
-		if len(groups) == 0 && (len(s.Groups) != 0 || s.Group != "") {
+		if len(groups) == 0 && (len(s.Groups) != 0) {
 			continue
 		}
 		ok := false
-		if s.Group == "" && len(s.Groups) == 0 {
+		if len(s.Groups) == 0 {
 			ok = true
-		}
-		if !ok && s.Group != "" {
-			for _, group := range groups {
-				if strings.EqualFold(group, s.Group) {
-					ok = true
-					break
-				}
-			}
 		}
 		if !ok && len(s.Groups) > 0 {
 			for _, group := range groups {

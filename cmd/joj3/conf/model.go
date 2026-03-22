@@ -6,7 +6,6 @@ import (
 
 type ConfStage struct {
 	Name     string
-	Group    string // TODO: remove Group in the future
 	Groups   []string
 	Executor struct {
 		Name string
@@ -31,15 +30,6 @@ type Conf struct {
 	PreStages         []ConfStage
 	Stages            []ConfStage
 	PostStages        []ConfStage
-	// TODO: remove this nested struct
-	Stage struct {
-		SandboxExecServer string
-		SandboxToken      string
-		OutputPath        string
-		PreStages         []ConfStage
-		Stages            []ConfStage
-		PostStages        []ConfStage
-	}
 }
 
 type OptionalCmd struct {

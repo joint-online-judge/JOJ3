@@ -208,13 +208,6 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	confStages = append(confStages, conf.Stages...)
 	confStages = append(confStages, conf.PostStages...)
 	for _, stage := range confStages {
-		if stage.Group != "" {
-			keyword := strings.ToLower(stage.Group)
-			if _, exists := seen[keyword]; !exists {
-				seen[keyword] = true
-				keywords = append(keywords, keyword)
-			}
-		}
 		if len(stage.Groups) > 0 {
 			for _, group := range stage.Groups {
 				keyword := strings.ToLower(group)
@@ -235,15 +228,12 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	slog.Info("matched groups", "groups", groups)
 	if matchAllGroups {
 		for i := range conf.PreStages {
-			conf.PreStages[i].Group = ""
 			conf.PreStages[i].Groups = nil
 		}
 		for i := range conf.Stages {
-			conf.Stages[i].Group = ""
 			conf.Stages[i].Groups = nil
 		}
 		for i := range conf.PostStages {
-			conf.PostStages[i].Group = ""
 			conf.PostStages[i].Groups = nil
 		}
 	}
