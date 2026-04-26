@@ -12,7 +12,8 @@ type Result struct {
 }
 
 func All(
-	rootDir, checkFileNameList, checkFileSumList, allowedDomainList, actorCsvPath string,
+	rootDir, checkFileNameList, checkFileSumList, whitelistedChars,
+	allowedDomainList, actorCsvPath string,
 	metaFile []string, repoSize float64,
 ) (res Result) {
 	var err error
@@ -44,7 +45,7 @@ func All(
 	} else {
 		res.Msg += "### Meta File Check Passed\n"
 	}
-	err = NonASCIIFiles(rootDir)
+	err = NonASCIIFiles(rootDir, whitelistedChars)
 	if err != nil {
 		res.Msg += fmt.Sprintf("### Non-ASCII Characters File Check Failed:\n%s\n", err.Error())
 		res.Failed = true

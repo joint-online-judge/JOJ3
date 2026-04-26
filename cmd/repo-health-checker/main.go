@@ -45,6 +45,7 @@ var (
 	checkFileNameList string
 	checkFileSumList  string
 	metaFile          []string
+	whitelistedChars  string
 	allowedDomainList string
 	actorCsvPath      string
 	showVersion       *bool
@@ -57,6 +58,7 @@ func init() {
 	flag.Float64Var(&repoSize, "repoSize", 2, "maximum size of the repo in MiB")
 	flag.StringVar(&checkFileNameList, "checkFileNameList", "", "comma-separated list of files to check")
 	flag.StringVar(&checkFileSumList, "checkFileSumList", "", "comma-separated list of expected checksums")
+	flag.StringVar(&whitelistedChars, "whitelistedChars", "", "comma-separated list of non-ASCII characters allowed in files")
 	flag.StringVar(&allowedDomainList, "allowedDomainList", "sjtu.edu.cn", "comma-separated list of allowed domains for commit author email")
 	flag.StringVar(&actorCsvPath, "actorCsvPath", "/home/tt/.config/joj/students.csv", "path to actor csv file")
 	parseMultiValueFlag(&metaFile, "meta", "meta files to check")
@@ -74,12 +76,14 @@ func main() {
 		"repoSize", repoSize,
 		"checkFileNameList", checkFileNameList,
 		"checkFileSumList", checkFileSumList,
+		"whitelistedChars", whitelistedChars,
 		"meta", metaFile,
 	)
 	res := healthcheck.All(
 		rootDir,
 		checkFileNameList,
 		checkFileSumList,
+		whitelistedChars,
 		allowedDomainList,
 		actorCsvPath,
 		metaFile,

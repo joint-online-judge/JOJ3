@@ -8,10 +8,46 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/format/gitattributes"
 )
+
+// Read the list of comma-separated allowed characters from command line and convert it to a hashmap.
+func parseWhitelistedChars(csv string) map[rune]struct{} {
+	whitelist := make(map[rune]struct{})
+	if strings.TrimSpace(csv) == "" {
+		return whitelist
+	}
+
+	for _, raw := range strings.Split(csv, ",") {
+		elem := strings.TrimSpace(raw)
+		if elem == "" {
+			slog.Warn("ignoring invalid whitelisted-chars element", "element", raw, "reason", "empty element")
+			continue
+		}
+
+		if utf8.RuneCountInString(elem) != 1 {
+			slog.Warn("ignoring invalid whitelisted-chars element", "element", elem, "reason", "element must be exactly one character")
+			continue
+		}
+
+		ch, _ := utf8.DecodeRuneInString(elem)
+		if ch == utf8.RuneError {
+			slog.Warn("ignoring invalid whitelisted-chars element", "element", elem, "reason", "invalid utf-8 rune")
+			continue
+		}
+		if ch <= unicode.MaxASCII {
+			slog.Warn("ignoring invalid whitelisted-chars element", "element", elem, "reason", "ASCII characters are not allowed")
+			continue
+		}
+
+		whitelist[ch] = struct{}{}
+	}
+
+	return whitelist
+}
 
 // getSubmodulePathsFromGoGit uses the go-git library to open the repository
 // at the given root path and retrieve a list of all submodule paths.
@@ -48,7 +84,7 @@ func getSubmodulePathsFromGoGit(root string) (map[string]struct{}, error) {
 
 // getNonASCII retrieves a list of files in the specified root directory that contain non-ASCII characters.
 // It searches for non-ASCII characters in each file's content and returns a list of paths to files containing non-ASCII characters.
-func getNonASCII(root string) ([]string, error) {
+func getNonASCII(root string, whitelist map[rune]struct{}) ([]string, error) {
 	var nonASCII []string
 	gitattrExist := true
 	var matcher gitattributes.Matcher
@@ -113,6 +149,9 @@ func getNonASCII(root string) ([]string, error) {
 		for scanner.Scan() {
 			cont := true
 			for _, c := range scanner.Text() {
+				if _, ok := whitelist[c]; ok {
+					continue
+				}
 				if c > unicode.MaxASCII {
 					nonASCII = append(nonASCII, "\t"+path)
 					cont = false
@@ -132,8 +171,10 @@ func getNonASCII(root string) ([]string, error) {
 
 // NonASCIIFiles checks for non-ASCII characters in files within the specified root directory.
 // It prints a message with the paths to files containing non-ASCII characters, if any.
-func NonASCIIFiles(root string) error {
-	nonASCII, err := getNonASCII(root)
+// Additionally it accept a list of whitelisted characters that are allowed, repo-wide.
+func NonASCIIFiles(root, whitelistedChars string) error {
+	whitelist := parseWhitelistedChars(whitelistedChars)
+	nonASCII, err := getNonASCII(root, whitelist)
 	if err != nil {
 		slog.Error("getting non-ascii", "err", err)
 		return fmt.Errorf("error getting non-ascii: %w", err)
