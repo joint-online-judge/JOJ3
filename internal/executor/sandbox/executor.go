@@ -10,13 +10,17 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 	"google.golang.org/protobuf/proto"
 )
 
-const tarThreshold = 128 * 1024
+const (
+	tarSizeThreshold  = 128 * 1024 // 128 KB
+	tarCountThreshold = 100        // 100 files
+)
 
 func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var err error
@@ -28,13 +32,12 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 		}
 	}
 	for i := 0; i < len(cmds); i += 1 {
-		cmd := &cmds[i]
-		if cmd.CopyIn == nil {
+		if cmd := &cmds[i]; cmd.CopyIn == nil {
 			cmd.CopyIn = make(map[string]stage.CmdFile)
 		}
-		for k, v := range cmd.CopyInCached {
+		for k, v := range cmds[i].CopyInCached {
 			if fileID, ok := e.cachedMap[v]; ok {
-				cmd.CopyIn[k] = stage.CmdFile{FileID: &fileID}
+				cmds[i].CopyIn[k] = stage.CmdFile{FileID: &fileID}
 			}
 		}
 	}
@@ -49,8 +52,7 @@ func prepareTar(cmds []stage.Cmd) (bool, []byte) {
 		return false, nil
 	}
 	for i := range cmds {
-		if cmds[i].CopyInDir != "" &&
-			estimateCopyInSize(&cmds[i]) >= tarThreshold {
+		if shouldTar(&cmds[i]) {
 			tarData, keysInTar := createCopyInTar(&cmds[i])
 			if tarData == nil {
 				return false, nil
@@ -66,6 +68,11 @@ func prepareTar(cmds []stage.Cmd) (bool, []byte) {
 		}
 	}
 	return false, nil
+}
+
+func shouldTar(cmd *stage.Cmd) bool {
+	size, count := estimateCopyIn(cmd)
+	return size >= tarSizeThreshold || count >= tarCountThreshold
 }
 
 func (e *Sandbox) runUnary(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
@@ -100,35 +107,38 @@ func (e *Sandbox) runWithTar(cmds []stage.Cmd, tarData []byte) ([]stage.Executor
 	fid := fileIDResp.GetFileID()
 	slog.Debug("sandbox tar uploaded", "fileID", fid, "tarSize", len(tarData))
 
+	defer func() {
+		deleteReq := &pb.FileID{}
+		deleteReq.SetFileID(fid)
+		if _, err := e.execClient.FileDelete(context.TODO(), deleteReq); err != nil {
+			slog.Warn("sandbox tar file delete", "fileID", fid, "error", err)
+		}
+	}()
+
 	tarFileName := "/w/__joj3_copyin.tar"
 	script := fmt.Sprintf(
-		"/bin/tar xf %s -C / --no-same-owner && rm %s && exec \"$@\"",
+		"/bin/tar xf %s -C / --no-same-owner && rm -f %s && exec \"$@\"",
 		tarFileName, tarFileName,
 	)
 
-	cmds[0].CopyIn[tarFileName] = stage.CmdFile{FileID: &fid}
-	cmds[0].Args = append([]string{
-		"/bin/sh", "-c", script, "--",
-	}, cmds[0].Args...)
+	for i := range cmds {
+		if cmds[i].CopyIn == nil {
+			cmds[i].CopyIn = make(map[string]stage.CmdFile)
+		}
+		cmds[i].CopyIn[tarFileName] = stage.CmdFile{FileID: &fid}
+		cmds[i].Args = append([]string{
+			"/bin/sh", "-c", script, "_",
+		}, cmds[i].Args...)
+	}
 
 	slog.Debug("sandbox tar exec", "cmd", cmds[0].Args[:3])
 
-	results, err := e.runUnary(cmds)
-	if err != nil {
-		return nil, err
-	}
-
-	deleteReq := &pb.FileID{}
-	deleteReq.SetFileID(fid)
-	if _, err := e.execClient.FileDelete(context.TODO(), deleteReq); err != nil {
-		slog.Warn("sandbox tar file delete", "fileID", fid, "error", err)
-	}
-
-	return results, nil
+	return e.runUnary(cmds)
 }
 
-func estimateCopyInSize(cmd *stage.Cmd) int {
-	total := 0
+func estimateCopyIn(cmd *stage.Cmd) (int, int) {
+	totalSize := 0
+	totalCount := 0
 	if cmd.CopyInDir != "" {
 		_ = filepath.Walk(cmd.CopyInDir,
 			func(path string, info os.FileInfo, err error) error {
@@ -140,7 +150,8 @@ func estimateCopyInSize(cmd *stage.Cmd) int {
 					return nil
 				}
 				if _, exists := cmd.CopyIn[relPath]; !exists {
-					total += int(info.Size())
+					totalSize += int(info.Size())
+					totalCount++
 				}
 				return nil
 			})
@@ -151,13 +162,22 @@ func estimateCopyInSize(cmd *stage.Cmd) int {
 		}
 		if f.Src != nil {
 			if fi, err := os.Stat(*f.Src); err == nil {
-				total += int(fi.Size())
+				totalSize += int(fi.Size())
+				totalCount++
 			}
 		} else if f.Content != nil {
-			total += len(*f.Content)
+			totalSize += len(*f.Content)
+			totalCount++
 		}
 	}
-	return total
+	return totalSize, totalCount
+}
+
+func formatTarPath(p string) string {
+	if filepath.IsAbs(p) {
+		return strings.TrimPrefix(p, "/")
+	}
+	return "w/" + p
 }
 
 func createCopyInTar(cmd *stage.Cmd) ([]byte, []string) {
@@ -193,20 +213,14 @@ func createCopyInTar(cmd *stage.Cmd) ([]byte, []string) {
 					if err != nil {
 						return err
 					}
-					hdr.Name = relPath
-					if !filepath.IsAbs(hdr.Name) {
-						hdr.Name = "w/" + hdr.Name
-					}
+					hdr.Name = formatTarPath(relPath)
 					return tw.WriteHeader(hdr)
 				}
 				hdr, err := tar.FileInfoHeader(info, "")
 				if err != nil {
 					return err
 				}
-				hdr.Name = relPath
-				if !filepath.IsAbs(hdr.Name) {
-					hdr.Name = "w/" + hdr.Name
-				}
+				hdr.Name = formatTarPath(relPath)
 				if info.IsDir() {
 					hdr.Name += "/"
 				}
@@ -235,12 +249,8 @@ func createCopyInTar(cmd *stage.Cmd) ([]byte, []string) {
 			continue
 		}
 		if f.Content != nil {
-			name := k
-			if !filepath.IsAbs(name) {
-				name = "w/" + name
-			}
 			hdr := &tar.Header{
-				Name: name,
+				Name: formatTarPath(k),
 				Mode: 0o644,
 				Size: int64(len(*f.Content)),
 			}
@@ -267,10 +277,7 @@ func createCopyInTar(cmd *stage.Cmd) ([]byte, []string) {
 				slog.Error("create copyIn tar file info header", "key", k, "error", err)
 				continue
 			}
-			hdr.Name = k
-			if !filepath.IsAbs(hdr.Name) {
-				hdr.Name = "w/" + hdr.Name
-			}
+			hdr.Name = formatTarPath(k)
 			if err := tw.WriteHeader(hdr); err != nil {
 				slog.Error("create copyIn tar write header", "key", k, "error", err)
 				continue
