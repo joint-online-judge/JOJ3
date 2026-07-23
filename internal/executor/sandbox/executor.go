@@ -102,8 +102,8 @@ func (e *Sandbox) runWithTar(cmds []stage.Cmd, tarData []byte) ([]stage.Executor
 
 	tarFileName := "/w/__joj3_copyin.tar"
 	script := fmt.Sprintf(
-		"/bin/tar xf %s -C / --no-same-owner && exec \"$@\"",
-		tarFileName,
+		"/bin/tar xf %s -C / --no-same-owner && rm %s && exec \"$@\"",
+		tarFileName, tarFileName,
 	)
 
 	cmds[0].CopyIn[tarFileName] = stage.CmdFile{FileID: &fid}
