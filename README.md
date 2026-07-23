@@ -17,7 +17,7 @@
 1. Clone this repo in a Linux computer. For Windows, use [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
 ```bash
-$ git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/JOJ3.git
+$ git clone ssh://git@focs.gc.sjtu.edu.cn:2222/JOJ/JOJ3.git
 ```
 
 2. Install [Go](https://go.dev/doc/install). Also, make sure `make` and `git` are installed and all 3 programs are presented in `$PATH`.
@@ -85,7 +85,7 @@ pre-commit installed at .git/hooks/pre-commit
 
 ## Workflow
 
-These steps are executed within [runner-images](https://focs.ji.sjtu.edu.cn/git/JOJ/runner-images), as specified in the YAML files under `.gitea/workflows` in student repositories. Our customized [`act_runner`](https://github.com/focs-gitea/act_runner) ensures that only labeled images controlled by administrators can be used. Furthermore, our private Docker registry requires authentication for pushing images, so only administrator-created images can be used to run `joj3`.
+These steps are executed within [runner-images](https://focs.gc.sjtu.edu.cn/git/JOJ/runner-images), as specified in the YAML files under `.gitea/workflows` in student repositories. Our customized [`act_runner`](https://github.com/focs-gitea/act_runner) ensures that only labeled images controlled by administrators can be used. Furthermore, our private Docker registry requires authentication for pushing images, so only administrator-created images can be used to run `joj3`.
 
 Inside the container created by `act_runner`, we use `sudo -E -u tt` to elevate permissions and run `joj3` with environment variables provided by Gitea Actions. All sensitive files should be stored on the host machine under the `tt` user's directory and mounted into the runner (e.g., `/home/tt/.config`). Allowed mount directories are also limited in `act_runner` configuration. Since the default `student` user inside the container (created from runner-images) shares the same UID as the `student` user on the host, which does not have the permission to access `tt`'s files. This helps ensure data security.
 

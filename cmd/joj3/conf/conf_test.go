@@ -93,24 +93,24 @@ func TestParseConventionalCommit(t *testing.T) {
 		},
 		{
 			name:   "Multi-line body",
-			commit: "feat(h1/e2): group (#86)\n\nReviewed-on: https://focs.ji.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>\n",
+			commit: "feat(h1/e2): group (#86)\n\nReviewed-on: https://focs.gc.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>\n",
 			want: &ConventionalCommit{
 				Type:        "feat",
 				Scope:       "h1/e2",
 				Description: "group (#86)",
-				Body:        "Reviewed-on: https://focs.ji.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>",
+				Body:        "Reviewed-on: https://focs.gc.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>",
 				Footer:      "",
 			},
 			wantErr: false,
 		},
 		{
 			name:   "Multi-line body with footer",
-			commit: "feat(h1/e2): group (#86)\n\nReviewed-on: https://focs.ji.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>\n\nFooter here\n",
+			commit: "feat(h1/e2): group (#86)\n\nReviewed-on: https://focs.gc.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>\n\nFooter here\n",
 			want: &ConventionalCommit{
 				Type:        "feat",
 				Scope:       "h1/e2",
 				Description: "group (#86)",
-				Body:        "Reviewed-on: https://focs.ji.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>",
+				Body:        "Reviewed-on: https://focs.gc.sjtu.edu.cn/git/test/test/pulls/86\nReviewed-by: foo <foo@sjtu.edu.cn>\nReviewed-by: bar <bar@sjtu.edu.cn>\nReviewed-by: nobody <nobody@sjtu.edu.cn>",
 				Footer:      "Footer here",
 			},
 			wantErr: false,
