@@ -1,6 +1,8 @@
 package conf
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -130,3 +132,80 @@ func TestParseConventionalCommit(t *testing.T) {
 		})
 	}
 }
+
+func TestGetConfPath(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// 1. Setup layout: tmpDir/alpha/conf.json, tmpDir/conf.json
+	alphaDir := filepath.Join(tmpDir, "alpha")
+	if err := os.MkdirAll(alphaDir, 0755); err != nil {
+		t.Fatalf("failed to create alpha dir: %v", err)
+	}
+	alphaConfPath := filepath.Join(alphaDir, "conf.json")
+	if err := os.WriteFile(alphaConfPath, []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write alpha conf: %v", err)
+	}
+
+	rootConfPath := filepath.Join(tmpDir, "conf.json")
+	if err := os.WriteFile(rootConfPath, []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write root conf: %v", err)
+	}
+
+	t.Run("Exact Scope Match", func(t *testing.T) {
+		gotPath, _, cc, err := GetConfPath(tmpDir, "conf.json", "conf.json", "", "alpha")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if gotPath != alphaConfPath {
+			t.Errorf("got path %s, want %s", gotPath, alphaConfPath)
+		}
+		if cc.Scope != "alpha" {
+			t.Errorf("got scope %s, want alpha", cc.Scope)
+		}
+	})
+
+	t.Run("Prefix Scope Match for Floating Release", func(t *testing.T) {
+		gotPath, _, cc, err := GetConfPath(tmpDir, "conf.json", "conf.json", "", "alpha1")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if gotPath != alphaConfPath {
+			t.Errorf("got path %s, want %s", gotPath, alphaConfPath)
+		}
+		if cc.Scope != "alpha" {
+			t.Errorf("got scope %s, want alpha", cc.Scope)
+		}
+	})
+
+	t.Run("Fallback to Root Conf when Scope Not Found", func(t *testing.T) {
+		gotPath, _, cc, err := GetConfPath(tmpDir, "conf.json", "conf.json", "", "beta")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if gotPath != rootConfPath {
+			t.Errorf("got path %s, want %s", gotPath, rootConfPath)
+		}
+		if cc.Scope != "beta" {
+			t.Errorf("got scope %s, want beta", cc.Scope)
+		}
+	})
+
+	t.Run("Fallback to Root Conf with Empty Fallback Conf Name", func(t *testing.T) {
+		gotPath, _, _, err := GetConfPath(tmpDir, "conf.json", "", "", "gamma")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if gotPath != rootConfPath {
+			t.Errorf("got path %s, want %s", gotPath, rootConfPath)
+		}
+	})
+
+	t.Run("No Conf Found Error", func(t *testing.T) {
+		emptyTmpDir := t.TempDir()
+		_, _, _, err := GetConfPath(emptyTmpDir, "conf.json", "conf.json", "", "alpha")
+		if err == nil {
+			t.Fatalf("expected error when no conf found, got nil")
+		}
+	})
+}
+

@@ -152,50 +152,115 @@ func hintValidScopes(confRoot, confName string) {
 		"valid scopes", validScopes)
 }
 
-func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
-	confPath string, confStat fs.FileInfo,
-	conventionalCommit *ConventionalCommit, err error,
-) {
-	confPath, conventionalCommit, err = parseMsg(confRoot, confName, msg, tag)
-	if err != nil {
-		slog.Error("parse msg", "error", err)
-		// no fallback when tag is specified, it is triggered by release.yaml
-		if os.IsNotExist(err) {
-			slog.Info("tag is not empty, no fallback conf")
-			hintValidScopes(confRoot, confName)
-			return confPath, confStat, conventionalCommit, err
-		}
-		// fallback to conf file in conf root on parse error
-		confPath = filepath.Join(confRoot, fallbackConfName)
-		slog.Info("fallback to conf", "path", confPath)
+func findBestMatchingScope(confRoot, targetScope, confName string) string {
+	if targetScope == "" {
+		return ""
 	}
-	confStat, err = os.Stat(confPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			hintValidScopes(confRoot, confName)
-		}
-		slog.Error("stat conf", "error", err)
-		// fallback to conf file in conf root on conf not exist
-		confPath = filepath.Join(confRoot, fallbackConfName)
-		slog.Info("fallback to conf", "path", confPath)
-		confStat, err = os.Stat(confPath)
+	confRoot = filepath.Clean(confRoot)
+	bestMatch := ""
+
+	_ = filepath.WalkDir(confRoot, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			slog.Error("stat fallback conf", "error", err)
-			return confPath, confStat, conventionalCommit, err
+			return nil
 		}
-	}
-	// Check file ownership
+		if d.IsDir() {
+			relPath, err := filepath.Rel(confRoot, path)
+			if err != nil || relPath == "." || relPath == "" || strings.HasPrefix(relPath, "..") {
+				return nil
+			}
+			confPath := filepath.Join(path, confName)
+			if stat, err := os.Stat(confPath); err == nil && !stat.IsDir() {
+				if strings.HasPrefix(targetScope, relPath) {
+					if len(relPath) > len(bestMatch) {
+						bestMatch = relPath
+					}
+				}
+			}
+		}
+		return nil
+	})
+
+	return bestMatch
+}
+
+func checkFileOwnership(confPath string, confStat fs.FileInfo) error {
 	if stat, ok := confStat.Sys().(*syscall.Stat_t); ok {
 		uid := int(stat.Uid)
 		currentUID := os.Getuid()
 		if uid != currentUID {
-			err = fmt.Errorf("insecure configuration file: owned by uid %d, expected %d", uid, currentUID)
 			slog.Error("insecure conf file", "path", confPath, "uid", uid, "currentUID", currentUID)
-			return confPath, confStat, conventionalCommit, err
+			return fmt.Errorf("insecure configuration file: owned by uid %d, expected %d", uid, currentUID)
+		}
+	}
+	return nil
+}
+
+func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
+	confPath string, confStat fs.FileInfo,
+	conventionalCommit *ConventionalCommit, err error,
+) {
+	if fallbackConfName == "" {
+		fallbackConfName = confName
+	}
+
+	confPath, conventionalCommit, err = parseMsg(confRoot, confName, msg, tag)
+	if err == nil && conventionalCommit != nil && conventionalCommit.Scope != "" {
+		confStat, err = os.Stat(confPath)
+		if err == nil && !confStat.IsDir() {
+			if err := checkFileOwnership(confPath, confStat); err != nil {
+				return confPath, confStat, conventionalCommit, err
+			}
+			return confPath, confStat, conventionalCommit, nil
 		}
 	}
 
-	return confPath, confStat, conventionalCommit, err
+	targetScope := ""
+	if tag != "" {
+		targetScope = tag
+	} else if conventionalCommit != nil {
+		targetScope = conventionalCommit.Scope
+	}
+
+	if targetScope != "" {
+		if matchedScope := findBestMatchingScope(confRoot, targetScope, confName); matchedScope != "" {
+			matchedPath := filepath.Join(confRoot, matchedScope, confName)
+			if stat, err := os.Stat(matchedPath); err == nil && !stat.IsDir() {
+				slog.Info("matched scope by prefix", "targetScope", targetScope, "matchedScope", matchedScope)
+				if conventionalCommit == nil {
+					conventionalCommit = &ConventionalCommit{
+						Scope: matchedScope,
+						Group: "all",
+					}
+				} else {
+					conventionalCommit.Scope = matchedScope
+				}
+				if err := checkFileOwnership(matchedPath, stat); err != nil {
+					return matchedPath, stat, conventionalCommit, err
+				}
+				return matchedPath, stat, conventionalCommit, nil
+			}
+		}
+	}
+
+	fallbackPath := filepath.Join(confRoot, fallbackConfName)
+	slog.Info("fallback to conf", "path", fallbackPath)
+	confStat, err = os.Stat(fallbackPath)
+	if err != nil || confStat.IsDir() {
+		if os.IsNotExist(err) || (confStat != nil && confStat.IsDir()) {
+			hintValidScopes(confRoot, confName)
+		}
+		slog.Error("stat fallback conf", "error", err)
+		if confStat != nil && confStat.IsDir() {
+			err = fmt.Errorf("fallback conf path is a directory: %s", fallbackPath)
+		}
+		return fallbackPath, confStat, conventionalCommit, err
+	}
+
+	if err := checkFileOwnership(fallbackPath, confStat); err != nil {
+		return fallbackPath, confStat, conventionalCommit, err
+	}
+
+	return fallbackPath, confStat, conventionalCommit, nil
 }
 
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
