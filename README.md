@@ -1,6 +1,6 @@
 # JOJ3
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/joint-online-judge/JOJ3)](https://goreportcard.com/report/github.com/joint-online-judge/JOJ3)
+[![Build](https://focs.gc.sjtu.edu.cn/git/JOJ/JOJ3/actions/workflows/build.yaml/badge.svg?branch=master)](https://focs.gc.sjtu.edu.cn/git/JOJ/JOJ3/actions?workflow=build.yaml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/joint-online-judge/JOJ3.svg)](https://pkg.go.dev/github.com/joint-online-judge/JOJ3)
 [![DeepWiki](https://img.shields.io/badge/DeepWiki-joint--online--judge%2FJOJ3-blue.svg)](https://deepwiki.com/joint-online-judge/JOJ3)
 
