@@ -19,15 +19,15 @@ type Sandbox struct {
 	cachedMap         map[string]string
 	execClient        pb.ExecutorClient
 	conn              *grpc.ClientConn
-	timeout           time.Duration
 }
+
+const rpcTimeoutMargin = 30 * time.Second
 
 func init() {
 	stage.RegisterExecutor(name, &Sandbox{
 		execServer: "localhost:5051",
 		token:      "",
 		cachedMap:  make(map[string]string),
-		timeout:    30 * time.Second,
 	})
 }
 
@@ -37,6 +37,5 @@ func InitWithConf(execServer, token string) {
 		execServer: execServer,
 		token:      token,
 		cachedMap:  make(map[string]string),
-		timeout:    30 * time.Second,
 	})
 }
