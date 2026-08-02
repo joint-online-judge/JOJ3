@@ -100,6 +100,7 @@ Here are the steps `joj3` will run.
 3. Generate stages.
     - We have an empty list of stages at the beginning.
     - We check all the stages from the configuration file. Stages with empty `group` field will always be added. Stages with non-empty `group` field requires that value (case insensitive) appears in the commit group. e.g. with commit msg `feat(h5/e3): joj msan [joj]`, stages with the following `group` field will run: `""`, `"joj"`. Currently, it does not support multiple groups within one commit. If the group specified in the commit message is `[all]`, then all groups will run.
+    - Groups are matched as case-insensitive, comma/space/semicolon/pipe-separated tokens. For example, `[joj, lint]` selects the `joj` and `lint` groups without substring matching.
     - Every stage needs to have an unique `name`, which means if two stages have the same name, only the first one will be added.
 4. Run stages.
     - By default, all the stages will run sequentially.

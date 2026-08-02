@@ -130,3 +130,16 @@ func TestParseConventionalCommit(t *testing.T) {
 		})
 	}
 }
+
+func TestMatchGroupsUsesExactTokens(t *testing.T) {
+	conf := &Conf{Stages: []ConfStage{
+		{Name: "short", Groups: []string{"c"}},
+		{Name: "cpp", Groups: []string{"cpp"}},
+		{Name: "lint", Groups: []string{"lint"}},
+	}}
+	got := MatchGroups(conf, &ConventionalCommit{Group: "cpp, lint"})
+	want := []string{"cpp", "lint"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("MatchGroups() = %v, want %v", got, want)
+	}
+}
