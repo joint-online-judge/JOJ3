@@ -132,14 +132,32 @@ func TestParseConventionalCommit(t *testing.T) {
 }
 
 func TestMatchGroupsUsesExactTokens(t *testing.T) {
-	conf := &Conf{Stages: []ConfStage{
-		{Name: "short", Groups: []string{"c"}},
-		{Name: "cpp", Groups: []string{"cpp"}},
-		{Name: "lint", Groups: []string{"lint"}},
-	}}
-	got := MatchGroups(conf, &ConventionalCommit{Group: "cpp, lint"})
-	want := []string{"cpp", "lint"}
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("MatchGroups() = %v, want %v", got, want)
+	tests := []struct {
+		name  string
+		group string
+		want  []string
+	}{
+		{name: "exact not substring", group: "cpp", want: []string{"cpp"}},
+		{name: "case insensitive", group: "CPP", want: []string{"cpp"}},
+		{name: "comma and space", group: "cpp, lint", want: []string{"cpp", "lint"}},
+		{name: "semicolon", group: "cpp;lint", want: []string{"cpp", "lint"}},
+		{name: "pipe", group: "cpp|lint", want: []string{"cpp", "lint"}},
+		{name: "tab", group: "cpp\tlint", want: []string{"cpp", "lint"}},
+		{name: "duplicate token", group: "cpp,cpp", want: []string{"cpp"}},
+		{name: "all", group: "ALL", want: []string{"c", "cpp", "lint"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			conf := &Conf{Stages: []ConfStage{
+				{Name: "short", Groups: []string{"c"}},
+				{Name: "cpp", Groups: []string{"cpp"}},
+				{Name: "lint", Groups: []string{"lint"}},
+			}}
+			got := MatchGroups(conf, &ConventionalCommit{Group: tt.group})
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("MatchGroups() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
