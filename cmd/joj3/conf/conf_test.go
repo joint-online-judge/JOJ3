@@ -1,9 +1,66 @@
 package conf
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestGetSHA256(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "input")
+	content := []byte("joj3")
+	if err := os.WriteFile(path, content, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	wantSum := sha256.Sum256(content)
+	got, err := GetSHA256(path)
+	if err != nil || got != hex.EncodeToString(wantSum[:]) {
+		t.Fatalf("GetSHA256() = %q, %v", got, err)
+	}
+	if _, err := GetSHA256(path + ".missing"); !os.IsNotExist(err) {
+		t.Fatalf("missing GetSHA256() error = %v", err)
+	}
+}
+
+func TestGetConfPath(t *testing.T) {
+	root := t.TempDir()
+	scopedDir := filepath.Join(root, "course")
+	if err := os.Mkdir(scopedDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{filepath.Join(scopedDir, "conf.json"), filepath.Join(root, "fallback.json")} {
+		if err := os.WriteFile(path, []byte("{}"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got, _, commit, err := GetConfPath(root, "conf.json", "fallback.json", "test(course): run", "")
+	if err != nil || got != filepath.Join(scopedDir, "conf.json") || commit.Scope != "course" {
+		t.Fatalf("GetConfPath(scoped) = %q, %+v, %v", got, commit, err)
+	}
+	got, _, _, err = GetConfPath(root, "conf.json", "fallback.json", "not conventional", "")
+	if err != nil || got != filepath.Join(root, "fallback.json") {
+		t.Fatalf("GetConfPath(fallback) = %q, %v", got, err)
+	}
+	if _, _, err = parseMsg(root, "conf.json", "test(../escape): run", ""); err == nil || !strings.Contains(err.Error(), "invalid scope") {
+		t.Fatalf("parseMsg(traversal) error = %v", err)
+	}
+	got, _, commit, err = GetConfPath(root, "conf.json", "fallback.json", "ignored", "missing-tag")
+	if !os.IsNotExist(err) || got != filepath.Join(root, "missing-tag", "conf.json") || commit.Scope != "missing-tag" {
+		t.Fatalf("GetConfPath(tag) = %q, %+v, %v", got, commit, err)
+	}
+	if err := os.Remove(filepath.Join(root, "fallback.json")); err != nil {
+		t.Fatal(err)
+	}
+	got, _, _, err = GetConfPath(root, "conf.json", "fallback.json", "invalid", "")
+	if !os.IsNotExist(err) || got != filepath.Join(root, "fallback.json") {
+		t.Fatalf("GetConfPath(missing fallback) = %q, %v", got, err)
+	}
+}
 
 func TestParseConventionalCommit(t *testing.T) {
 	tests := []struct {

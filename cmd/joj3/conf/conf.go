@@ -175,6 +175,9 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 			hintValidScopes(confRoot, confName)
 		}
 		slog.Error("stat conf", "error", err)
+		if tag != "" {
+			return confPath, confStat, conventionalCommit, err
+		}
 		// fallback to conf file in conf root on conf not exist
 		confPath = filepath.Join(confRoot, fallbackConfName)
 		slog.Info("fallback to conf", "path", confPath)

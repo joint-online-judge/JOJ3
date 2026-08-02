@@ -87,7 +87,16 @@ func TestRun(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, tt := range tests {
+		// The repo-health-checker package runs all healthcheck fixtures directly so
+		// their execution contributes to Go coverage. Keep one sandbox case here as
+		// an end-to-end binary/executor/parser smoke test.
+		if strings.HasPrefix(tt, "healthcheck/") && tt != "healthcheck/release" {
+			continue
+		}
 		t.Run(tt, func(t *testing.T) {
+			if tt == "healthcheck/release" {
+				prepareLargeCopyInFixture(t, filepath.Join(root, tt))
+			}
 			t.Chdir(fmt.Sprintf("%s%s", root, tt))
 			os.Args = []string{"./joj3"}
 			outputFile := "joj3_result.json"
@@ -105,4 +114,55 @@ func TestRun(t *testing.T) {
 			compareStageResults(t, stageResults, expectedStageResults, regex)
 		})
 	}
+}
+
+func prepareLargeCopyInFixture(t *testing.T, dir string) {
+	t.Helper()
+	const fileCount = 1001
+	filesDir := filepath.Join(dir, "many-files")
+	if err := os.Mkdir(filesDir, 0o700); err != nil && !os.IsExist(err) {
+		t.Fatal(err)
+	}
+	for i := range fileCount {
+		path := filepath.Join(filesDir, fmt.Sprintf("%04d", i))
+		if err := os.WriteFile(path, nil, 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(filesDir) })
+
+	confPath := filepath.Join(dir, "conf.json")
+	original, err := os.ReadFile(confPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var conf map[string]any
+	if err := json.Unmarshal(original, &conf); err != nil {
+		t.Fatal(err)
+	}
+	stages := conf["stages"].([]any)
+	executor := stages[0].(map[string]any)["executor"].(map[string]any)
+	with := executor["with"].(map[string]any)
+	command := with["default"].(map[string]any)
+	args := command["args"].([]any)
+	checkerArgs := make([]string, 0, len(args))
+	for _, arg := range args {
+		checkerArgs = append(checkerArgs, fmt.Sprintf("%q", arg))
+	}
+	command["args"] = []string{
+		"/bin/sh", "-c",
+		fmt.Sprintf("test \"$(find many-files -type f | wc -l)\" -eq %d && exec %s", fileCount, strings.Join(checkerArgs, " ")),
+	}
+	patched, err := json.Marshal(conf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(confPath, patched, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.WriteFile(confPath, original, 0o600); err != nil {
+			t.Errorf("restore conf: %v", err)
+		}
+	})
 }

@@ -71,14 +71,12 @@ func (e *Local) generateResult(
 
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
+			result.Status = stage.StatusNonzeroExitStatus
 			status := exitErr.Sys().(syscall.WaitStatus)
 			if status.Signaled() {
 				signal := status.Signal()
-				switch signal {
-				case syscall.SIGXCPU:
+				if signal == syscall.SIGXCPU {
 					result.Status = stage.StatusTimeLimitExceeded
-				default:
-					result.Status = stage.StatusNonzeroExitStatus
 				}
 			}
 			result.Error = exitErr.Error()
