@@ -1,6 +1,7 @@
 package stage
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -9,8 +10,8 @@ import (
 var executorMap = map[string]Executor{}
 
 type Executor interface {
-	Run([]Cmd) ([]ExecutorResult, error)
-	Cleanup() error
+	Run(context.Context, []Cmd) ([]ExecutorResult, error)
+	Cleanup(context.Context) error
 }
 
 func RegisterExecutor(name string, executor Executor) {

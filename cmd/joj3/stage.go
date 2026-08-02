@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -124,6 +126,7 @@ func newErrorStageResults(err error) ([]stage.StageResult, string) {
 	}, "Internal Error"
 }
 
+//nolint:unparam // named err lets deferred cleanup errors reach the caller
 func runStages(
 	conf *conf.Conf,
 	groups []string,
@@ -153,36 +156,42 @@ func runStages(
 		stageResults, forceQuitStageName = newErrorStageResults(err)
 		return stageResults, forceQuitStageName, err
 	}
-	defer stage.Cleanup()
+	ctx := context.Background()
+	defer func() {
+		err = errors.Join(err, stage.Cleanup(ctx))
+	}()
 	// ignore force quit in preStages & postStages
 	slog.Info("run preStages")
-	_, _, err = stage.Run(preStages)
-	if err != nil {
-		slog.Error("run preStages", "error", err)
+	_, _, preErr := stage.Run(ctx, preStages)
+	if preErr != nil {
+		slog.Error("run preStages", "error", preErr)
 	}
 	slog.Info("run stages")
-	stageResults, forceQuitStageName, err = stage.Run(stages)
-	if err != nil {
-		slog.Error("run stages", "error", err)
-		stageResults, forceQuitStageName = newErrorStageResults(err)
+	stageResults, forceQuitStageName, mainErr := stage.Run(ctx, stages)
+	if mainErr != nil {
+		slog.Error("run stages", "error", mainErr)
+		stageResults, forceQuitStageName = newErrorStageResults(mainErr)
 	}
 	onStagesComplete(stageResults, forceQuitStageName)
 	slog.Info("output result start", "path", conf.OutputPath)
 	slog.Debug("output result start",
 		"path", conf.OutputPath, "results", stageResults)
-	content, err := json.Marshal(stageResults)
-	if err != nil {
-		slog.Error("marshal stageResults", "error", err)
+	content, marshalErr := json.Marshal(stageResults)
+	if marshalErr != nil {
+		slog.Error("marshal stageResults", "error", marshalErr)
 	}
-	err = os.WriteFile(conf.OutputPath,
-		append(content, []byte("\n")...), 0o600)
-	if err != nil {
-		slog.Error("write stageResults", "error", err)
+	var outputErr error
+	if marshalErr == nil {
+		outputErr = os.WriteFile(conf.OutputPath,
+			append(content, '\n'), 0o600)
+		if outputErr != nil {
+			slog.Error("write stageResults", "error", outputErr)
+		}
 	}
 	slog.Info("run postStages")
-	_, _, err = stage.Run(postStages)
-	if err != nil {
-		slog.Error("run postStages", "error", err)
+	_, _, postErr := stage.Run(ctx, postStages)
+	if postErr != nil {
+		slog.Error("run postStages", "error", postErr)
 	}
-	return stageResults, forceQuitStageName, err
+	return stageResults, forceQuitStageName, errors.Join(preErr, mainErr, marshalErr, outputErr, postErr)
 }

@@ -4,11 +4,13 @@
 package stage
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 )
 
-func Run(stages []Stage) (
+func Run(ctx context.Context, stages []Stage) (
 	stageResults []StageResult, forceQuitStageName string, err error,
 ) {
 	var executorResults []ExecutorResult
@@ -59,9 +61,10 @@ func Run(stages []Stage) (
 					"name", stage.Executor.Name,
 				)
 				err = fmt.Errorf("executor not found: %s", stage.Executor.Name)
+				forceQuitStageName = stage.Name
 				return
 			}
-			executorResults, err = executor.Run(stage.Executor.Cmds)
+			executorResults, err = executor.Run(ctx, stage.Executor.Cmds)
 			if err != nil {
 				slog.Error(
 					"executor run error",
@@ -69,6 +72,7 @@ func Run(stages []Stage) (
 					"name", stage.Executor.Name,
 					"error", err,
 				)
+				forceQuitStageName = stage.Name
 				return
 			}
 			for i, executorResult := range executorResults {
@@ -115,6 +119,7 @@ func Run(stages []Stage) (
 						"name", stageParser.Name,
 					)
 					err = fmt.Errorf("parser not found: %s", stageParser.Name)
+					forceQuitStageName = stage.Name
 					return
 				}
 				var parserForceQuit bool
@@ -126,6 +131,14 @@ func Run(stages []Stage) (
 						"stageName", stage.Name,
 						"name", stageParser.Name,
 						"error", err,
+					)
+					forceQuitStageName = stage.Name
+					break
+				}
+				if len(tmpParserResults) != len(executorResults) {
+					err = fmt.Errorf(
+						"parser %q returned %d results for %d executor results",
+						stageParser.Name, len(tmpParserResults), len(executorResults),
 					)
 					forceQuitStageName = stage.Name
 					break
@@ -185,12 +198,15 @@ func Run(stages []Stage) (
 	return stageResults, forceQuitStageName, err
 }
 
-func Cleanup() {
+func Cleanup(ctx context.Context) error {
 	slog.Info("stage cleanup start")
+	var cleanupErr error
 	for name, executor := range executorMap {
-		err := executor.Cleanup()
+		err := executor.Cleanup(ctx)
 		if err != nil {
 			slog.Error("executor cleanup error", "name", name, "error", err)
+			cleanupErr = errors.Join(cleanupErr, fmt.Errorf("executor %q cleanup: %w", name, err))
 		}
 	}
+	return cleanupErr
 }

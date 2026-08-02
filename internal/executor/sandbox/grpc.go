@@ -12,13 +12,13 @@ import (
 )
 
 // copied from https://github.com/criyle/go-judger-demo/blob/master/apigateway/main.go
-func createExecClient(execServer, token string) (pb.ExecutorClient, error) {
+func createExecClient(execServer, token string) (pb.ExecutorClient, *grpc.ClientConn, error) {
 	conn, err := createGRPCConnection(execServer, token)
 	if err != nil {
 		slog.Error("gRPC connection", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
-	return pb.NewExecutorClient(conn), nil
+	return pb.NewExecutorClient(conn), conn, nil
 }
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {

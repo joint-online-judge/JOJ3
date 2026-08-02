@@ -2,6 +2,7 @@ package local
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"math"
@@ -105,10 +106,16 @@ func (e *Local) generateResult(
 	return result
 }
 
-func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+func (e *Local) Run(ctx context.Context, cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var results []stage.ExecutorResult
 
 	for _, cmd := range cmds {
+		if len(cmd.Args) == 0 {
+			return nil, fmt.Errorf("command args must not be empty")
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		execCmd := exec.Command(cmd.Args[0], cmd.Args[1:]...) // #nosec G204
 		execCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 		if cmd.CPULimit > 0 && cmd.ClockLimit <= 0 {
@@ -167,6 +174,10 @@ func (e *Local) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 				false,
 			)
 			results = append(results, result)
+		case <-ctx.Done():
+			_ = syscall.Kill(-execCmd.Process.Pid, syscall.SIGKILL)
+			<-done
+			return nil, ctx.Err()
 		case <-time.After(duration):
 			_ = syscall.Kill(-execCmd.Process.Pid, syscall.SIGKILL)
 			err := <-done
@@ -216,6 +227,6 @@ func handleCopyOut(result *stage.ExecutorResult, cmd stage.Cmd) error {
 	return nil
 }
 
-func (e *Local) Cleanup() error {
+func (e *Local) Cleanup(_ context.Context) error {
 	return nil
 }

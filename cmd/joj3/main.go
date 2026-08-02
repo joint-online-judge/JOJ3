@@ -104,6 +104,7 @@ func run(conf *joj3Conf.Conf, conventionalCommit *joj3Conf.ConventionalCommit) e
 	)
 	if err != nil {
 		slog.Error("stage run", "error", err)
+		return err
 	}
 	if forceQuitStageName != "" {
 		slog.Info("stage force quit", "name", forceQuitStageName)

@@ -5,8 +5,11 @@
 package sandbox
 
 import (
+	"time"
+
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"google.golang.org/grpc"
 )
 
 var name = "sandbox"
@@ -15,6 +18,8 @@ type Sandbox struct {
 	execServer, token string
 	cachedMap         map[string]string
 	execClient        pb.ExecutorClient
+	conn              *grpc.ClientConn
+	timeout           time.Duration
 }
 
 func init() {
@@ -22,6 +27,7 @@ func init() {
 		execServer: "localhost:5051",
 		token:      "",
 		cachedMap:  make(map[string]string),
+		timeout:    30 * time.Second,
 	})
 }
 
@@ -31,5 +37,6 @@ func InitWithConf(execServer, token string) {
 		execServer: execServer,
 		token:      token,
 		cachedMap:  make(map[string]string),
+		timeout:    30 * time.Second,
 	})
 }

@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -11,11 +12,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
+func (e *Sandbox) Run(ctx context.Context, cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	var err error
 	if e.execClient == nil {
 		slog.Debug("create exec client", "server", e.execServer)
-		e.execClient, err = createExecClient(e.execServer, e.token)
+		e.execClient, e.conn, err = createExecClient(e.execServer, e.token)
 		if err != nil {
 			return nil, err
 		}
@@ -32,14 +33,19 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 			}
 		}
 	}
-	pbCmds := convertPBCmd(cmds)
+	pbCmds, err := convertPBCmd(cmds)
+	if err != nil {
+		return nil, err
+	}
 	for i, pbCmd := range pbCmds {
 		slog.Debug("sandbox execute", "i", i, "pbCmd size", proto.Size(pbCmd))
 	}
 	pbReq := &pb.Request{}
 	pbReq.SetCmd(pbCmds)
 	slog.Debug("sandbox execute", "pbReq size", proto.Size(pbReq))
-	pbRet, err := e.execClient.Exec(context.TODO(), pbReq)
+	callCtx, cancel := context.WithTimeout(ctx, e.timeout)
+	defer cancel()
+	pbRet, err := e.execClient.Exec(callCtx, pbReq)
 	if err != nil {
 		return nil, err
 	}
@@ -53,15 +59,24 @@ func (e *Sandbox) Run(cmds []stage.Cmd) ([]stage.ExecutorResult, error) {
 	return results, nil
 }
 
-func (e *Sandbox) Cleanup() error {
+func (e *Sandbox) Cleanup(ctx context.Context) error {
+	var cleanupErr error
 	for k, fileID := range e.cachedMap {
 		req := &pb.FileID{}
 		req.SetFileID(fileID)
-		_, err := e.execClient.FileDelete(context.TODO(), req)
+		callCtx, cancel := context.WithTimeout(ctx, e.timeout)
+		_, err := e.execClient.FileDelete(callCtx, req)
+		cancel()
 		if err != nil {
 			slog.Error("sandbox cleanup", "error", err)
+			cleanupErr = errors.Join(cleanupErr, err)
 		}
 		delete(e.cachedMap, k)
 	}
-	return nil
+	if e.conn != nil {
+		cleanupErr = errors.Join(cleanupErr, e.conn.Close())
+		e.conn = nil
+		e.execClient = nil
+	}
+	return cleanupErr
 }
