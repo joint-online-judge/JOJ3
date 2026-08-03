@@ -19,8 +19,8 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519.pub
           chmod 600 ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub
           ssh -o StrictHostKeyChecking=accept-new -T git@focs.gc.sjtu.edu.cn -p 2222
-        # - name: Lint
-        #   run: make lint
+      - name: Lint
+        run: make lint
       - name: Build
         run: make build
       - name: Version
