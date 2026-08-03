@@ -1,14 +1,36 @@
 package conf
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+func TestConfLogValueRedactsSandboxToken(t *testing.T) {
+	var output bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&output, nil))
+	conf := &Conf{
+		Name:         "test",
+		SandboxToken: "top-secret-token",
+	}
+	logger.Info("config", "conf", conf)
+	got := output.String()
+	if strings.Contains(got, "top-secret-token") {
+		t.Fatalf("configuration log exposed sandbox token: %s", got)
+	}
+	if !strings.Contains(got, "[REDACTED]") || !strings.Contains(got, `"Name":"test"`) {
+		t.Fatalf("configuration log lost expected diagnostic fields: %s", got)
+	}
+	if conf.SandboxToken != "top-secret-token" {
+		t.Fatalf("logging mutated the runtime configuration: %q", conf.SandboxToken)
+	}
+}
 
 func TestGetSHA256(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "input")

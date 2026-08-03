@@ -1,6 +1,8 @@
 package conf
 
 import (
+	"log/slog"
+
 	"github.com/joint-online-judge/JOJ3/internal/stage"
 )
 
@@ -30,6 +32,16 @@ type Conf struct {
 	PreStages         []ConfStage
 	Stages            []ConfStage
 	PostStages        []ConfStage
+}
+
+// LogValue preserves the configuration's diagnostic value without writing the
+// sandbox credential to text or structured logs.
+func (c Conf) LogValue() slog.Value {
+	type logConf Conf
+	if c.SandboxToken != "" {
+		c.SandboxToken = "[REDACTED]"
+	}
+	return slog.AnyValue(logConf(c))
 }
 
 type OptionalCmd struct {
