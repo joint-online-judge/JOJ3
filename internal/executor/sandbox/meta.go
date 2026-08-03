@@ -5,8 +5,11 @@
 package sandbox
 
 import (
+	"time"
+
 	"github.com/criyle/go-judge/pb"
 	"github.com/joint-online-judge/JOJ3/internal/stage"
+	"google.golang.org/grpc"
 )
 
 var name = "sandbox"
@@ -15,7 +18,10 @@ type Sandbox struct {
 	execServer, token string
 	cachedMap         map[string]string
 	execClient        pb.ExecutorClient
+	conn              *grpc.ClientConn
 }
+
+const rpcTimeoutMargin = 30 * time.Second
 
 func init() {
 	stage.RegisterExecutor(name, &Sandbox{

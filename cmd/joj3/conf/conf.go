@@ -175,6 +175,9 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 			hintValidScopes(confRoot, confName)
 		}
 		slog.Error("stat conf", "error", err)
+		if tag != "" {
+			return confPath, confStat, conventionalCommit, err
+		}
 		// fallback to conf file in conf root on conf not exist
 		confPath = filepath.Join(confRoot, fallbackConfName)
 		slog.Info("fallback to conf", "path", confPath)
@@ -201,8 +204,13 @@ func GetConfPath(confRoot, confName, fallbackConfName, msg, tag string) (
 func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	seen := make(map[string]bool)
 	keywords := []string{}
-	loweredCommitGroup := strings.ToLower(conventionalCommit.Group)
-	matchAllGroups := loweredCommitGroup == "all"
+	requestedGroups := make(map[string]bool)
+	for _, group := range strings.FieldsFunc(conventionalCommit.Group, func(r rune) bool {
+		return r == ',' || r == ';' || r == '|' || r == ' ' || r == '\t'
+	}) {
+		requestedGroups[strings.ToLower(group)] = true
+	}
+	matchAllGroups := requestedGroups["all"]
 	confStages := []ConfStage{}
 	confStages = append(confStages, conf.PreStages...)
 	confStages = append(confStages, conf.Stages...)
@@ -221,7 +229,7 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 	slog.Info("group keywords from stages", "keywords", keywords)
 	groups := []string{}
 	for _, keyword := range keywords {
-		if matchAllGroups || strings.Contains(loweredCommitGroup, keyword) {
+		if matchAllGroups || requestedGroups[keyword] {
 			groups = append(groups, keyword)
 		}
 	}
