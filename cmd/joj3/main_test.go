@@ -161,7 +161,7 @@ func prepareLargeCopyInFixture(t *testing.T, dir string) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		if err := os.WriteFile(confPath, original, 0o600); err != nil {
+		if err := os.WriteFile(confPath, original, 0o600); err != nil { // #nosec G703
 			t.Errorf("restore conf: %v", err)
 		}
 	})

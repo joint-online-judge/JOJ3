@@ -74,7 +74,7 @@ func removeDuplicates(list []string) []string {
 	for _, v := range list {
 		uniqueMap[v] = true
 	}
-	result := []string{}
+	result := make([]string, 0, len(uniqueMap))
 	for k := range uniqueMap {
 		result = append(result, k)
 	}
@@ -151,7 +151,7 @@ func extractLocation(message ClangMessage) map[string]any {
 }
 
 func extractOtherLocations(message ClangMessage) []map[string]any {
-	locationList := []map[string]any{}
+	locationList := make([]map[string]any, 0, len(message.children))
 	for _, child := range message.children {
 		locationList = append(locationList, extractLocation(child))
 		locationList = append(locationList, extractOtherLocations(child)...)

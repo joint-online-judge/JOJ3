@@ -211,7 +211,7 @@ func MatchGroups(conf *Conf, conventionalCommit *ConventionalCommit) []string {
 		requestedGroups[strings.ToLower(group)] = true
 	}
 	matchAllGroups := requestedGroups["all"]
-	confStages := []ConfStage{}
+	confStages := make([]ConfStage, 0, len(conf.PreStages)+len(conf.Stages)+len(conf.PostStages))
 	confStages = append(confStages, conf.PreStages...)
 	confStages = append(confStages, conf.Stages...)
 	confStages = append(confStages, conf.PostStages...)

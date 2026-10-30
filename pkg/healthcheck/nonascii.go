@@ -112,6 +112,14 @@ func getNonASCII(root string, whitelist map[rune]struct{}) ([]string, error) {
 		matcher = gitattributes.NewMatcher(attribute)
 	}
 
+	// Open the root once and resolve every file relative to it, so a
+	// symlink inside the tree cannot escape the scanned directory (gosec G122).
+	rootDir, err := os.OpenRoot(root)
+	if err != nil {
+		return nil, err
+	}
+	defer rootDir.Close()
+
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -139,7 +147,7 @@ func getNonASCII(root string, whitelist map[rune]struct{}) ([]string, error) {
 			}
 		}
 
-		file, err := os.Open(path)
+		file, err := rootDir.Open(relPath)
 		if err != nil {
 			return err
 		}

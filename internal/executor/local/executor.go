@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"math"
 	"os"
 	"os/exec"
@@ -174,7 +175,11 @@ func (e *Local) Run(ctx context.Context, cmds []stage.Cmd) ([]stage.ExecutorResu
 			results = append(results, result)
 		case <-ctx.Done():
 			_ = syscall.Kill(-execCmd.Process.Pid, syscall.SIGKILL)
-			<-done
+			// Reap the killed process; a non-nil error is expected here,
+			// the caller gets ctx.Err() instead.
+			if waitErr := <-done; waitErr != nil {
+				slog.Debug("local executor reaped killed process", "error", waitErr)
+			}
 			return nil, ctx.Err()
 		case <-time.After(duration):
 			_ = syscall.Kill(-execCmd.Process.Pid, syscall.SIGKILL)
