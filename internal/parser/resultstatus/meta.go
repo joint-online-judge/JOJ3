@@ -1,6 +1,6 @@
 // Package resultstatus provides functionality to parse execution results
 // and determine success/failure status. It can return forced quit status
-// when a non-accepted status is encountered.
+// when a non-accepted status outside the whitelist is encountered.
 package resultstatus
 
 import "github.com/joint-online-judge/JOJ3/internal/stage"
@@ -11,6 +11,7 @@ type Conf struct {
 	Score                  int
 	Comment                string
 	ForceQuitOnNotAccepted bool `default:"true"`
+	WhitelistedCodes       []string
 }
 
 type ResultStatus struct{}
